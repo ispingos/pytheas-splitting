@@ -1,0 +1,7 @@
+[PATHS]
+model = example/rigo_crustal.nd
+stations = example/wgoc_stations_eida.xml
+
+[OPTIONS]
+ain = False
+

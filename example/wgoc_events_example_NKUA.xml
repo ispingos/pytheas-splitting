@@ -1,0 +1,3277 @@
+<?xml version='1.0' encoding='utf-8'?>
+<q:quakeml xmlns:q="http://quakeml.org/xmlns/quakeml/1.2" xmlns="http://quakeml.org/xmlns/bed/1.2">
+  <eventParameters publicID="smi:local/NA">
+    <event publicID="smi:local/nkua2019ejdk">
+      <preferredOriginID>smi:local/Origin#20190304122857.430749.39476</preferredOriginID>
+      <preferredMagnitudeID>smi:local/Origin#20190304122857.430749.39476#netMag.M</preferredMagnitudeID>
+      <type>earthquake</type>
+      <description>
+        <text>Greece</text>
+        <type>region name</type>
+      </description>
+      <creationInfo>
+        <agencyID>HA</agencyID>
+        <author>scevent@sc3-jakarta</author>
+        <creationTime>2019-03-03T22:06:37.177695Z</creationTime>
+      </creationInfo>
+      <origin publicID="smi:local/Origin#20190304122857.430749.39476">
+        <time>
+          <value>2019-03-03T22:05:54.469999Z</value>
+        </time>
+        <latitude>
+          <value>38.37233333</value>
+          <uncertainty>0.3535533906</uncertainty>
+        </latitude>
+        <longitude>
+          <value>21.91216667</value>
+          <uncertainty>0.3535533906</uncertainty>
+        </longitude>
+        <depth>
+          <value>7120.0</value>
+          <uncertainty>900.0</uncertainty>
+        </depth>
+        <methodID>smi:local/Hypo71</methodID>
+        <earthModelID>smi:local/MyModel</earthModelID>
+        <quality>
+          <associatedPhaseCount>9</associatedPhaseCount>
+          <usedPhaseCount>9</usedPhaseCount>
+          <usedStationCount>8</usedStationCount>
+          <depthPhaseCount>0</depthPhaseCount>
+          <standardError>0.07</standardError>
+          <azimuthalGap>147.0</azimuthalGap>
+          <groundTruthLevel>B</groundTruthLevel>
+          <minimumDistance>0.03779258381</minimumDistance>
+          <maximumDistance>0.08998234239</maximumDistance>
+          <medianDistance>8.1</medianDistance>
+        </quality>
+        <evaluationMode>manual</evaluationMode>
+        <evaluationStatus>confirmed</evaluationStatus>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:57.431874Z</creationTime>
+        </creationInfo>
+        <arrival publicID="smi:local/Pick#20190304122822.669147.39413#Origin#20190304122857.430749.39476">
+          <pickID>smi:local/Pick#20190304122822.669147.39413</pickID>
+          <phase>P</phase>
+          <azimuth>304.0</azimuth>
+          <distance>0.03779258381</distance>
+          <takeoffAngle>
+            <value>144.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.03</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T12:28:57.431061Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304122855.324581.39473#Origin#20190304122857.430749.39476">
+          <pickID>smi:local/Pick#20190304122855.324581.39473</pickID>
+          <phase>S</phase>
+          <azimuth>304.0</azimuth>
+          <distance>0.03779258381</distance>
+          <takeoffAngle>
+            <value>144.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.1</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T12:28:57.431061Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304122822.669249.39414#Origin#20190304122857.430749.39476">
+          <pickID>smi:local/Pick#20190304122822.669249.39414</pickID>
+          <phase>P</phase>
+          <azimuth>355.0</azimuth>
+          <distance>0.05488922886</distance>
+          <takeoffAngle>
+            <value>131.0</value>
+          </takeoffAngle>
+          <timeResidual>0.06</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T12:28:57.431224Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304122848.636657.39455#Origin#20190304122857.430749.39476">
+          <pickID>smi:local/Pick#20190304122848.636657.39455</pickID>
+          <phase>S</phase>
+          <azimuth>355.0</azimuth>
+          <distance>0.05488922886</distance>
+          <takeoffAngle>
+            <value>131.0</value>
+          </takeoffAngle>
+          <timeResidual>0.1</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T12:28:57.431224Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304122822.669352.39415#Origin#20190304122857.430749.39476">
+          <pickID>smi:local/Pick#20190304122822.669352.39415</pickID>
+          <phase>P</phase>
+          <azimuth>157.0</azimuth>
+          <distance>0.07288569734</distance>
+          <takeoffAngle>
+            <value>122.0</value>
+          </takeoffAngle>
+          <timeResidual>0.07</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T12:28:57.431315Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304122848.636924.39456#Origin#20190304122857.430749.39476">
+          <pickID>smi:local/Pick#20190304122848.636924.39456</pickID>
+          <phase>S</phase>
+          <azimuth>157.0</azimuth>
+          <distance>0.07288569734</distance>
+          <takeoffAngle>
+            <value>122.0</value>
+          </takeoffAngle>
+          <timeResidual>0.01</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T12:28:57.431315Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304122822.669453.39416#Origin#20190304122857.430749.39476">
+          <pickID>smi:local/Pick#20190304122822.669453.39416</pickID>
+          <phase>P</phase>
+          <azimuth>65.0</azimuth>
+          <distance>0.08998234239</distance>
+          <takeoffAngle>
+            <value>114.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.11</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T12:28:57.431407Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304122848.637063.39457#Origin#20190304122857.430749.39476">
+          <pickID>smi:local/Pick#20190304122848.637063.39457</pickID>
+          <phase>S</phase>
+          <azimuth>65.0</azimuth>
+          <distance>0.08998234239</distance>
+          <takeoffAngle>
+            <value>114.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.0</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T12:28:57.431407Z</creationTime>
+          </creationInfo>
+        </arrival>
+      </origin>
+      <magnitude publicID="smi:local/Magnitude#20190304122857.802671.39481">
+        <mag>
+          <value>0.2838656143</value>
+          <uncertainty>0.2739262615</uncertainty>
+        </mag>
+        <type>MLv</type>
+        <originID>smi:local/Origin#20190304122857.430749.39476</originID>
+        <methodID>smi:local/trimmed_mean</methodID>
+        <stationCount>4</stationCount>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304122857.803128.39482</stationMagnitudeID>
+          <weight>0.5</weight>
+          <residual>0.3698941972</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304122857.803494.39483</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.005139254948</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304122857.803759.39484</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.01177410978</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304122857.804011.39485</stationMagnitudeID>
+          <weight>0.5</weight>
+          <residual>-0.4037209266</residual>
+        </stationMagnitudeContribution>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:57.802734Z</creationTime>
+        </creationInfo>
+      </magnitude>
+      <magnitude publicID="smi:local/Origin#20190304122857.430749.39476#netMag.M">
+        <mag>
+          <value>0.2838656143</value>
+        </mag>
+        <type>M</type>
+        <originID>smi:local/Origin#20190304122857.430749.39476</originID>
+        <methodID>smi:local/weighted_average</methodID>
+        <stationCount>4</stationCount>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>scmag@sc3-jakarta</author>
+          <creationTime>2019-03-04T14:29:11.775987Z</creationTime>
+        </creationInfo>
+      </magnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304122857.803128.39482">
+        <originID>smi:local/Origin#20190304122857.430749.39476</originID>
+        <mag>
+          <value>0.6537598114</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304122857.673432.39477</amplitudeID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MALA"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:57.803157Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304122857.803494.39483">
+        <originID>smi:local/Origin#20190304122857.430749.39476</originID>
+        <mag>
+          <value>0.2890048692</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304122857.710231.39480</amplitudeID>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="EFP"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:57.803513Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304122857.803759.39484">
+        <originID>smi:local/Origin#20190304122857.430749.39476</originID>
+        <mag>
+          <value>0.295639724</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304122857.697158.39479</amplitudeID>
+        <waveformID channelCode="EHZ" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:57.803779Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304122857.804011.39485">
+        <originID>smi:local/Origin#20190304122857.430749.39476</originID>
+        <mag>
+          <value>-0.1198553123</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304122857.685667.39478</amplitudeID>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="PYRG"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:57.804031Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <pick publicID="smi:local/Pick#20190304122822.669147.39413">
+        <time>
+          <value>2019-03-03T22:05:56.041359Z</value>
+        </time>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MALA"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:22.669199Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304122855.324581.39473">
+        <time>
+          <value>2019-03-03T22:05:57.185942Z</value>
+        </time>
+        <waveformID channelCode="HH2" locationCode="00" networkCode="CL" stationCode="MALA"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:55.324723Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304122822.669249.39414">
+        <time>
+          <value>2019-03-03T22:05:56.362829Z</value>
+        </time>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="EFP"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:22.669301Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304122848.636657.39455">
+        <time>
+          <value>2019-03-03T22:05:57.788578Z</value>
+        </time>
+        <waveformID channelCode="HHN" networkCode="HP" stationCode="EFP"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:48.636801Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304122822.669352.39415">
+        <time>
+          <value>2019-03-03T22:05:56.699493Z</value>
+        </time>
+        <waveformID channelCode="EHZ" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:22.669404Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304122848.636924.39456">
+        <time>
+          <value>2019-03-03T22:05:58.272968Z</value>
+        </time>
+        <waveformID channelCode="EHE" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:48.636978Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304122822.669453.39416">
+        <time>
+          <value>2019-03-03T22:05:56.820526Z</value>
+        </time>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="PYRG"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:22.669505Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304122848.637063.39457">
+        <time>
+          <value>2019-03-03T22:05:58.794038Z</value>
+        </time>
+        <waveformID channelCode="EHN" locationCode="00" networkCode="CL" stationCode="PYRG"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:48.637116Z</creationTime>
+        </creationInfo>
+      </pick>
+      <amplitude publicID="smi:local/Amplitude#20190304122857.673432.39477">
+        <genericAmplitude>
+          <value>0.2185893982</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>1.528943117</snr>
+        <timeWindow>
+          <reference>2019-03-03T22:06:16.080000Z</reference>
+          <begin>-25.04</begin>
+          <end>11.36</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304122822.669147.39413</pickID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MALA"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:57.673527Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304122857.710231.39480">
+        <genericAmplitude>
+          <value>0.1088349968</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>1.656270996</snr>
+        <timeWindow>
+          <reference>2019-03-03T22:05:59.440000Z</reference>
+          <begin>-8.08</begin>
+          <end>28.96</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304122822.669249.39414</pickID>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="EFP"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:57.710294Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304122857.697158.39479">
+        <genericAmplitude>
+          <value>0.09856804352</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>4.68876283</snr>
+        <timeWindow>
+          <reference>2019-03-03T22:05:59.020000Z</reference>
+          <begin>-7.32</begin>
+          <end>30.38</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304122822.669352.39415</pickID>
+        <waveformID channelCode="EHZ" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:57.697203Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304122857.685667.39478">
+        <genericAmplitude>
+          <value>0.02133860449</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>4.177276442</snr>
+        <timeWindow>
+          <reference>2019-03-03T22:05:59.015000Z</reference>
+          <begin>-7.19</begin>
+          <end>31.14</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304122822.669453.39416</pickID>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="PYRG"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T12:28:57.685738Z</creationTime>
+        </creationInfo>
+      </amplitude>
+    </event>
+    <event publicID="smi:local/nkua2019ejqb">
+      <preferredOriginID>smi:local/Origin#20190304112735.488439.30434</preferredOriginID>
+      <preferredMagnitudeID>smi:local/Origin#20190304112735.488439.30434#netMag.M</preferredMagnitudeID>
+      <type>earthquake</type>
+      <description>
+        <text>Greece</text>
+        <type>region name</type>
+      </description>
+      <creationInfo>
+        <agencyID>HA</agencyID>
+        <author>scevent@sc3-jakarta</author>
+        <creationTime>2019-03-04T04:29:59.935049Z</creationTime>
+      </creationInfo>
+      <origin publicID="smi:local/Origin#20190304112735.488439.30434">
+        <time>
+          <value>2019-03-04T04:29:14.000000Z</value>
+        </time>
+        <latitude>
+          <value>38.36916667</value>
+          <uncertainty>0.2121320344</uncertainty>
+        </latitude>
+        <longitude>
+          <value>21.91916667</value>
+          <uncertainty>0.2121320344</uncertainty>
+        </longitude>
+        <depth>
+          <value>6960.0</value>
+          <uncertainty>300.0</uncertainty>
+        </depth>
+        <methodID>smi:local/Hypo71</methodID>
+        <earthModelID>smi:local/MyModel</earthModelID>
+        <quality>
+          <associatedPhaseCount>26</associatedPhaseCount>
+          <usedPhaseCount>26</usedPhaseCount>
+          <usedStationCount>25</usedStationCount>
+          <depthPhaseCount>0</depthPhaseCount>
+          <standardError>0.13</standardError>
+          <azimuthalGap>93.0</azimuthalGap>
+          <groundTruthLevel>B</groundTruthLevel>
+          <minimumDistance>0.04409134777</minimumDistance>
+          <maximumDistance>0.4607095931</maximumDistance>
+          <medianDistance>17.4</medianDistance>
+        </quality>
+        <evaluationMode>manual</evaluationMode>
+        <evaluationStatus>confirmed</evaluationStatus>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:35.490457Z</creationTime>
+        </creationInfo>
+        <arrival publicID="smi:local/Pick#20190304112645.243346.30372#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112645.243346.30372</pickID>
+          <phase>P</phase>
+          <azimuth>303.0</azimuth>
+          <distance>0.04409134777</distance>
+          <takeoffAngle>
+            <value>141.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.08</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.488742Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112733.035595.30420#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112733.035595.30420</pickID>
+          <phase>S</phase>
+          <azimuth>303.0</azimuth>
+          <distance>0.04409134777</distance>
+          <takeoffAngle>
+            <value>141.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.11</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.488742Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112645.243786.30374#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112645.243786.30374</pickID>
+          <phase>P</phase>
+          <azimuth>350.0</azimuth>
+          <distance>0.05848852256</distance>
+          <takeoffAngle>
+            <value>132.0</value>
+          </takeoffAngle>
+          <timeResidual>0.03</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.488946Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112733.035887.30421#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112733.035887.30421</pickID>
+          <phase>S</phase>
+          <azimuth>350.0</azimuth>
+          <distance>0.05848852256</distance>
+          <takeoffAngle>
+            <value>132.0</value>
+          </takeoffAngle>
+          <timeResidual>0.01</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.488946Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112645.243669.30373#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112645.243669.30373</pickID>
+          <phase>P</phase>
+          <azimuth>199.0</azimuth>
+          <distance>0.06478728652</distance>
+          <takeoffAngle>
+            <value>130.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.04</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489037Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112733.036053.30422#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112733.036053.30422</pickID>
+          <phase>S</phase>
+          <azimuth>199.0</azimuth>
+          <distance>0.06478728652</distance>
+          <takeoffAngle>
+            <value>130.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.02</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489037Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112645.243916.30375#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112645.243916.30375</pickID>
+          <phase>P</phase>
+          <azimuth>161.0</azimuth>
+          <distance>0.0674867568</distance>
+          <takeoffAngle>
+            <value>129.0</value>
+          </takeoffAngle>
+          <timeResidual>0.01</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489132Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112733.036213.30423#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112733.036213.30423</pickID>
+          <phase>S</phase>
+          <azimuth>161.0</azimuth>
+          <distance>0.0674867568</distance>
+          <takeoffAngle>
+            <value>129.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.08</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489132Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112645.244145.30377#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112645.244145.30377</pickID>
+          <phase>P</phase>
+          <azimuth>92.0</azimuth>
+          <distance>0.1205763388</distance>
+          <takeoffAngle>
+            <value>110.0</value>
+          </takeoffAngle>
+          <timeResidual>0.1</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489218Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112733.036372.30424#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112733.036372.30424</pickID>
+          <phase>S</phase>
+          <azimuth>92.0</azimuth>
+          <distance>0.1205763388</distance>
+          <takeoffAngle>
+            <value>110.0</value>
+          </takeoffAngle>
+          <timeResidual>0.16</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489218Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112645.244032.30376#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112645.244032.30376</pickID>
+          <phase>P</phase>
+          <azimuth>280.0</azimuth>
+          <distance>0.1565692758</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.12</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489311Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112733.03653.30425#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112733.03653.30425</pickID>
+          <phase>S</phase>
+          <azimuth>280.0</azimuth>
+          <distance>0.1565692758</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.14</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489311Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112645.244257.30378#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112645.244257.30378</pickID>
+          <phase>P</phase>
+          <azimuth>133.0</azimuth>
+          <distance>0.1538698055</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>0.05</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489398Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112733.036688.30426#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112733.036688.30426</pickID>
+          <phase>S</phase>
+          <azimuth>133.0</azimuth>
+          <distance>0.1538698055</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.02</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489398Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112645.244377.30379#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112645.244377.30379</pickID>
+          <phase>P</phase>
+          <azimuth>83.0</azimuth>
+          <distance>0.1745657442</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.04</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489483Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112733.036847.30427#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112733.036847.30427</pickID>
+          <phase>S</phase>
+          <azimuth>83.0</azimuth>
+          <distance>0.1745657442</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.55</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489483Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112645.244601.30381#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112645.244601.30381</pickID>
+          <phase>P</phase>
+          <azimuth>101.0</azimuth>
+          <distance>0.2051597407</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.05</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489567Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112733.037013.30428#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112733.037013.30428</pickID>
+          <phase>S</phase>
+          <azimuth>101.0</azimuth>
+          <distance>0.2051597407</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>0.07</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489567Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112645.244488.30380#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112645.244488.30380</pickID>
+          <phase>P</phase>
+          <azimuth>131.0</azimuth>
+          <distance>0.2087590344</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>0.23</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489662Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112733.037172.30429#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112733.037172.30429</pickID>
+          <phase>S</phase>
+          <azimuth>131.0</azimuth>
+          <distance>0.2087590344</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.32</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489662Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112645.244713.30382#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112645.244713.30382</pickID>
+          <phase>P</phase>
+          <azimuth>151.0</azimuth>
+          <distance>0.3725268975</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.35</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489750Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112645.244942.30384#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112645.244942.30384</pickID>
+          <phase>P</phase>
+          <azimuth>202.0</azimuth>
+          <distance>0.4481120651</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.11</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489815Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112733.037378.30430#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112733.037378.30430</pickID>
+          <phase>S</phase>
+          <azimuth>202.0</azimuth>
+          <distance>0.4481120651</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>0.07</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489815Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112645.244823.30383#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112645.244823.30383</pickID>
+          <phase>P</phase>
+          <azimuth>248.0</azimuth>
+          <distance>0.4607095931</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>0.21</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489912Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190304112733.037538.30431#Origin#20190304112735.488439.30434">
+          <pickID>smi:local/Pick#20190304112733.037538.30431</pickID>
+          <phase>S</phase>
+          <azimuth>248.0</azimuth>
+          <distance>0.4607095931</distance>
+          <takeoffAngle>
+            <value>69.0</value>
+          </takeoffAngle>
+          <timeResidual>0.25</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-04T11:27:35.489912Z</creationTime>
+          </creationInfo>
+        </arrival>
+      </origin>
+      <magnitude publicID="smi:local/Magnitude#20190304112736.119557.30448">
+        <mag>
+          <value>1.123176029</value>
+          <uncertainty>0.2159765422</uncertainty>
+        </mag>
+        <type>MLv</type>
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <methodID>smi:local/trimmed_mean</methodID>
+        <stationCount>11</stationCount>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304112736.120024.30449</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.0601497588</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304112736.120341.30450</stationMagnitudeID>
+          <weight>0.375</weight>
+          <residual>0.4060424362</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304112736.120633.30451</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.2991947221</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304112736.120899.30452</stationMagnitudeID>
+          <weight>0.0</weight>
+          <residual>0.6567011464</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304112736.121152.30453</stationMagnitudeID>
+          <weight>0.375</weight>
+          <residual>-0.3104526475</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304112736.121441.30454</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>-0.03214924034</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304112736.121678.30455</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>-0.182917704</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304112736.121948.30456</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>-0.2843996272</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304112736.122186.30457</stationMagnitudeID>
+          <weight>0.0</weight>
+          <residual>-0.3183386938</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304112736.122459.30458</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>-0.227097808</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304112736.122716.30459</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.01790674187</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304112736.122986.30460</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.1747080555</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190304112736.123232.30461</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.1387589306</residual>
+        </stationMagnitudeContribution>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.119608Z</creationTime>
+        </creationInfo>
+      </magnitude>
+      <magnitude publicID="smi:local/Origin#20190304112735.488439.30434#netMag.M">
+        <mag>
+          <value>1.123176029</value>
+        </mag>
+        <type>M</type>
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <methodID>smi:local/weighted_average</methodID>
+        <stationCount>11</stationCount>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>scmag@sc3-jakarta</author>
+          <creationTime>2019-03-04T13:27:54.614391Z</creationTime>
+        </creationInfo>
+      </magnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304112736.120024.30449">
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <mag>
+          <value>1.183325788</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304112736.011216.30437</amplitudeID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MALA"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.120050Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304112736.120341.30450">
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <mag>
+          <value>1.529218465</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304112736.033522.30439</amplitudeID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="ROD3"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.120360Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304112736.120633.30451">
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <mag>
+          <value>1.422370751</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304112736.113615.30447</amplitudeID>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="EFP"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.120655Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304112736.120899.30452">
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <mag>
+          <value>1.779877175</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304112736.062791.30442</amplitudeID>
+        <waveformID channelCode="EHZ" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.120919Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304112736.121152.30453">
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <mag>
+          <value>0.8127233813</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304112735.999812.30436</amplitudeID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="AGRP"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.121171Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304112736.121441.30454">
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <mag>
+          <value>1.091026788</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304112736.053102.30441</amplitudeID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="TRIZ"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.121460Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304112736.121678.30455">
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <mag>
+          <value>0.9402583247</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304112735.987597.30435</amplitudeID>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="AGEO"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.121697Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304112736.121948.30456">
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <mag>
+          <value>0.8387764016</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304112736.073121.30443</amplitudeID>
+        <waveformID channelCode="HHZ" networkCode="HA" stationCode="KALE"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.121967Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304112736.122186.30457">
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <mag>
+          <value>0.804837335</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304112736.042955.30440</amplitudeID>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="TEME"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.122205Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304112736.122459.30458">
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <mag>
+          <value>0.8960782207</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304112736.023916.30438</amplitudeID>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="PSAR"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.122478Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304112736.122716.30459">
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <mag>
+          <value>1.141082771</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304112736.082577.30444</amplitudeID>
+        <waveformID channelCode="HHZ" networkCode="HL" stationCode="KLV"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.122735Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304112736.122986.30460">
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <mag>
+          <value>1.297884084</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304112736.093629.30445</amplitudeID>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="AXS"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.123006Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190304112736.123232.30461">
+        <originID>smi:local/Origin#20190304112735.488439.30434</originID>
+        <mag>
+          <value>1.261934959</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190304112736.10331.30446</amplitudeID>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="DRO"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.123253Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <pick publicID="smi:local/Pick#20190304112645.243346.30372">
+        <time>
+          <value>2019-03-04T04:29:15.569236Z</value>
+        </time>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MALA"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:26:45.243531Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112733.035595.30420">
+        <time>
+          <value>2019-03-04T04:29:16.796255Z</value>
+        </time>
+        <waveformID channelCode="HH2" locationCode="00" networkCode="CL" stationCode="MALA"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:33.035738Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112645.243786.30374">
+        <time>
+          <value>2019-03-04T04:29:15.886132Z</value>
+        </time>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="EFP"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:26:45.243844Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112733.035887.30421">
+        <time>
+          <value>2019-03-04T04:29:17.288727Z</value>
+        </time>
+        <waveformID channelCode="HHN" networkCode="HP" stationCode="EFP"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:33.035943Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112645.243669.30373">
+        <time>
+          <value>2019-03-04T04:29:15.969404Z</value>
+        </time>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="ROD3"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:26:45.243723Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112733.036053.30422">
+        <time>
+          <value>2019-03-04T04:29:17.516219Z</value>
+        </time>
+        <waveformID channelCode="HHN" locationCode="00" networkCode="CL" stationCode="ROD3"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:33.036106Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112645.243916.30375">
+        <time>
+          <value>2019-03-04T04:29:16.070145Z</value>
+        </time>
+        <waveformID channelCode="EHZ" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:26:45.243971Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112733.036213.30423">
+        <time>
+          <value>2019-03-04T04:29:17.547243Z</value>
+        </time>
+        <waveformID channelCode="EHN" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:33.036265Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112645.244145.30377">
+        <time>
+          <value>2019-03-04T04:29:17.009880Z</value>
+        </time>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="TRIZ"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:26:45.244197Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112733.036372.30424">
+        <time>
+          <value>2019-03-04T04:29:19.280222Z</value>
+        </time>
+        <waveformID channelCode="HH2" locationCode="00" networkCode="CL" stationCode="TRIZ"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:33.036423Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112645.244032.30376">
+        <time>
+          <value>2019-03-04T04:29:17.479566Z</value>
+        </time>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="AGRP"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:26:45.244084Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112733.03653.30425">
+        <time>
+          <value>2019-03-04T04:29:20.188664Z</value>
+        </time>
+        <waveformID channelCode="HHE" locationCode="00" networkCode="CL" stationCode="AGRP"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:33.036582Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112645.244257.30378">
+        <time>
+          <value>2019-03-04T04:29:17.555647Z</value>
+        </time>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="AGEO"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:26:45.244318Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112733.036688.30426">
+        <time>
+          <value>2019-03-04T04:29:20.168199Z</value>
+        </time>
+        <waveformID channelCode="EH3" locationCode="00" networkCode="CL" stationCode="AGEO"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:33.036740Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112645.244377.30379">
+        <time>
+          <value>2019-03-04T04:29:17.940757Z</value>
+        </time>
+        <waveformID channelCode="HHZ" networkCode="HA" stationCode="KALE"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:26:45.244429Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112733.036847.30427">
+        <time>
+          <value>2019-03-04T04:29:20.464714Z</value>
+        </time>
+        <waveformID channelCode="HHE" networkCode="HA" stationCode="KALE"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:33.036903Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112645.244601.30381">
+        <time>
+          <value>2019-03-04T04:29:18.402539Z</value>
+        </time>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="PSAR"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:26:45.244653Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112733.037013.30428">
+        <time>
+          <value>2019-03-04T04:29:21.896672Z</value>
+        </time>
+        <waveformID channelCode="EHE" locationCode="00" networkCode="CL" stationCode="PSAR"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:33.037064Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112645.244488.30380">
+        <time>
+          <value>2019-03-04T04:29:18.725850Z</value>
+        </time>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="TEME"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:26:45.244541Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112733.037172.30429">
+        <time>
+          <value>2019-03-04T04:29:21.601792Z</value>
+        </time>
+        <waveformID channelCode="EH3" locationCode="00" networkCode="CL" stationCode="TEME"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:33.037223Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112645.244713.30382">
+        <time>
+          <value>2019-03-04T04:29:21.236185Z</value>
+        </time>
+        <waveformID channelCode="HHZ" networkCode="HL" stationCode="KLV"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:26:45.244765Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112645.244942.30384">
+        <time>
+          <value>2019-03-04T04:29:22.821945Z</value>
+        </time>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="DRO"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:26:45.244994Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112733.037378.30430">
+        <time>
+          <value>2019-03-04T04:29:29.794875Z</value>
+        </time>
+        <waveformID channelCode="HHN" networkCode="HP" stationCode="DRO"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:33.037430Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112645.244823.30383">
+        <time>
+          <value>2019-03-04T04:29:23.327695Z</value>
+        </time>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="AXS"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:26:45.244880Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190304112733.037538.30431">
+        <time>
+          <value>2019-03-04T04:29:30.299231Z</value>
+        </time>
+        <waveformID channelCode="HHN" networkCode="HP" stationCode="AXS"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:33.037589Z</creationTime>
+        </creationInfo>
+      </pick>
+      <amplitude publicID="smi:local/Amplitude#20190304112736.011216.30437">
+        <genericAmplitude>
+          <value>0.7106120897</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>6.463367688</snr>
+        <timeWindow>
+          <reference>2019-03-04T04:29:17.840000Z</reference>
+          <begin>-7.27</begin>
+          <end>29.36</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304112645.243346.30372</pickID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MALA"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.011250Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304112736.033522.30439">
+        <genericAmplitude>
+          <value>2.688922418</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>34.9747579</snr>
+        <timeWindow>
+          <reference>2019-03-04T04:29:18.874999Z</reference>
+          <begin>-7.91</begin>
+          <end>29.5</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304112645.243669.30373</pickID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="ROD3"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.033557Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304112736.113615.30447">
+        <genericAmplitude>
+          <value>1.443277325</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>24.86135372</snr>
+        <timeWindow>
+          <reference>2019-03-04T04:29:15.990000Z</reference>
+          <begin>-5.1</begin>
+          <end>32.06</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304112645.243786.30374</pickID>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="EFP"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.113677Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304112736.062791.30442">
+        <genericAmplitude>
+          <value>3.101926532</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>272.3188666</snr>
+        <timeWindow>
+          <reference>2019-03-04T04:29:17.670000Z</reference>
+          <begin>-6.6</begin>
+          <end>30.9</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304112645.243916.30375</pickID>
+        <waveformID channelCode="EHZ" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.062829Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304112735.999812.30436">
+        <genericAmplitude>
+          <value>0.1899303515</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>2.640803756</snr>
+        <timeWindow>
+          <reference>2019-03-04T04:29:21.200000Z</reference>
+          <begin>-8.72</begin>
+          <end>32.08</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304112645.244032.30376</pickID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="AGRP"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:35.999871Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304112736.053102.30441">
+        <genericAmplitude>
+          <value>0.4532884896</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>19.72723461</snr>
+        <timeWindow>
+          <reference>2019-03-04T04:29:19.924999Z</reference>
+          <begin>-7.92</begin>
+          <end>31.55</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304112645.244145.30377</pickID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="TRIZ"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.053151Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304112735.987597.30435">
+        <genericAmplitude>
+          <value>0.07455558053</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>10.3485084</snr>
+        <timeWindow>
+          <reference>2019-03-04T04:29:20.550000Z</reference>
+          <begin>-7.99</begin>
+          <end>32.71</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304112645.244257.30378</pickID>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="AGEO"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:35.987693Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304112736.073121.30443">
+        <genericAmplitude>
+          <value>0.1796384511</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>4.710649282</snr>
+        <timeWindow>
+          <reference>2019-03-04T04:29:21.480000Z</reference>
+          <begin>-8.54</begin>
+          <end>32.93</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304112645.244377.30379</pickID>
+        <waveformID channelCode="HHZ" networkCode="HA" stationCode="KALE"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.073169Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304112736.042955.30440">
+        <genericAmplitude>
+          <value>0.04434046563</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>9.1229673</snr>
+        <timeWindow>
+          <reference>2019-03-04T04:29:25.584999Z</reference>
+          <begin>-11.86</begin>
+          <end>30.88</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304112645.244488.30380</pickID>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="TEME"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.042990Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304112736.023916.30438">
+        <genericAmplitude>
+          <value>0.1693311387</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>81.49181869</snr>
+        <timeWindow>
+          <reference>2019-03-04T04:29:22.705000Z</reference>
+          <begin>-9.3</begin>
+          <end>33.3</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304112645.244601.30381</pickID>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="PSAR"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.023975Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304112736.082577.30444">
+        <genericAmplitude>
+          <value>0.07673168942</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>1.996250666</snr>
+        <timeWindow>
+          <reference>2019-03-04T04:29:28.980000Z</reference>
+          <begin>-12.74</begin>
+          <end>36.06</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304112645.244713.30382</pickID>
+        <waveformID channelCode="HHZ" networkCode="HL" stationCode="KLV"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.082613Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304112736.093629.30445">
+        <genericAmplitude>
+          <value>0.08320434007</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>1.908091477</snr>
+        <timeWindow>
+          <reference>2019-03-04T04:29:25.010000Z</reference>
+          <begin>-6.68</begin>
+          <end>45.39</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304112645.244823.30383</pickID>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="AXS"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.093679Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190304112736.10331.30446">
+        <genericAmplitude>
+          <value>0.1722237589</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>2.36892762</snr>
+        <timeWindow>
+          <reference>2019-03-04T04:29:30.690000Z</reference>
+          <begin>-12.87</begin>
+          <end>38.74</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190304112645.244942.30384</pickID>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="DRO"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-04T11:27:36.103354Z</creationTime>
+        </creationInfo>
+      </amplitude>
+    </event>
+    <event publicID="smi:local/nkua2019enfr">
+      <preferredOriginID>smi:local/Origin#20190306071617.907668.23256</preferredOriginID>
+      <preferredMagnitudeID>smi:local/Origin#20190306071617.907668.23256#netMag.M</preferredMagnitudeID>
+      <type>earthquake</type>
+      <description>
+        <text>Greece</text>
+        <type>region name</type>
+      </description>
+      <creationInfo>
+        <agencyID>HA</agencyID>
+        <author>scevent@sc3-jakarta</author>
+        <creationTime>2019-03-06T03:47:22.753305Z</creationTime>
+      </creationInfo>
+      <origin publicID="smi:local/Origin#20190306071617.907668.23256">
+        <time>
+          <value>2019-03-06T03:46:34.030000Z</value>
+        </time>
+        <latitude>
+          <value>38.375</value>
+          <uncertainty>0.2121320344</uncertainty>
+        </latitude>
+        <longitude>
+          <value>21.9165</value>
+          <uncertainty>0.2121320344</uncertainty>
+        </longitude>
+        <depth>
+          <value>7170.0</value>
+          <uncertainty>400.0</uncertainty>
+        </depth>
+        <methodID>smi:local/Hypo71</methodID>
+        <earthModelID>smi:local/MyModel</earthModelID>
+        <quality>
+          <associatedPhaseCount>15</associatedPhaseCount>
+          <usedPhaseCount>15</usedPhaseCount>
+          <usedStationCount>14</usedStationCount>
+          <depthPhaseCount>0</depthPhaseCount>
+          <standardError>0.08</standardError>
+          <azimuthalGap>95.0</azimuthalGap>
+          <groundTruthLevel>B</groundTruthLevel>
+          <minimumDistance>0.03959223065</minimumDistance>
+          <maximumDistance>0.1538698055</maximumDistance>
+          <medianDistance>7.7</medianDistance>
+        </quality>
+        <evaluationMode>manual</evaluationMode>
+        <evaluationStatus>confirmed</evaluationStatus>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:17.908605Z</creationTime>
+        </creationInfo>
+        <arrival publicID="smi:local/Pick#20190306071331.030438.23127#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071331.030438.23127</pickID>
+          <phase>P</phase>
+          <azimuth>161.0</azimuth>
+          <distance>0.07378552076</distance>
+          <takeoffAngle>
+            <value>122.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.05</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.908215Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190306071331.030722.23128#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071331.030722.23128</pickID>
+          <phase>P</phase>
+          <azimuth>31.0</azimuth>
+          <distance>0.04589099462</distance>
+          <takeoffAngle>
+            <value>138.0</value>
+          </takeoffAngle>
+          <timeResidual>0.08</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.908031Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190306071331.030904.23129#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071331.030904.23129</pickID>
+          <phase>P</phase>
+          <azimuth>66.0</azimuth>
+          <distance>0.0863830487</distance>
+          <takeoffAngle>
+            <value>116.0</value>
+          </takeoffAngle>
+          <timeResidual>0.08</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.908275Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190306071331.031047.23130#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071331.031047.23130</pickID>
+          <phase>P</phase>
+          <azimuth>196.0</azimuth>
+          <distance>0.06928640364</distance>
+          <takeoffAngle>
+            <value>124.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.01</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.908158Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190306071331.031187.23131#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071331.031187.23131</pickID>
+          <phase>P</phase>
+          <azimuth>298.0</azimuth>
+          <distance>0.03959223065</distance>
+          <takeoffAngle>
+            <value>143.0</value>
+          </takeoffAngle>
+          <timeResidual>0.01</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.907917Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190306071331.031328.23132#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071331.031328.23132</pickID>
+          <phase>P</phase>
+          <azimuth>351.0</azimuth>
+          <distance>0.05218975859</distance>
+          <takeoffAngle>
+            <value>133.0</value>
+          </takeoffAngle>
+          <timeResidual>0.14</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.908095Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190306071331.031607.23134#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071331.031607.23134</pickID>
+          <phase>P</phase>
+          <azimuth>278.0</azimuth>
+          <distance>0.1538698055</distance>
+          <takeoffAngle>
+            <value>93.0</value>
+          </takeoffAngle>
+          <timeResidual>0.06</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.908330Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190306071443.481799.23196#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071443.481799.23196</pickID>
+          <phase>S</phase>
+          <azimuth>161.0</azimuth>
+          <distance>0.07378552076</distance>
+          <takeoffAngle>
+            <value>122.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.01</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.908215Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190306071545.384772.23204#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071545.384772.23204</pickID>
+          <phase>S</phase>
+          <azimuth>196.0</azimuth>
+          <distance>0.06928640364</distance>
+          <takeoffAngle>
+            <value>124.0</value>
+          </takeoffAngle>
+          <timeResidual>0.07</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.908158Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190306071545.385091.23205#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071545.385091.23205</pickID>
+          <phase>S</phase>
+          <azimuth>31.0</azimuth>
+          <distance>0.04589099462</distance>
+          <takeoffAngle>
+            <value>138.0</value>
+          </takeoffAngle>
+          <timeResidual>0.01</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.908031Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190306071545.385293.23206#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071545.385293.23206</pickID>
+          <phase>S</phase>
+          <azimuth>298.0</azimuth>
+          <distance>0.03959223065</distance>
+          <takeoffAngle>
+            <value>143.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.04</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.907917Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190306071545.385913.23209#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071545.385913.23209</pickID>
+          <phase>S</phase>
+          <azimuth>351.0</azimuth>
+          <distance>0.05218975859</distance>
+          <takeoffAngle>
+            <value>133.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.01</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.908095Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190306071545.386107.23210#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071545.386107.23210</pickID>
+          <phase>S</phase>
+          <azimuth>278.0</azimuth>
+          <distance>0.1538698055</distance>
+          <takeoffAngle>
+            <value>93.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.1</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.908330Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190306071616.632657.23253#Origin#20190306071617.907668.23256">
+          <pickID>smi:local/Pick#20190306071616.632657.23253</pickID>
+          <phase>S</phase>
+          <azimuth>66.0</azimuth>
+          <distance>0.0863830487</distance>
+          <takeoffAngle>
+            <value>116.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.19</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-06T07:16:17.908275Z</creationTime>
+          </creationInfo>
+        </arrival>
+      </origin>
+      <magnitude publicID="smi:local/Magnitude#20190306071621.154143.23264">
+        <mag>
+          <value>0.7861483844</value>
+          <uncertainty>0.2247321169</uncertainty>
+        </mag>
+        <type>MLv</type>
+        <originID>smi:local/Origin#20190306071617.907668.23256</originID>
+        <methodID>smi:local/mean</methodID>
+        <stationCount>6</stationCount>
+        <evaluationStatus>confirmed</evaluationStatus>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190306071621.154435.23265</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.3805266281</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190306071621.154643.23266</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.240327091</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190306071621.154816.23267</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>-0.16219659</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190306071621.154982.23268</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.05907464813</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190306071621.155137.23269</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>-0.2006784406</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190306071621.155322.23270</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.06386984821</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190306071621.155482.23271</stationMagnitudeID>
+          <weight>0.0</weight>
+          <residual>-0.383699081</residual>
+        </stationMagnitudeContribution>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:21.154178Z</creationTime>
+        </creationInfo>
+      </magnitude>
+      <magnitude publicID="smi:local/Origin#20190306071617.907668.23256#netMag.M">
+        <mag>
+          <value>0.7861483844</value>
+        </mag>
+        <type>M</type>
+        <originID>smi:local/Origin#20190306071617.907668.23256</originID>
+        <methodID>smi:local/weighted_average</methodID>
+        <stationCount>6</stationCount>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>scmag@sc3-jakarta</author>
+          <creationTime>2019-03-06T07:16:39.480512Z</creationTime>
+        </creationInfo>
+      </magnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190306071621.154435.23265">
+        <originID>smi:local/Origin#20190306071617.907668.23256</originID>
+        <mag>
+          <value>1.103187815</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190306071620.166988.23262</amplitudeID>
+        <waveformID channelCode="EHZ" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:21.154456Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190306071621.154643.23266">
+        <originID>smi:local/Origin#20190306071617.907668.23256</originID>
+        <mag>
+          <value>0.9629882779</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190306071620.13792.23259</amplitudeID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MG00"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:21.154661Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190306071621.154816.23267">
+        <originID>smi:local/Origin#20190306071617.907668.23256</originID>
+        <mag>
+          <value>0.5604645969</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190306071620.149122.23260</amplitudeID>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="PYRG"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:21.154833Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190306071621.154982.23268">
+        <originID>smi:local/Origin#20190306071617.907668.23256</originID>
+        <mag>
+          <value>0.7817358351</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190306071620.156493.23261</amplitudeID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="ROD3"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:21.154998Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190306071621.155137.23269">
+        <originID>smi:local/Origin#20190306071617.907668.23256</originID>
+        <mag>
+          <value>0.5219827463</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190306071620.125892.23258</amplitudeID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MALA"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:21.155153Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190306071621.155322.23270">
+        <originID>smi:local/Origin#20190306071617.907668.23256</originID>
+        <mag>
+          <value>0.7865310352</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190306071620.183116.23263</amplitudeID>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="EFP"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:21.155338Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190306071621.155482.23271">
+        <originID>smi:local/Origin#20190306071617.907668.23256</originID>
+        <mag>
+          <value>0.338962106</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190306071620.115585.23257</amplitudeID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="AGRP"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:21.155498Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <pick publicID="smi:local/Pick#20190306071331.030438.23127">
+        <time>
+          <value>2019-03-06T03:46:36.164420Z</value>
+        </time>
+        <waveformID channelCode="EHZ" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:13:31.030594Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190306071331.030722.23128">
+        <time>
+          <value>2019-03-06T03:46:35.838138Z</value>
+        </time>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MG00"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:13:31.030815Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190306071331.030904.23129">
+        <time>
+          <value>2019-03-06T03:46:36.503772Z</value>
+        </time>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="PYRG"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:13:31.030973Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190306071331.031047.23130">
+        <time>
+          <value>2019-03-06T03:46:36.132126Z</value>
+        </time>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="ROD3"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:13:31.031116Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190306071331.031187.23131">
+        <time>
+          <value>2019-03-06T03:46:35.668501Z</value>
+        </time>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MALA"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:13:31.031254Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190306071331.031328.23132">
+        <time>
+          <value>2019-03-06T03:46:35.975430Z</value>
+        </time>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="EFP"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:13:31.031402Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190306071331.031607.23134">
+        <time>
+          <value>2019-03-06T03:46:37.640053Z</value>
+        </time>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="AGRP"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:13:31.031675Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190306071443.481799.23196">
+        <time>
+          <value>2019-03-06T03:46:37.915423Z</value>
+        </time>
+        <waveformID channelCode="EHE" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:14:43.481899Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190306071545.384772.23204">
+        <time>
+          <value>2019-03-06T03:46:37.867878Z</value>
+        </time>
+        <waveformID channelCode="HHE" locationCode="00" networkCode="CL" stationCode="ROD3"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:15:45.384941Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190306071545.385091.23205">
+        <time>
+          <value>2019-03-06T03:46:37.128513Z</value>
+        </time>
+        <waveformID channelCode="HHE" locationCode="00" networkCode="CL" stationCode="MG00"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:15:45.385172Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190306071545.385293.23206">
+        <time>
+          <value>2019-03-06T03:46:36.903966Z</value>
+        </time>
+        <waveformID channelCode="HH3" locationCode="00" networkCode="CL" stationCode="MALA"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:15:45.385368Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190306071545.385913.23209">
+        <time>
+          <value>2019-03-06T03:46:37.250552Z</value>
+        </time>
+        <waveformID channelCode="HHE" networkCode="HP" stationCode="EFP"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:15:45.385987Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190306071545.386107.23210">
+        <time>
+          <value>2019-03-06T03:46:40.281813Z</value>
+        </time>
+        <waveformID channelCode="HHE" locationCode="00" networkCode="CL" stationCode="AGRP"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:15:45.386182Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190306071616.632657.23253">
+        <time>
+          <value>2019-03-06T03:46:38.120553Z</value>
+        </time>
+        <waveformID channelCode="EHE" locationCode="00" networkCode="CL" stationCode="PYRG"></waveformID>
+        <filterID>smi:local/BW(4,1.0,8)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:16.632747Z</creationTime>
+        </creationInfo>
+      </pick>
+      <amplitude publicID="smi:local/Amplitude#20190306071620.166988.23262">
+        <genericAmplitude>
+          <value>0.6276627949</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>53.89192325</snr>
+        <timeWindow>
+          <reference>2019-03-06T03:46:38.680000Z</reference>
+          <begin>-7.52</begin>
+          <end>30.22</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190306071331.030438.23127</pickID>
+        <waveformID channelCode="EHZ" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:20.167057Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190306071620.13792.23259">
+        <genericAmplitude>
+          <value>0.7000146944</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>11.84232108</snr>
+        <timeWindow>
+          <reference>2019-03-06T03:46:35.870000Z</reference>
+          <begin>-5.03</begin>
+          <end>31.67</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190306071331.030722.23128</pickID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MG00"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:20.138017Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190306071620.149122.23260">
+        <genericAmplitude>
+          <value>0.1049897348</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>11.89690268</snr>
+        <timeWindow>
+          <reference>2019-03-06T03:46:38.560000Z</reference>
+          <begin>-7.06</begin>
+          <end>31.15</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190306071331.030904.23129</pickID>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="PYRG"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:20.149185Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190306071620.156493.23261">
+        <genericAmplitude>
+          <value>0.4660164547</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>8.644526928</snr>
+        <timeWindow>
+          <reference>2019-03-06T03:46:38.575000Z</reference>
+          <begin>-7.44</begin>
+          <end>30.13</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190306071331.031047.23130</pickID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="ROD3"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:20.156562Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190306071620.125892.23258">
+        <genericAmplitude>
+          <value>0.1598127146</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>1.891528429</snr>
+        <timeWindow>
+          <reference>2019-03-06T03:46:35.980000Z</reference>
+          <begin>-5.31</begin>
+          <end>31.16</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190306071331.031187.23131</pickID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MALA"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:20.125951Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190306071620.183116.23263">
+        <genericAmplitude>
+          <value>0.3471092132</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>4.256333852</snr>
+        <timeWindow>
+          <reference>2019-03-06T03:46:36.030000Z</reference>
+          <begin>-5.05</begin>
+          <end>31.88</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190306071331.031328.23132</pickID>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="EFP"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:20.183175Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190306071620.115585.23257">
+        <genericAmplitude>
+          <value>0.0650251646</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>1.537883529</snr>
+        <timeWindow>
+          <reference>2019-03-06T03:46:37.770000Z</reference>
+          <begin>-5.13</begin>
+          <end>35.57</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190306071331.031607.23134</pickID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="AGRP"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>K.Pavlou</author>
+          <creationTime>2019-03-06T07:16:20.115655Z</creationTime>
+        </creationInfo>
+      </amplitude>
+    </event>
+    <event publicID="smi:local/nkua2019fykx">
+      <preferredOriginID>smi:local/Origin#20190326123958.271313.394621</preferredOriginID>
+      <preferredMagnitudeID>smi:local/Origin#20190326123958.271313.394621#netMag.M</preferredMagnitudeID>
+      <type>earthquake</type>
+      <description>
+        <text>Greece</text>
+        <type>region name</type>
+      </description>
+      <creationInfo>
+        <agencyID>HA</agencyID>
+        <author>scevent@sc3-jakarta</author>
+        <creationTime>2019-03-26T12:27:22.749318Z</creationTime>
+      </creationInfo>
+      <origin publicID="smi:local/Origin#20190326123958.271313.394621">
+        <time>
+          <value>2019-03-26T12:26:33.960000Z</value>
+        </time>
+        <latitude>
+          <value>38.35883333</value>
+          <uncertainty>0.2828427125</uncertainty>
+        </latitude>
+        <longitude>
+          <value>22.072</value>
+          <uncertainty>0.2828427125</uncertainty>
+        </longitude>
+        <depth>
+          <value>9380.0</value>
+          <uncertainty>700.0</uncertainty>
+        </depth>
+        <methodID>smi:local/Hypo71</methodID>
+        <earthModelID>smi:local/MyModel</earthModelID>
+        <quality>
+          <associatedPhaseCount>15</associatedPhaseCount>
+          <usedPhaseCount>15</usedPhaseCount>
+          <usedStationCount>14</usedStationCount>
+          <depthPhaseCount>0</depthPhaseCount>
+          <standardError>0.09</standardError>
+          <azimuthalGap>110.0</azimuthalGap>
+          <groundTruthLevel>B</groundTruthLevel>
+          <minimumDistance>0.06208781625</minimumDistance>
+          <maximumDistance>0.3212369623</maximumDistance>
+          <medianDistance>12.6</medianDistance>
+        </quality>
+        <evaluationMode>manual</evaluationMode>
+        <evaluationStatus>confirmed</evaluationStatus>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.272800Z</creationTime>
+        </creationInfo>
+        <arrival publicID="smi:local/Pick#20190326123925.930879.394580#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123925.930879.394580</pickID>
+          <phase>P</phase>
+          <azimuth>320.0</azimuth>
+          <distance>0.0674867568</distance>
+          <takeoffAngle>
+            <value>138.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.07</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.271613Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190326123955.674973.394611#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123955.674973.394611</pickID>
+          <phase>S</phase>
+          <azimuth>320.0</azimuth>
+          <distance>0.0674867568</distance>
+          <takeoffAngle>
+            <value>138.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.29</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.271613Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190326123925.931188.394581#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123925.931188.394581</pickID>
+          <phase>P</phase>
+          <azimuth>59.0</azimuth>
+          <distance>0.06208781625</distance>
+          <takeoffAngle>
+            <value>141.0</value>
+          </takeoffAngle>
+          <timeResidual>0.07</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.271787Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190326123955.675302.394612#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123955.675302.394612</pickID>
+          <phase>S</phase>
+          <azimuth>59.0</azimuth>
+          <distance>0.06208781625</distance>
+          <takeoffAngle>
+            <value>141.0</value>
+          </takeoffAngle>
+          <timeResidual>0.02</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.271787Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190326123925.931297.394582#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123925.931297.394582</pickID>
+          <phase>P</phase>
+          <azimuth>299.0</azimuth>
+          <distance>0.1133777514</distance>
+          <takeoffAngle>
+            <value>119.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.06</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.271881Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190326123955.675482.394613#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123955.675482.394613</pickID>
+          <phase>S</phase>
+          <azimuth>299.0</azimuth>
+          <distance>0.1133777514</distance>
+          <takeoffAngle>
+            <value>119.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.05</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.271881Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190326123925.931509.394584#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123925.931509.394584</pickID>
+          <phase>P</phase>
+          <azimuth>241.0</azimuth>
+          <distance>0.1115781046</distance>
+          <takeoffAngle>
+            <value>120.0</value>
+          </takeoffAngle>
+          <timeResidual>0.37</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.271978Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190326123955.675659.394614#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123955.675659.394614</pickID>
+          <phase>S</phase>
+          <azimuth>241.0</azimuth>
+          <distance>0.1115781046</distance>
+          <takeoffAngle>
+            <value>120.0</value>
+          </takeoffAngle>
+          <timeResidual>0.02</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.271978Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190326123925.931404.394583#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123925.931404.394583</pickID>
+          <phase>P</phase>
+          <azimuth>297.0</azimuth>
+          <distance>0.1475710415</distance>
+          <takeoffAngle>
+            <value>110.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.01</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.272067Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190326123955.675837.394615#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123955.675837.394615</pickID>
+          <phase>S</phase>
+          <azimuth>297.0</azimuth>
+          <distance>0.1475710415</distance>
+          <takeoffAngle>
+            <value>110.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.09</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.272067Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190326123925.931615.394585#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123925.931615.394585</pickID>
+          <phase>P</phase>
+          <azimuth>250.0</azimuth>
+          <distance>0.1502705118</distance>
+          <takeoffAngle>
+            <value>110.0</value>
+          </takeoffAngle>
+          <timeResidual>0.15</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.272172Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190326123955.676002.394616#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123955.676002.394616</pickID>
+          <phase>S</phase>
+          <azimuth>250.0</azimuth>
+          <distance>0.1502705118</distance>
+          <takeoffAngle>
+            <value>110.0</value>
+          </takeoffAngle>
+          <timeResidual>0.04</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.272172Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190326123955.676128.394617#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123955.676128.394617</pickID>
+          <phase>S</phase>
+          <azimuth>169.0</azimuth>
+          <distance>0.3212369623</distance>
+          <takeoffAngle>
+            <value>96.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.08</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.272259Z</creationTime>
+          </creationInfo>
+        </arrival>
+        <arrival publicID="smi:local/Pick#20190326123955.676237.394618#Origin#20190326123958.271313.394621">
+          <pickID>smi:local/Pick#20190326123955.676237.394618</pickID>
+          <phase>P</phase>
+          <azimuth>169.0</azimuth>
+          <distance>0.3212369623</distance>
+          <takeoffAngle>
+            <value>96.0</value>
+          </takeoffAngle>
+          <timeResidual>-0.02</timeResidual>
+          <timeWeight>1.0</timeWeight>
+          <creationInfo>
+            <author>Hypo71</author>
+            <creationTime>2019-03-26T12:39:58.272259Z</creationTime>
+          </creationInfo>
+        </arrival>
+      </origin>
+      <magnitude publicID="smi:local/Magnitude#20190326123958.914214.394629">
+        <mag>
+          <value>0.8700598336</value>
+          <uncertainty>0.1826987103</uncertainty>
+        </mag>
+        <type>MLv</type>
+        <originID>smi:local/Origin#20190326123958.271313.394621</originID>
+        <methodID>smi:local/trimmed_mean</methodID>
+        <stationCount>7</stationCount>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190326123958.914701.394630</stationMagnitudeID>
+          <weight>0.125</weight>
+          <residual>0.2085641688</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190326123958.915044.394631</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.1467337974</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190326123958.915336.394632</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>-0.1386715647</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190326123958.915627.394633</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>-0.2342101726</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190326123958.915882.394634</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.1218151791</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190326123958.916137.394635</stationMagnitudeID>
+          <weight>0.125</weight>
+          <residual>-0.3124676531</residual>
+        </stationMagnitudeContribution>
+        <stationMagnitudeContribution>
+          <stationMagnitudeID>StationMagnitude#20190326123958.916402.394636</stationMagnitudeID>
+          <weight>1.0</weight>
+          <residual>0.1173206963</residual>
+        </stationMagnitudeContribution>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.914280Z</creationTime>
+        </creationInfo>
+      </magnitude>
+      <magnitude publicID="smi:local/Origin#20190326123958.271313.394621#netMag.M">
+        <mag>
+          <value>0.8700598336</value>
+        </mag>
+        <type>M</type>
+        <originID>smi:local/Origin#20190326123958.271313.394621</originID>
+        <methodID>smi:local/weighted_average</methodID>
+        <stationCount>7</stationCount>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>scmag@sc3-jakarta</author>
+          <creationTime>2019-03-26T14:40:28.141937Z</creationTime>
+        </creationInfo>
+      </magnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190326123958.914701.394630">
+        <originID>smi:local/Origin#20190326123958.271313.394621</originID>
+        <mag>
+          <value>1.078624002</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190326123958.592543.394623</amplitudeID>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="PYRG"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.914733Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190326123958.915044.394631">
+        <originID>smi:local/Origin#20190326123958.271313.394621</originID>
+        <mag>
+          <value>1.016793631</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190326123958.607785.394628</amplitudeID>
+        <waveformID channelCode="HHZ" networkCode="HA" stationCode="KALE"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.915065Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190326123958.915336.394632">
+        <originID>smi:local/Origin#20190326123958.271313.394621</originID>
+        <mag>
+          <value>0.7313882689</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190326123958.59893.394625</amplitudeID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MG00"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.915357Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190326123958.915627.394633">
+        <originID>smi:local/Origin#20190326123958.271313.394621</originID>
+        <mag>
+          <value>0.635849661</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190326123958.605513.394627</amplitudeID>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="EFP"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.915647Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190326123958.915882.394634">
+        <originID>smi:local/Origin#20190326123958.271313.394621</originID>
+        <mag>
+          <value>0.9918750127</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190326123958.60193.394626</amplitudeID>
+        <waveformID channelCode="EHZ" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.915902Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190326123958.916137.394635">
+        <originID>smi:local/Origin#20190326123958.271313.394621</originID>
+        <mag>
+          <value>0.5575921805</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190326123958.595286.394624</amplitudeID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="ROD3"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.916158Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <stationMagnitude publicID="smi:local/StationMagnitude#20190326123958.916402.394636">
+        <originID>smi:local/Origin#20190326123958.271313.394621</originID>
+        <mag>
+          <value>0.9873805299</value>
+        </mag>
+        <type>MLv</type>
+        <amplitudeID>smi:local/Amplitude#20190326123958.542397.394622</amplitudeID>
+        <waveformID channelCode="HHZ" networkCode="HL" stationCode="KLV"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.916422Z</creationTime>
+        </creationInfo>
+      </stationMagnitude>
+      <pick publicID="smi:local/Pick#20190326123925.930879.394580">
+        <time>
+          <value>2019-03-26T12:26:36.231267Z</value>
+        </time>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="PYRG"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:25.931058Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190326123955.674973.394611">
+        <time>
+          <value>2019-03-26T12:26:37.781377Z</value>
+        </time>
+        <waveformID channelCode="EHN" locationCode="00" networkCode="CL" stationCode="PYRG"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:55.675134Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190326123925.931188.394581">
+        <time>
+          <value>2019-03-26T12:26:36.327303Z</value>
+        </time>
+        <waveformID channelCode="HHZ" networkCode="HA" stationCode="KALE"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:25.931244Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190326123955.675302.394612">
+        <time>
+          <value>2019-03-26T12:26:38.032989Z</value>
+        </time>
+        <waveformID channelCode="HHN" networkCode="HA" stationCode="KALE"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:55.675364Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190326123925.931297.394582">
+        <time>
+          <value>2019-03-26T12:26:36.821221Z</value>
+        </time>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MG00"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:25.931351Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190326123955.675482.394613">
+        <time>
+          <value>2019-03-26T12:26:39.047601Z</value>
+        </time>
+        <waveformID channelCode="HHN" locationCode="00" networkCode="CL" stationCode="MG00"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:55.675536Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190326123925.931509.394584">
+        <time>
+          <value>2019-03-26T12:26:37.281267Z</value>
+        </time>
+        <waveformID channelCode="EHZ" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:25.931563Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190326123955.675659.394614">
+        <time>
+          <value>2019-03-26T12:26:39.176004Z</value>
+        </time>
+        <waveformID channelCode="EHN" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:55.675718Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190326123925.931404.394583">
+        <time>
+          <value>2019-03-26T12:26:37.434921Z</value>
+        </time>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="EFP"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:25.931458Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190326123955.675837.394615">
+        <time>
+          <value>2019-03-26T12:26:39.996589Z</value>
+        </time>
+        <waveformID channelCode="HHN" networkCode="HP" stationCode="EFP"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:55.675891Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190326123925.931615.394585">
+        <time>
+          <value>2019-03-26T12:26:37.695476Z</value>
+        </time>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="ROD3"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:25.931669Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190326123955.676002.394616">
+        <time>
+          <value>2019-03-26T12:26:40.311947Z</value>
+        </time>
+        <waveformID channelCode="HHN" locationCode="00" networkCode="CL" stationCode="ROD3"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:55.676059Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190326123955.676128.394617">
+        <time>
+          <value>2019-03-26T12:26:45.617951Z</value>
+        </time>
+        <waveformID channelCode="HHN" networkCode="HL" stationCode="KLV"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>S</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:55.676181Z</creationTime>
+        </creationInfo>
+      </pick>
+      <pick publicID="smi:local/Pick#20190326123955.676237.394618">
+        <time>
+          <value>2019-03-26T12:26:40.606744Z</value>
+        </time>
+        <waveformID channelCode="HHZ" networkCode="HL" stationCode="KLV"></waveformID>
+        <filterID>smi:local/BW(4,3.5,15)</filterID>
+        <phaseHint>P</phaseHint>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:55.676298Z</creationTime>
+        </creationInfo>
+      </pick>
+      <amplitude publicID="smi:local/Amplitude#20190326123958.592543.394623">
+        <genericAmplitude>
+          <value>0.390845078</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>47.24653697</snr>
+        <timeWindow>
+          <reference>2019-03-26T12:26:36.344999Z</reference>
+          <begin>-5.11</begin>
+          <end>32.39</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190326123925.930879.394580</pickID>
+        <waveformID channelCode="EHZ" locationCode="00" networkCode="CL" stationCode="PYRG"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.592638Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190326123958.607785.394628">
+        <genericAmplitude>
+          <value>0.5546734354</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>5.20305765</snr>
+        <timeWindow>
+          <reference>2019-03-26T12:26:38.660000Z</reference>
+          <begin>-7.33</begin>
+          <end>29.97</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190326123925.931188.394581</pickID>
+        <waveformID channelCode="HHZ" networkCode="HA" stationCode="KALE"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.607805Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190326123958.59893.394625">
+        <genericAmplitude>
+          <value>0.2678228819</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>4.18783387</snr>
+        <timeWindow>
+          <reference>2019-03-26T12:26:39.920000Z</reference>
+          <begin>-8.1</begin>
+          <end>31.1</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190326123925.931297.394582</pickID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="MG00"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.598957Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190326123958.605513.394627">
+        <genericAmplitude>
+          <value>0.1341243747</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>2.164480893</snr>
+        <timeWindow>
+          <reference>2019-03-26T12:26:42.520000Z</reference>
+          <begin>-10.09</begin>
+          <end>30.38</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190326123925.931404.394583</pickID>
+        <waveformID channelCode="HHZ" networkCode="HP" stationCode="EFP"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.605538Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190326123958.60193.394626">
+        <genericAmplitude>
+          <value>0.3823951618</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>23.53437485</snr>
+        <timeWindow>
+          <reference>2019-03-26T12:26:40.095000Z</reference>
+          <begin>-7.81</begin>
+          <end>31.32</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190326123925.931509.394584</pickID>
+        <waveformID channelCode="EHZ" locationCode="02" networkCode="CL" stationCode="ZIRI"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.601952Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190326123958.595286.394624">
+        <genericAmplitude>
+          <value>0.1662818277</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>1.936094306</snr>
+        <timeWindow>
+          <reference>2019-03-26T12:26:40.744999Z</reference>
+          <begin>-8.05</begin>
+          <end>32.52</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190326123925.931615.394585</pickID>
+        <waveformID channelCode="HHZ" locationCode="00" networkCode="CL" stationCode="ROD3"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.595309Z</creationTime>
+        </creationInfo>
+      </amplitude>
+      <amplitude publicID="smi:local/Amplitude#20190326123958.542397.394622">
+        <genericAmplitude>
+          <value>0.07494065169</value>
+        </genericAmplitude>
+        <type>MLv</type>
+        <snr>2.020468507</snr>
+        <timeWindow>
+          <reference>2019-03-26T12:26:51.250000Z</reference>
+          <begin>-15.64</begin>
+          <end>31.26</end>
+        </timeWindow>
+        <pickID>smi:local/Pick#20190326123955.676237.394618</pickID>
+        <waveformID channelCode="HHZ" networkCode="HL" stationCode="KLV"></waveformID>
+        <creationInfo>
+          <agencyID>HA</agencyID>
+          <author>A.Karakonstantis</author>
+          <creationTime>2019-03-26T12:39:58.542500Z</creationTime>
+        </creationInfo>
+      </amplitude>
+    </event>
+  </eventParameters>
+</q:quakeml>

@@ -1,0 +1,17 @@
+[WINDOWS]
+tbeg1 = -0.1
+dtbeg = 0.2
+dtend = 0.02
+tend0 = 0.1
+tptsmax = 1.5
+specwindow = 0.5
+multperiod = 3.0
+minperiod = 0.1
+maxperiod = 2.0
+
+[CLUSTERING]
+ccrit = 3.2
+kmax = 10
+ncmin = 5
+linkage = ward
+
