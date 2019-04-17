@@ -2531,11 +2531,13 @@ class Pytheas(QtWidgets.QMainWindow):
                 _=build_taup_model(self.tpCNF.model)
                 # get vel model name
                 vmod=os.path.split(os.path.splitext(self.tpCNF.model)[0])[1]
+            # set taup model
+            self.tmodel=TauPyModel(model=vmod)
         except:
             logging.exception("Could not use custom model! Using IASP91 instead...")
-            vmod="IASP91"        
-        # set taup model
-        self.tmodel=TauPyModel(model=vmod)                            
+            vmod="IASP91"
+            # set taup model
+            self.tmodel=TauPyModel(model=vmod)            
         # set velocity model
         try:
             self.vmodel=VelocityModel.read_velocity_file(self.tpCNF.model)
@@ -2582,11 +2584,11 @@ class Pytheas(QtWidgets.QMainWindow):
         try: # get the catalogue, files etc
             self.getCat(self.dataPath,self.catFile,self.dbPath)
         except FileNotFoundError: # woops!
-            logging.warning("Could not find file %s"%catFile)
+            logging.warning("Could not find file %s" % self.catFile)
             self.pDial.close()
             winTitle="No Catalogue Found"
             genText="Could not find the catalogue!"
-            infText="No corresponding catalogue found in %s"%catFile
+            infText="No corresponding catalogue found in %s" % self.catFile
             self.warnMsgBox(genText,infText,winTitle)
             return
         self.pDial.setLabelText("Fetch S arrivals...")
