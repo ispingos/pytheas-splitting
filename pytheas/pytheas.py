@@ -2528,9 +2528,10 @@ class Pytheas(QtWidgets.QMainWindow):
             if self.tpCNF.model.endswith("tvel") or self.tpCNF.model.endswith("nd"):
                 from obspy.taup.taup_create import build_taup_model
                 modroot=os.path.split(self.tpCNF.model)[0]
-                _=build_taup_model(self.tpCNF.model)
+                _=build_taup_model(self.tpCNF.model,output_folder=modroot)
                 # get vel model name
                 vmod=os.path.split(os.path.splitext(self.tpCNF.model)[0])[1]
+                vmod=os.path.splitext(self.tpCNF.model)[0]+'.npz'
             # set taup model
             self.tmodel=TauPyModel(model=vmod)
         except:
@@ -2541,7 +2542,7 @@ class Pytheas(QtWidgets.QMainWindow):
         # set velocity model
         try:
             self.vmodel=VelocityModel.read_velocity_file(self.tpCNF.model)
-        except ValueError:
+        except:
             # if the vel model doesn't exist it might mean this
             # is one of the builtins, so search for it
             bltin=taup_get_builtin_model_files()
