@@ -8,8 +8,8 @@ p1=(21.6255,37.9624) # SE point of selection rectangle
 p2=(22.7428,38.5516) # NW point of selection rectangle
 level='response' # information layer to download (network,station,channel,response)
 outName='wgoc_stations_eida.txt' # full name for destination file of results 
-outType='QUAKEML'    # output type of file (CSS, KML, SACPZ, SHAPEFILE, STATIONTXT, STATIONXML)
-                     # use 'CLASSTXT' for a custom text format
+outType='STATIONXML'    # output type of file (CSS, KML, SACPZ, SHAPEFILE, STATIONTXT, STATIONXML)
+                        # use 'CLASSTXT' for a custom text format
 #############################################
 #
 #

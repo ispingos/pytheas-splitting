@@ -8,7 +8,8 @@ p1=(21.6255,37.9624) # SE point of selection rectangle
 p2=(22.7428,38.5516) # NW point of selection rectangle
 arrivals=False # select to download responses or not
 outName='wgoc_events_example_ISC.xml' # full name for destination file of results 
-outType='QUAKEML' # output type of file (CSS, KML, SACPZ, SHAPEFILE, STATIONTXT, STATIONXML)
+outType='QUAKEML' # output type of file ( CMTSOLUTION, CNV, JSON, KML, NLLOC_OBS, 
+                  #                       NORDIC, QUAKEML, SC3ML, SCARDEC, SHAPEFILE, ZMAP)
 #############################################
 #
 #
