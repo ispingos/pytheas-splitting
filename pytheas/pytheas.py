@@ -1267,21 +1267,25 @@ class Pytheas(QtWidgets.QMainWindow):
                            "SNR","phi error","td error (ms)","CC FS","CC NE",
                            "Score","Grade","Orientation","Comment"))
         writeList.append(hdr+"\n")
+        logging.debug('Splitting dictionary has %i records' % len(splittingDict))
         # event details
         frmt="%Y %m %d %H %M %S.%f" # format for origin information
+        entry_n = 0
         for activeEvent in sorted(splittingDict):
             evLayer=splittingDict[activeEvent]
             date=UTCDateTime(evLayer["origin"]).strftime(frmt)[:-3]
             latitude="{:.4f}".format(evLayer["latitude"])
             longitude="{:.4f}".format(evLayer["longitude"])
             depth=evLayer["depth"]
-            magnitude="{:.1f}".format(evLayer["magnitude"])
+            try:
+                magnitude="{:.1f}".format(evLayer["magnitude"])
+            except TypeError:
+                magnitude = "{:.1f}".format(np.nan)
             # station details
             for station in sorted(evLayer):
                 stLayer=evLayer[station]
                 if not isinstance(stLayer,dict): continue # if object is not a dictionary, it's not a station layer
                 depth="{:.1f}".format(float(depth)) # reset it for next station
-                logging.debug("Writing station "+station)
                 network=stLayer["network"]
                 distance="{:.2f}".format(stLayer["epicentral"])
                 backazimuth="{:.1f}".format(stLayer["azimuth"])
@@ -1292,6 +1296,8 @@ class Pytheas(QtWidgets.QMainWindow):
                     if not isinstance(meLayer,dict): continue # same as above
                     grade=meLayer["grade"]
                     if grade in ("F","X"): continue # skip failed attempts
+                    entry_n += 1
+                    logging.debug("Writing entry #%i: %s / %s / %s" % (entry_n, activeEvent, station, method))
                     phi="{:.1f}".format(meLayer["phi"])
                     td="{:.1f}".format(meLayer["td"])
                     pol="{:.1f}".format(meLayer["pol"])
