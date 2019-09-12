@@ -1,0 +1,155 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>3. Getting Started &#8212; Pytheas 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="shortcut icon" href="../_static/Pytheas_ICO.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4. Basic Description" href="../application/descriptions.html" />
+    <link rel="prev" title="2. Installation" href="installation.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../application/descriptions.html" title="4. Basic Description"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="2. Installation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="getting-started">
+<h1>3. Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="running-an-example">
+<h2>3.1. Running an example<a class="headerlink" href="#running-an-example" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><strong>Important</strong></dt>
+<dd>Before you start the process, go to the <code class="docutils literal notranslate"><span class="pre">example</span></code> folder and unzip the data in the <code class="docutils literal notranslate"><span class="pre">data.zip</span></code> archive.</dd>
+</dl>
+<p>Start the program. You (might) get a warning message stating that no Station Information file was found. In this case, open the Preferences menu (either through the toolbar in File-&gt;Preferences or with Shift+P) and then go the TauP tab. Browse to the example folder included in the release and select the StationXML file (<em>wgoc_stations_eida.xml</em>). <strong>Restart the program for the changes to take effect.</strong></p>
+<p>After restarting, you will get no new warning message. To open the example, use the Open Catalogue menu option (either through the toolbar in File-&gt;Open Catalogue or with Shift+O). A new window will ask for:</p>
+<ol class="arabic simple">
+<li>The path to the main data directory (<em>&lt;path&gt;/&lt;to&gt;/&lt;pytheas&gt;/example/data</em>)</li>
+<li>The path to the Catalogue file (<em>&lt;path&gt;/&lt;to&gt;/&lt;pytheas&gt;/example/wgoc_events_example_NKUA.xml</em>)</li>
+<li>The path where the Database will be stored (<em>&lt;path&gt;/&lt;to&gt;/&lt;pytheas&gt;/example/data/wgoc_events_example_NKUA.db3</em>)</li>
+</ol>
+<p>Browse, in each case, to the files included in the example folder. You can now press <cite>Ok</cite> to start the analysis! Keep in mind that the example file also includes a <code class="docutils literal notranslate"><span class="pre">rigo_crustal.nd</span></code> file, which is a local velocity model for the Western Gulf of Corinth (where the sample waveforms and events are from).</p>
+</div>
+<div class="section" id="acquiring-data-and-metadata">
+<h2>3.2. Acquiring data and metadata<a class="headerlink" href="#acquiring-data-and-metadata" title="Permalink to this headline">¶</a></h2>
+<p>Pytheas requires three inputs to work:</p>
+<ol class="arabic simple">
+<li><strong>A directory containing the data:</strong> This can be of any name, but the final branch of the directory tree should contain folders named after the events in a %Y-%m-%d-%H-%M-%S format. For example, <em>~/my_data/2019/04/01/2019-04-01-22-19-32</em> and <em>~/my_data/2019-04-01-22-19-32</em> are the same for Pytheas.</li>
+<li><dl class="first docutils">
+<dt><strong>A compatible Catalogue file:</strong> This can be either of a QuakeML format or a simple ASCII file containing event information (origin time in any format up to the 23th column and then the latitude, longitude, magnitude and depth of the event, space-delimited). For instance:</dt>
+<dd><code class="docutils literal notranslate"><span class="pre">2019</span> <span class="pre">04</span> <span class="pre">14</span> <span class="pre">21</span> <span class="pre">00</span> <span class="pre">00.000</span>&#160; <span class="pre">38.0100</span>&#160;&#160; <span class="pre">23.8314</span>&#160; <span class="pre">13.0</span>&#160; <span class="pre">6.0</span></code></dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>A compatible Station Information file:</strong> This can be either of a StaionXML format or a simple ASCII file containing station information (station name, network code, latitude, longitude and elevation, space-delimited). For example:</dt>
+<dd><code class="docutils literal notranslate"><span class="pre">ATHU</span> <span class="pre">HA</span>&#160; <span class="pre">37.9665</span>&#160;&#160; <span class="pre">23.7845</span>&#160; <span class="pre">308</span></code></dd>
+</dl>
+</li>
+</ol>
+<p>You can find scripts for downloading data and metadata from the FDSN in the <em>acquisition_scripts</em> folder, inluded with Pytheas.</p>
+<div class="topic">
+<p class="topic-title first">QuakeML and StationXML</p>
+<p>It is <strong>highly</strong> recommended to use QuakeML and StationXML files. QuakeML can contain additional information vital for the use of Pytheas (i.e. S arrivals, S-P times, angle of incidence). StationXML can contain equally important information about the stations (i.e. the instrument orientation). You can acquire those types of files through popular services (e.g. <a class="reference external" href="http://eida.gfz-potsdam.de/webdc3/">WebDC3</a> and <a class="reference external" href="https://service.iris.edu/fdsnws/">IRIS DMC</a>) via the provided scripts. In a future update, we plan to implement this functionality through Pytheas itself. For Greece, you can acquire event metadata in QuakeML format from the <a class="reference external" href="http://www.geophysics.geol.uoa.gr/stations/gmapv3_db/index.php?lang=en">National and Kapodistrian University of Athens - Seismological Laboratory website</a> by going to the detailed event information of each event.</p>
+<p>Some parameters will need to be calculated for Pytheas to work, if a QuakeML is not provided. The angle of incidence will be calculated geometrically, considering a linear ray path. In such cases, it is important to use TauP to (re)calculate accurate angles.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/splash_color_55px.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3. Getting Started</a><ul>
+<li><a class="reference internal" href="#running-an-example">3.1. Running an example</a></li>
+<li><a class="reference internal" href="#acquiring-data-and-metadata">3.2. Acquiring data and metadata</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="previous chapter">2. Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../application/descriptions.html"
+                        title="next chapter">4. Basic Description</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/introduction/quickstart.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../application/descriptions.html" title="4. Basic Description"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="2. Installation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Ioannis Spingos.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

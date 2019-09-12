@@ -1,0 +1,62 @@
+Installation
+============
+Compatibility
+~~~~~~~~~~~~~
+ Pytheas has been tested on various systems running Windows 10, using Python 3.7.2. The program has been tested on the following versions of individual packages:
+
+ * obspy 1.1.1
+ * PyQt5 5.11.3
+ * scikit-learn 0.20.2
+ * matplotlib 3.0.2
+ * numpy 1.16.0
+ * scipy 1.2.0
+
+Dependencies and Installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To use Pytheas you first need to install `Python 3 <https://www.python.org/downloads/>`_ and then the following dependencies:
+
+* obspy
+* PyQt5
+* scikit-learn
+* configparser
+
+You can use the provided scripts to install dependencies. For Windows users this is ``install_reqs_windows.bat`` and for Linux users ``install_reqs_linux.sh``.
+
+Alternatively, you can install the packages by ``pip`` using the following commands in a terminal (Linux/MacOS) or command prompt (Windows): 
+
+|  ``pip install obspy``
+|  ``pip install PyQt5``
+|  ``pip install scikit-learn`` 
+|  ``pip install configparser``
+
+Remember to also update ``numpy``, ``scipy`` and ``matplotlib``:
+
+|  ``pip install --upgrade numpy``
+|  ``pip install --upgrade scipy``
+|  ``pip install --upgrade matplotlib``
+
+Another option is using a distribution like `Anaconda <https://www.anaconda.com/>`_.
+
+No matter which one of the above you prefer, the program runs by using the ``LaunchPytheas.pyw`` file. Windows users can use ``LaunchPytheas.exe`` instead.
+
+Download
+~~~~~~~~
+You can download the Python code and related files from https://www.github.com/ispingos/pytheas-splitting .
+
+System Requirements
+~~~~~~~~~~~~~~~~~~~
+Hardware requirements are largely dependent on the analyzed waveforms. We tested Pytheas on four different systems with the following results.
+
+.. csv-table:: **System Requirements**
+    :header: System,CPU,RAM,GPU,User Experience*
+    :widths: 100,100,100,100,100
+
+    ASUS Vivobook X5600UD,Intel Core i7 8550U,8 GB,Nvidia GTX 1050 (4 GB),A+
+    Custom Desktop,Intel Core i5 8400,8 GB,Nvidia GTX 950 (2 GB),A+
+    Dell Inspiron 15 5567-1753,Intel Core i7 7200U,8 GB,AMD Radeon R7 M445 (4 GB),A
+    Custom Desktop,Intel Core i5 3470,4 GB,Nvidia GT 640 (2 GB),B
+    Toshiba Satellite m50-a-110,Intel Core i5 4200U,4 GB,Nvidia GT 740M (2 GB),B-
+
+*User Experience is based on subjective criteria, among three different analysts.*
+
+A dedicated GPU is generally recommended, especially if you intend to work extensively with the MAN method.

@@ -1,0 +1,162 @@
+Controls
+============
+
+Toolbar Options
+~~~~~~~~~~~~~~~
+Various functions can be accessed through the toolbar. 
+
+.. csv-table:: **File Menu**
+    :header: Option,Description
+    :widths: 20,60
+
+    Open Catalogue,"Starts the analysis process by asking for the data, catalogue and database locations."
+    Preferences,View and edit the available Preferences of Pytheas.
+    Quit,Exits the program.
+
+| 
+
+.. csv-table:: **Database Menu**
+    :header: Option,Description
+    :widths: 20,60
+
+    Save as...,"Copies the existing database to a new location and, hereafter, uses the new file instead."
+    Load New,Loads a new database and uses it instead.
+    Save Solution to Database,Save active solution to the database.
+    Load Solution from database,Loads an existing solution from the database. A dialog window will open with a drop-down menu oferring all the available methods from the database.
+    Export...,Exports the selected event-station-method pairs from the database to a text file (either ``spl`` or ``csv``).
+    Export Active,Exports only the active solution to a text file.
+    Export Figure,Exports a figure summarizing the results of the selected method of the active event-station pair.
+
+| 
+
+.. csv-table:: **View Menu**
+    :header: Option,Description
+    :widths: 20,60
+
+    Grid,Show a grid overlaying the waveform and polarigram plots.
+    Center S,Centers the current view around the picked S-arrival.
+    Set X Axis Limits,Prompts the user to set custom limits for the time axis.
+
+| 
+
+.. csv-table:: **Manual Menu**
+    :header: Option,Description
+    :widths: 20,60
+
+    Initial Stage,Go to the Initial Stage of the MAN method.
+    Rotated Stage,Go to the Rotated Stage of the MAN method.
+    Corrected Stage,Go to the Corrected Stage of the MAN method.
+    Set phi,Prompts the user to set a custom φ value.
+    Set time-delay,Prompts the user to set a custom t\ :sub:`d` \value.
+    Set grade,Prompts the user to select a grade from the available in the drop-down menu.
+    Set comment,Prompts the user to set a custom comment for the measurement.
+
+| 
+
+.. csv-table:: **Splitting Menu**
+    :header: Option,Description
+    :widths: 20,60
+
+    Set Shear-wave Window,Prompts the user to select a maximum angle of incidence (shear-wave window) for the analysis. Defaults to infinite (i.e. no angle set).
+    ZRT/LQT,Select to which system waveforms should be rotated for the EV and ME methods. This option persists when using any CA implementation.
+    Eigenvalue,Use the EV method.
+    Minimum Energy,Use the ME method.
+    Rotation-Correlation,Use the RC method.
+    Cluster Analysis (EV),Use the EV method with CA in the active event-station pair. 
+    Cluster Analysis (ME),Use the ME method with CA in the active event-station pair. 
+    Cluster Analysis (RC),Use the RC method with CA in the active event-station pair.
+    Catalogue Cluster Analysis,Opens a dialog to set options and initiate the CA method for the whole catalogue.
+
+| 
+
+.. csv-table:: **Navigate Menu**
+    :header: Option,Description
+    :widths: 20,60
+
+    Station List,Opens the Station List window. 
+    Next Station,Go to the Next Station.
+    Previous Station,Go to the Previous Station.
+    Events List,Opens the Events List window.
+    Next Event,Go to the Next Event.
+    Previous Event,Go to the Previous Event.
+
+.. topic:: **Station and Event Windows**
+
+    These windows offer the ability to the user to select which event or station to analyze. Each window displays some additional information for the selection and each header (if clicked) sorts the available events/stations according to the respective parameter. The *font* for each entry works as follows:
+    
+    1. **Bold:** The event/station exists in the dataset and is within the shear-wave window.
+    2. Normal: The event/station exists in the dataset, but is not within the shear-wave window.
+    3. *Strikethrough:* The event/station pair does not exist in the dataset.
+
+    Please keep in mind that events in this window are acquired from the catalogue given. If a catalogue does not contain an event that exists in the data directory, this event will not be recognized by Pytheas. The same is true for stations. Only picked stations will be shown. If a QuakeML is not provided or it does not contain S-arrivals, all of the stations included in the provided Station Information file will be shown in the Stations Window (with the font coding still in effect).
+
+    If a station or an event is not found, the user will be prompted by the program to skip it and go to the next/previous, until one is found.
+
+    Finally, the program uses any angles of incidence obtained from loading the catalogue for the above process. If you select to recalculate angles with TauP, it is possible that the displayed angle is different than the one in the selection window. Also, it is possible that some rays outside the shear-wave window end up in it.
+
+| 
+
+.. csv-table:: **Tools Menu**
+    :header: Option,Description
+    :widths: 20,60
+
+    AR-AIC,Toggle to turn the AR-AIC auto-picker on or off.
+    Bandpass Filter,Apply a bandpass filter to the waveforms. A user prompt will ask for the filter boundaries.
+    Bandpass 1-20 Hz,Apply a bandpass filter in the 1-20 Hz range.
+    Bandpass 1-10 Hz,Apply a bandpass filter in the 1-10 Hz range.
+    Recommmend Filter,Apply a filter with recommended frequency bounds defined as 0.5*T\ :sub:`S` \ and 1.5*T\ :sub:`S` \ Hz.
+    Remove Filter,Remove any filter and display the raw waveforms.
+    Show Horizontal Spectra,Display the spectrum of each active horizontal component. Requires a window to first be picked. 
+
+Key bindings
+~~~~~~~~~~~~
+The following key bindings are offered in Pytheas.
+
+.. csv-table:: **Visual Inspection Controls**
+    :header: Description,Key
+    :widths: 60,20
+
+    Increase t\ :sub:`d` \ by 1 sample,Left Arrow
+    Decrease t\ :sub:`d` \ by 1 sample,Right Arrow
+    Increase t\ :sub:`d` \ by 5 samples,Shift + Left Arrow
+    Decrease t\ :sub:`d` \ by 5 samples,Shift + Right Arrow
+    Adjust amplitude axis,Mouse Wheel
+    Adjust time axis,Shift + Mouse Wheel
+    Pick for splitting measurement,Ctrl + Left Mouse
+    Pick for S arrival,Ctrl + Right Mouse
+    Set time window start,Shift + Left Mouse
+    Set time window end,Shift + Right Mouse
+    Remove time window,Shift + Middle Mouse
+
+|  
+
+.. csv-table:: **Keys**
+    :header: Description,Key
+    :widths: 60,20
+
+    Open Catalogue,Shift + O
+    Open Preferences,Shift + P
+    Save Current Solution to Database,Ctrl + S
+    Go to Initial Stage,Ctrl + 1
+    Go to Rotated Stage,Ctrl + 2
+    Go to Corrected Stage,Ctrl + 3
+    Set time-delay,Ctrl + D
+    Set grade,Ctrl + X
+    Set comment,Ctrl + G
+    Apply MRC,Ctrl + K
+    Apply MEV,Ctrl + L
+    Apply MME,Ctrl + E
+    Apply ARC,Ctrl + Y
+    Apply AEV,Ctrl + T
+    Apply AME,Ctrl + U
+    Catalogue Cluster Analysis,Shift + A
+    Station Selection Window,Shift + S
+    Next Station,Ctrl + W
+    Previous Station,Ctrl + Q
+    Event Selection Window,Shift + E
+    Next Event,Shift + N
+    Previous Event,Shift + B
+    Apply Bandpass Filter,Ctrl + B
+    Apply 1-20 Hz BP Filter,Ctrl + F
+    Apply 1-10 Hz BP Filter,Ctrl + H
+    Remove Filter,Ctrl + R

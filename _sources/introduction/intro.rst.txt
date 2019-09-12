@@ -1,0 +1,31 @@
+What is Pytheas?
+================
+Pytheas is an open-source software solution for local shear-wave splitting studies. Shear-wave Splitting (SwS) is the phenomenon of two, orthogonally polarized, shear-waves, produced from the same original wave, propagating in an anisotropic medium. SwS has been explored in various branches of Seismology, such as earthquake precursors `(Crampin et al., 1999) <https://doi.org/10.1046/j.1365-246x.1999.00891.x>`_ and fracture characterization in reservoirs `(Al-Harassi et al., 2010) <https://doi.org/10.1111/j.1365-2478.2010.00915.x>`_. 
+
+After performing multiple SwS studies with a cumbersome blend of Shell scripts and Fortran programs (e.g. `Kaviris et al., 2017 <https://doi.org/10.1016/j.pepi.2017.06.006>`_), we decided to start developing a new application for analysis, back in 2016. We selected the Python language due to its open-source character, high level features and increasing popularity in Seismology. Even though we started with the intention to simply develop a comfortable GUI for the manual method of visually inspecting particle motion diagrams, the program started to evolve into something more. Fast forward ~3 years (and a MSc thesis) later, we developed a fully-fledged SwS application that includes several popular methods of analysis and aims to introduce a new workflow scheme, by mixing both manual and automatic methods, under a unified and intuitive GUI. By achieving the above, Pytheas' goal is to make analyzing SwS in local recordings easier, more comfortable and more effective.
+
+Who is Pytheas for?
+~~~~~~~~~~~~~~~~~~~
+Pytheas was developed with both beginners and experts in mind. Despite offering a plethora of customizing options, the application should have a smooth learning curve. The intuitive implementation of the visual inspection method can be used both as a research (e.g. for establishing a quality control sample of measurements before using any automatic methods) and a teaching (actually 'seeing' the polarization direction in the particle motion diagrams and then 'moving' the waveforms in time can have a vivid impression on students and help them better understand how splitting works) tool. Striving for the best user-experience, we hope to avoid intimidating students and early-career scientists with requiring terminals and commands to operate the software. Experienced researchers can benefit from the combination of multiple methods to obtain more robust results, while the integration of common file formats will trivialize the hassle of acquiring and converting data.
+
+Highlights
+~~~~~~~~~~
+
++ Includes the most popular SwS analysis methods (Visual inspection of particle motion diagrams, Rotation-Correlation, Eigenvalues, Minimum Energy, Cluster Analysis).
++ All functionality implemented through the GUI.
++ Permits the seamless use of different methods, offering a new approach to the quality control of results.
++ Compatible with standard formats for both data (e.g. SAC and mSEED) and metadata (QuakeML and StationXML).
++ Provides a results-management framework that includes databases, the production of publication-ready figures and comprehensive results files.
++ Open-source, which means the ability for user-customization.
+
+Acknowledgements
+~~~~~~~~~~~~~~~~
+One of the projects that had a major impact on the development team of Pytheas is `Obspy <https://www.obpy.org>`_. Obspy managed to offer a very valuable tool to Seismology and provide the foundations required to build sophisticated Seismological software in Python. 
+
+Every modern programmer would be omissive to not acknowledge the `StackOverflow community <https://stackoverflow.com/>`_, which has been a great help in getting started with programming.
+
+Finally, we would like to thank the developers of `Sphinx <http://www.sphinx-doc.org/>`_ for providing the tools to generate this lovely documentation.
+
+Got any feedback?
+~~~~~~~~~~~~~~~~~
+If you have any issue, comment or suggestion feel free to contact us at ispingos@geol.uoa.gr. You can also use the software's dedicated GitHub page at https://ispingos.github.com/pytheas/

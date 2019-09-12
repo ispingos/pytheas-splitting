@@ -17,6 +17,4 @@ Pytheas is released under the GNU GPLv3 license.
 Authors: Spingos I. & Kaviris G. (c) 2019
 Special thanks to Millas C. for testing the software and providing valuable feedback from the very early stages of this endeavor!
 
-Pytheas on YouTube: https://www.youtube.com/channel/UC7USfZT9PfnNTNqMiY1AgTg
-
 For any issues, comments or suggestions please contact us at ispingos@geol.uoa.gr or through GitHub at https://www.github.com/ispingos/pytheas-splitting

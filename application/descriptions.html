@@ -1,0 +1,197 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>4. Basic Description &#8212; Pytheas 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="shortcut icon" href="../_static/Pytheas_ICO.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5. Other Features" href="features.html" />
+    <link rel="prev" title="3. Getting Started" href="../introduction/quickstart.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="features.html" title="5. Other Features"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../introduction/quickstart.html" title="3. Getting Started"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="basic-description">
+<h1>4. Basic Description<a class="headerlink" href="#basic-description" title="Permalink to this headline">¶</a></h1>
+<p>Pytheas offers a lot of functionality in terms of analyzing shear-wave splitting. The user can benefit from manual, semi- and fully- automatic methods, used separately or in tandem.</p>
+<div class="section" id="available-methods">
+<h2>4.1. Available Methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<p>The following shear-wave splitting methods are available through Pytheas. The references provided are indicative and by no means cover the topic of each technique or its application.</p>
+<table border="1" class="colwidths-given docutils" id="id2">
+<caption><span class="caption-text"><strong>Methods</strong></span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="13%" />
+<col width="64%" />
+<col width="15%" />
+<col width="8%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Short Description</th>
+<th class="head">Reference</th>
+<th class="head">Notation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Visual Inspection</td>
+<td>The manual method of visually inspecting particle motion diagrams</td>
+<td><a class="reference external" href="https://doi.org/10.1016/j.pepi.2017.06.006">Kaviris et al. (2017)</a></td>
+<td>MAN</td>
+</tr>
+<tr class="row-odd"><td>Rotation-Correlation</td>
+<td>Semi-automatic method which seeks the φ-t<sub>d</sub> pair that provides the highest similarity of the horizontal components</td>
+<td><a class="reference external" href="https://doi.org/10.1111/j.1365-246X.1987.tb01367.x">Bowman and Ando (1987)</a></td>
+<td>RC</td>
+</tr>
+<tr class="row-even"><td>Eigenvalue</td>
+<td>Semi-automatic method which seeks the φ-t<sub>d</sub> pair that minimizes the second eigenvalue of the covariance matrix of the two horizontal components</td>
+<td><a class="reference external" href="https://doi.org/10.1029/91JB00899">Silver and Chan (1991)</a></td>
+<td>EV</td>
+</tr>
+<tr class="row-odd"><td>Minimum Energy</td>
+<td>Semi-automatic method which seeks the φ-t<sub>d</sub> pair that minimizes the energy of the transverse component</td>
+<td><a class="reference external" href="https://doi.org/10.1029/91JB00899">Silver and Chan (1991)</a></td>
+<td>ME</td>
+</tr>
+<tr class="row-even"><td>Cluster Analyis</td>
+<td>Method for automating RC, EV and ME by seeking the most stable solution over a range of measurements</td>
+<td><a class="reference external" href="http://dx.doi.org/10.1785/0120030123">Teanby et al. (2004)</a></td>
+<td>CA</td>
+</tr>
+</tbody>
+</table>
+<p>Hereafter, the notation for the semi-automatic methods uses a ‘M’ prefix if the signal window for analysis is provided by the user (<strong>MRC, MEV and MME</strong>) or a ‘A’ prefix if the signal window is obtained from CA (<strong>ARC, AEV and AME</strong>).</p>
+</div>
+<div class="section" id="visual-inspection-man">
+<h2>4.2. Visual Inspection (MAN)<a class="headerlink" href="#visual-inspection-man" title="Permalink to this headline">¶</a></h2>
+<p>The MAN method demands the full involvement of the analyst in all steps. It displays the motion in the horizontal plane defined by the N-S and E-W instrument components to enable the determination of polarization and, then, measure the time-delay. It can be broken down to three steps:</p>
+<ol class="arabic simple">
+<li><strong>Initial Stage:</strong> Pick the arrival of the S<sub>fast</sub> phase in one of the horizontal components. The respective vector in the polarigram will also be selected and the φ value at the top will change accordingly.</li>
+<li><strong>Rotated Stage:</strong> Rotate the waveforms to the axial system defined by φ and its orthogonal S<sub>slow</sub> polarization direction (Ctrl+2). Temporally shift the S<sub>slow</sub> component (with the Arrow Keys) to match the arrival of the shear-waves in both horizontal components. In the meantime, the t<sub>d</sub> and <em>pol</em> values at the top will change dynamically. The latter refers to the polarization direction of the corrected (for anisotropy) waveforms.</li>
+<li><strong>Corrected Stage:</strong> Rotate the wavefroms back to the NE axial system (Ctrl+3) to validate visually the measurement. The S-wave should now arrive simultaneously in both horizontal channels and the polarigram around its arrival should present parallel vectors. A qualitative grade must be given by the user (Ctrl+G).</li>
+</ol>
+<div class="topic">
+<p class="topic-title first">Manual Grading</p>
+<p>The manual grade is a synthesis of multiple factors, such as clarity of the initial S<sub>fast</sub> arrival, the parallelism of vectors around the arrival in the FS system and the degree of correction achieved as decided by the analyst. If no grade is given by the user, the default ‘X’ will be set. In that case, the measurement will <strong>not be stored in the database</strong>, since ‘X’-graded results are not considered as final measurements.</p>
+</div>
+<p>Even though the above description is how the method has been used so far, Pytheas gives the opportunity to skip the <em>Rotated Stage</em> and perform the time-delay determination in the <em>Corrected Stage</em>. The program will automatically rotate the waveforms to the <em>Rotated Stage</em>, apply the time-delay and re-rotate them to the <em>Corrected Stage</em>, without the involvement of the user. This new addition to the method can facilitate small improvements in measuring the time-delay.</p>
+<p>Pytheas also offers the ability to set a maximum angle of incidence. This quantity is often used to exclude station-event pairs where there is potential for secondary phases to distort the arrival of the direct S-wave. Thus, by setting a maximum angle of incidence (<em>shear-wave window</em>), the analyst can simply use the keybinding to navigate to the next available station-event pair, with the ones outside the shear-wave window being automatically skipped.</p>
+</div>
+<div class="section" id="semi-automatic-methods-ev-mc-and-rc">
+<h2>4.3. Semi-automatic Methods (EV, MC and RC)<a class="headerlink" href="#semi-automatic-methods-ev-mc-and-rc" title="Permalink to this headline">¶</a></h2>
+<p>The application principle for all three methods is the same. The analyst tries different signal windows around the arrival of the S<sub>fast</sub> to obtain the one that provides the best measurement, with the start of the window usually being somewhat steady. In Pytheas, after the user has specified the window and selected the analysis method, a new automatic grading algorithm provides a score and qualitative grade for the measurement. Moreover, a figure is shown to permit the quality assesment of the result by the user.</p>
+<div class="topic">
+<p class="topic-title first">Grading Algorithm</p>
+<p>To enable the use of a fully automated process, Pytheas employs a new grading algorithm. The quality of the measurement is determined from five factors; (a) the error of φ, (b) the error of t<sub>d</sub>, (c) the Signal-to-Noise Ratio (SNR), (d) the Correlation Coefficient (CC) for the corrected waveforms in the FS axial system and (d) the CC for the corrected waveforms in the NE axial system. First, a check is performed to ensure the measurement’s SNR is above the minimum accepted. For each of the other parameters, an individual score is calculated, based on the ratio of the parameter and user-defined accepted tresholds. If any of them exceeds 1, the measurement gets an ‘E’ grade. The mean of the scores provides the final score and, consequently, grade. Most of the above can be customized by the user in the Preferences. However, it is important to note that the final score (since it’s normalized to all four parameters) cannot exceed 1. Thus, a perfect measurement would have a final score tending to 0 and a very bad quality one would have a score close to 1. There are two special cases of grades. The ‘N’ grade is given when a measurement is considered null, i.e. when φ is either (sub)parallel or (sub)perpendicular to <em>pol</em>. The ‘F’ grade is used privately by the program to characterize event-station pairs that existed but yielded no result or an error occured during Cluster Analysis.</p>
+</div>
+<p>To conduct a measurement with the EV and ME methods, the waveforms are first rotated to the ray-defined axial system. Pytheas permits the rotation of waveforms to either ZRT (i.e. rotated only by the backazimuth) or LQT (i.e. rotated by both the backazimuth and the angle of incidence).</p>
+</div>
+<div class="section" id="cluster-analysis-ca">
+<h2>4.4. Cluster Analysis (CA)<a class="headerlink" href="#cluster-analysis-ca" title="Permalink to this headline">¶</a></h2>
+<p>Cluster Analysis automates the window selection process described above. The program conducts measurements over a large number of candidate windows. The measurements, which form a space defined by φ and t<sub>d</sub>, are then clustered. The optimal window is the one that belongs to the most constrained cluster and features the smallest errors. If it is not already provided, the Pytheas user needs only to pick the arrival of the S<sub>fast</sub>. The grading algorithm provides a qualitative grade and two figures are generated; one detailing the clustering process and one showcasing the measurement in the optimal signal window.</p>
+<p>CA can be used in two ways. Either after opening a new station-event pair or by selecting the Catalogue Cluster Analysis option, where the whole catalogue will be processed. The latter offers some refinement options, i.e. the selection of specific stations, the setting of the shear-wave window and a universal filter. Moreover, it offers the ability to skip already analyzed pairs or ones that where previously processed but yielded no result (<em>failed</em> pairs graded with ‘F’). Keep in mind that for EV and me, the waveforms will be rotated in either ZRT or LQT, as defined in the Splitting menu from the toolbar.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/splash_color_55px.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">4. Basic Description</a><ul>
+<li><a class="reference internal" href="#available-methods">4.1. Available Methods</a></li>
+<li><a class="reference internal" href="#visual-inspection-man">4.2. Visual Inspection (MAN)</a></li>
+<li><a class="reference internal" href="#semi-automatic-methods-ev-mc-and-rc">4.3. Semi-automatic Methods (EV, MC and RC)</a></li>
+<li><a class="reference internal" href="#cluster-analysis-ca">4.4. Cluster Analysis (CA)</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../introduction/quickstart.html"
+                        title="previous chapter">3. Getting Started</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="features.html"
+                        title="next chapter">5. Other Features</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/application/descriptions.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="features.html" title="5. Other Features"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../introduction/quickstart.html" title="3. Getting Started"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Ioannis Spingos.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

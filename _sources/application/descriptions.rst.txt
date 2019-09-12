@@ -1,0 +1,52 @@
+Basic Description
+=================
+Pytheas offers a lot of functionality in terms of analyzing shear-wave splitting. The user can benefit from manual, semi- and fully- automatic methods, used separately or in tandem. 
+
+Available Methods
+~~~~~~~~~~~~~~~~~
+The following shear-wave splitting methods are available through Pytheas. The references provided are indicative and by no means cover the topic of each technique or its application.
+
+.. csv-table:: **Methods**
+    :header: Name,Short Description,Reference,Notation
+    :widths: 50,250,60,30
+
+    Visual Inspection,The manual method of visually inspecting particle motion diagrams,`Kaviris et al. (2017) <https://doi.org/10.1016/j.pepi.2017.06.006>`_,MAN
+    Rotation-Correlation,Semi-automatic method which seeks the φ-t\ :sub:`d` \pair that provides the highest similarity of the horizontal components,`Bowman and Ando (1987) <https://doi.org/10.1111/j.1365-246X.1987.tb01367.x>`_,RC
+    Eigenvalue,Semi-automatic method which seeks the φ-t\ :sub:`d` \pair that minimizes the second eigenvalue of the covariance matrix of the two horizontal components,`Silver and Chan (1991) <https://doi.org/10.1029/91JB00899>`_,EV
+    Minimum Energy,Semi-automatic method which seeks the φ-t\ :sub:`d` \pair that minimizes the energy of the transverse component,`Silver and Chan (1991) <https://doi.org/10.1029/91JB00899>`_,ME
+    Cluster Analyis,"Method for automating RC, EV and ME by seeking the most stable solution over a range of measurements",`Teanby et al. (2004) <http://dx.doi.org/10.1785/0120030123>`_,CA
+
+Hereafter, the notation for the semi-automatic methods uses a 'M' prefix if the signal window for analysis is provided by the user (**MRC, MEV and MME**) or a 'A' prefix if the signal window is obtained from CA (**ARC, AEV and AME**).
+
+Visual Inspection (MAN)
+~~~~~~~~~~~~~~~~~~~~~~~
+The MAN method demands the full involvement of the analyst in all steps. It displays the motion in the horizontal plane defined by the N-S and E-W instrument components to enable the determination of polarization and, then, measure the time-delay. It can be broken down to three steps:
+
+1. **Initial Stage:** Pick the arrival of the S\ :sub:`fast` \ phase in one of the horizontal components. The respective vector in the polarigram will also be selected and the φ value at the top will change accordingly.
+2. **Rotated Stage:** Rotate the waveforms to the axial system defined by φ and its orthogonal S\ :sub:`slow` \ polarization direction (Ctrl+2). Temporally shift the S\ :sub:`slow` \ component (with the Arrow Keys) to match the arrival of the shear-waves in both horizontal components. In the meantime, the t\ :sub:`d` \ and *pol* values at the top will change dynamically. The latter refers to the polarization direction of the corrected (for anisotropy) waveforms.
+3. **Corrected Stage:** Rotate the wavefroms back to the NE axial system (Ctrl+3) to validate visually the measurement. The S-wave should now arrive simultaneously in both horizontal channels and the polarigram around its arrival should present parallel vectors. A qualitative grade must be given by the user (Ctrl+G).
+
+.. topic:: Manual Grading
+
+	The manual grade is a synthesis of multiple factors, such as clarity of the initial S\ :sub:`fast` \ arrival, the parallelism of vectors around the arrival in the FS system and the degree of correction achieved as decided by the analyst. If no grade is given by the user, the default 'X' will be set. In that case, the measurement will **not be stored in the database**, since 'X'-graded results are not considered as final measurements.
+
+Even though the above description is how the method has been used so far, Pytheas gives the opportunity to skip the *Rotated Stage* and perform the time-delay determination in the *Corrected Stage*. The program will automatically rotate the waveforms to the *Rotated Stage*, apply the time-delay and re-rotate them to the *Corrected Stage*, without the involvement of the user. This new addition to the method can facilitate small improvements in measuring the time-delay.
+
+Pytheas also offers the ability to set a maximum angle of incidence. This quantity is often used to exclude station-event pairs where there is potential for secondary phases to distort the arrival of the direct S-wave. Thus, by setting a maximum angle of incidence (*shear-wave window*), the analyst can simply use the keybinding to navigate to the next available station-event pair, with the ones outside the shear-wave window being automatically skipped.
+
+Semi-automatic Methods (EV, MC and RC)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The application principle for all three methods is the same. The analyst tries different signal windows around the arrival of the S\ :sub:`fast` \ to obtain the one that provides the best measurement, with the start of the window usually being somewhat steady. In Pytheas, after the user has specified the window and selected the analysis method, a new automatic grading algorithm provides a score and qualitative grade for the measurement. Moreover, a figure is shown to permit the quality assesment of the result by the user.
+
+
+.. topic:: Grading Algorithm
+	
+	To enable the use of a fully automated process, Pytheas employs a new grading algorithm. The quality of the measurement is determined from five factors; (a) the error of φ, (b) the error of t\ :sub:`d`\, (c) the Signal-to-Noise Ratio (SNR), (d) the Correlation Coefficient (CC) for the corrected waveforms in the FS axial system and (d) the CC for the corrected waveforms in the NE axial system. First, a check is performed to ensure the measurement's SNR is above the minimum accepted. For each of the other parameters, an individual score is calculated, based on the ratio of the parameter and user-defined accepted tresholds. If any of them exceeds 1, the measurement gets an 'E' grade. The mean of the scores provides the final score and, consequently, grade. Most of the above can be customized by the user in the Preferences. However, it is important to note that the final score (since it's normalized to all four parameters) cannot exceed 1. Thus, a perfect measurement would have a final score tending to 0 and a very bad quality one would have a score close to 1. There are two special cases of grades. The 'N' grade is given when a measurement is considered null, i.e. when φ is either (sub)parallel or (sub)perpendicular to *pol*. The 'F' grade is used privately by the program to characterize event-station pairs that existed but yielded no result or an error occured during Cluster Analysis.
+
+To conduct a measurement with the EV and ME methods, the waveforms are first rotated to the ray-defined axial system. Pytheas permits the rotation of waveforms to either ZRT (i.e. rotated only by the backazimuth) or LQT (i.e. rotated by both the backazimuth and the angle of incidence).
+
+Cluster Analysis (CA)
+~~~~~~~~~~~~~~~~~~~~~
+Cluster Analysis automates the window selection process described above. The program conducts measurements over a large number of candidate windows. The measurements, which form a space defined by φ and t\ :sub:`d`\, are then clustered. The optimal window is the one that belongs to the most constrained cluster and features the smallest errors. If it is not already provided, the Pytheas user needs only to pick the arrival of the S\ :sub:`fast`\. The grading algorithm provides a qualitative grade and two figures are generated; one detailing the clustering process and one showcasing the measurement in the optimal signal window.
+
+CA can be used in two ways. Either after opening a new station-event pair or by selecting the Catalogue Cluster Analysis option, where the whole catalogue will be processed. The latter offers some refinement options, i.e. the selection of specific stations, the setting of the shear-wave window and a universal filter. Moreover, it offers the ability to skip already analyzed pairs or ones that where previously processed but yielded no result (*failed* pairs graded with 'F'). Keep in mind that for EV and me, the waveforms will be rotated in either ZRT or LQT, as defined in the Splitting menu from the toolbar.

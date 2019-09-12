@@ -1,0 +1,34 @@
+Getting Started
+===============
+
+Running an example
+~~~~~~~~~~~~~~~~~~
+**Important**
+	Before you start the process, go to the ``example`` folder and unzip the data in the ``data.zip`` archive.
+Start the program. You (might) get a warning message stating that no Station Information file was found. In this case, open the Preferences menu (either through the toolbar in File->Preferences or with Shift+P) and then go the TauP tab. Browse to the example folder included in the release and select the StationXML file (*wgoc_stations_eida.xml*). **Restart the program for the changes to take effect.**
+
+After restarting, you will get no new warning message. To open the example, use the Open Catalogue menu option (either through the toolbar in File->Open Catalogue or with Shift+O). A new window will ask for:
+
+1. The path to the main data directory (*<path>/<to>/<pytheas>/example/data*)
+2. The path to the Catalogue file (*<path>/<to>/<pytheas>/example/wgoc_events_example_NKUA.xml*)
+3. The path where the Database will be stored (*<path>/<to>/<pytheas>/example/data/wgoc_events_example_NKUA.db3*)
+
+Browse, in each case, to the files included in the example folder. You can now press `Ok` to start the analysis! Keep in mind that the example file also includes a ``rigo_crustal.nd`` file, which is a local velocity model for the Western Gulf of Corinth (where the sample waveforms and events are from).
+
+Acquiring data and metadata
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Pytheas requires three inputs to work:
+
+1. **A directory containing the data:** This can be of any name, but the final branch of the directory tree should contain folders named after the events in a %Y-%m-%d-%H-%M-%S format. For example, *~/my_data/2019/04/01/2019-04-01-22-19-32* and *~/my_data/2019-04-01-22-19-32* are the same for Pytheas.
+2. **A compatible Catalogue file:** This can be either of a QuakeML format or a simple ASCII file containing event information (origin time in any format up to the 23th column and then the latitude, longitude, magnitude and depth of the event, space-delimited). For instance: 
+	``2019 04 14 21 00 00.000  38.0100   23.8314  13.0  6.0``
+3. **A compatible Station Information file:** This can be either of a StaionXML format or a simple ASCII file containing station information (station name, network code, latitude, longitude and elevation, space-delimited). For example:
+	``ATHU HA  37.9665   23.7845  308``
+
+You can find scripts for downloading data and metadata from the FDSN in the *acquisition_scripts* folder, inluded with Pytheas.
+
+.. topic:: QuakeML and StationXML
+
+	It is **highly** recommended to use QuakeML and StationXML files. QuakeML can contain additional information vital for the use of Pytheas (i.e. S arrivals, S-P times, angle of incidence). StationXML can contain equally important information about the stations (i.e. the instrument orientation). You can acquire those types of files through popular services (e.g. `WebDC3 <http://eida.gfz-potsdam.de/webdc3/>`_ and `IRIS DMC <https://service.iris.edu/fdsnws/>`_) via the provided scripts. In a future update, we plan to implement this functionality through Pytheas itself. For Greece, you can acquire event metadata in QuakeML format from the `National and Kapodistrian University of Athens - Seismological Laboratory website <http://www.geophysics.geol.uoa.gr/stations/gmapv3_db/index.php?lang=en>`_ by going to the detailed event information of each event.
+
+	Some parameters will need to be calculated for Pytheas to work, if a QuakeML is not provided. The angle of incidence will be calculated geometrically, considering a linear ray path. In such cases, it is important to use TauP to (re)calculate accurate angles.

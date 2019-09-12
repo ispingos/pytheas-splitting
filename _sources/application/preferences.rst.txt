@@ -1,0 +1,103 @@
+Preferences
+===========
+General
+~~~~~~~
+.. csv-table:: **General**
+    :header: Setting,Description
+    :widths: 50,250
+
+    Clean Logs,Sets the amount of days prior for which to delete log files.
+
+| 
+
+.. csv-table:: **Waveforms**
+    :header: Setting,Description
+    :widths: 50,250
+
+    Offset for matching event folders to origin times,Sets the maximum accepted difference (in s) when attempting to match event folder codes to origin times from the catalogue.
+    Trim waveforms,Select whether or not you want waveforms to be trimmed when displayed. This is very important as it can dramatically increase performance.
+    Start time from S-arrival,Time from the S-arrival (in s) to use as the trimming window start point.
+    End time from S-arrival,Time from the S-arrival (in s) to use as the trimming window end point.
+    Channel Code Preference,"Provide a comma-separated list of the first two channel code letters (according to SEED) in the sequence Pytheas will preferrentially look for them. For example, if both HH and HN type channels exist in the dataset for the same station/event pair and the user has provided the list 'HH,HN', the HH channels will be used. If none of the preferred codes is found, the program will read any channels it'll find first."
+    Instrument Orientation Correction,"Select whether to perform orientation correction on non-oriented waveforms. Requires the use of a StationXML file with information down to the Channel layer."
+
+| 
+
+.. csv-table:: **SNR**
+    :header: Setting,Description
+    :widths: 50,250
+
+    Start of noise window,Time from the S-arrival (in s) to use as the noise window start point. The end point is defined as the S-arrival. 
+    End of signal window,Time from the S-arrival (in s) to use as the signal window end point. The start point is defined as the S-arrival. 
+
+| 
+
+.. csv-table:: **Splitting**
+    :header: Setting,Description
+    :widths: 50,250
+
+    Maximum accepted t\ :sub:`d`,"The maximum time-delay (in ms) to use when defining test ranges in the EV, ME and RC methods. This does not affect any measurements with the MAN method." 
+
+Grading
+~~~~~~~
+.. csv-table:: **Thresholds**
+    :header: Setting,Description
+    :widths: 50,250
+
+    Polarization difference for nulls,Sets the angular maximum differences for which the S\ :sub:`fast` \ direction and the corrected S-wave polarization (*pol*) will be considered parallel or perpendicular. In other words the value *offset* specified here is used as: 0 - *offset* <= φ - *pol* <= 0 + *offset* OR 90 - *offset* <= φ - *pol* <= 90 + *offset*. If any of these conditions are met the measurement is considered null ('N' grade).
+    SNR\ :sub:`min`,Set the minimum accepted SNR.
+    δφ\ :sub:`max`,Set the maximum accepted error for the S\ :sub:`fast` \ polarization direction (in degrees).
+    δt\ :sub:`dmax`,Set the maximum accepted error for the time-delay (in ms).
+    Minimum Correlation Coefficient (FxS),Set the minimum accepted correlation coefficient for the correlation in the FS axial system.
+    Minimum Correlation Coefficient (NxE),Set the minimum accepted correlation coefficient for the correlation in the corrected NE axial system.    
+    Grades,"Set the upper bounds for which the grading algorithm will match scores to grades. The maximum attainable score is 1.0, so individual values should be set accordingly. Any score greater than the one specified for 'D' will be graded as 'E'."
+
+Clustering
+~~~~~~~~~~
+
+.. topic:: Cluster Analysis
+
+    To fully understand the settings in this section we **strongly** recommend reading the article of `Teanby et al. (2004) <http://dx.doi.org/10.1785/0120030123>`_. For the parameters concerning the definition of the **Windows Bounds** range you can also see `Savage et al. (2010) <https://doi.org/10.1029/2010JB007722>`_.
+
+.. csv-table:: **Thresholds**
+    :header: Setting,Description
+    :widths: 50,250
+
+    Minimum window start point (T\ :sub:`beg1`),"Set the minimum accepted window start (i.e. the closest to the S-arrival), relative to the S-arrival (in s)."
+    Step for window start points (DT\ :sub:`beg`),"Set the step with which the start points of candidate windows will be generated (in s)."
+    Step for window end points (DT\ :sub:`end`),"Set the step with which the end points of candidate windows will be generated (in s)."
+    Minimum window end point (T\ :sub:`end0`),"Set the minimum accepted window end (i.e. the closest to the S-arrival), relative to the S-arrival (in s)."
+
+|
+
+.. csv-table:: **Windows Bounds**
+    :header: Setting,Description
+    :widths: 50,250
+
+    Maximum t\ :sub:`S`\ -t\ :sub:`P`,The maximum accepted S-P time (in s). This constraint is use in case of errors or overestimation in the provided times. If an error occurs during the process (e.g. there is no provided S-P time in the catalogue) or the given time exceeds this limit the S-P time used is this. This parameter is used to determine the maximum window start point (T\ :sub:`beg0`) which is the half of the S-P time (i.e. T\ :sub:`beg0`\=(t\ :sub:`S`-t\ :sub:`P`)/2).
+    Time from S-arrival for period determination,Set the end of the time window used for determining the S-wave's period (in s).
+    Minimum S-wave period,The minimum accepted S-wave period. If a measurement exceeds the limit this will be the value used.
+    Maximum S-wave period,The maximum accepted S-wave period. If a measurement exceeds the limit this will be the value used.
+    Period factor,Set the factor (f\ :sub:`T` \) used to obtain the maximum window end point (T\ :sub:`end1`) which is defined as: T\ :sub:`end1` \ = f\ :sub:`T` \*T\ :sub:`S` \ where T\ :sub:`S` \ the period of the S-waves. 
+    C\ :sub:`critical`,The critical value for which to reject the null hypothesis in the `Duda and Hart (1974) <https://www.wiley.com/en-us/Pattern+Classification%2C+2nd+Edition-p-9780471056690>`_ criterion.
+    Maximum number of clusters,Set the maximum number of clusters the program can look for.
+    Minimum number of points per cluster,Any clusters containing less than the number of points set here will be rejected.
+    Linkage Criterion,Set which of the available criteria will be used when linking clusters. For more information you can see `sci-kit learn's page <https://scikit-learn.org/stable/modules/generated/sklearn.cluster.AgglomerativeClustering.html>`_.
+
+TauP
+~~~~
+
+.. csv-table:: **TauP**
+    :header: Setting,Description
+    :widths: 50,250
+
+    Model,Select the velocity model used for TauP. Either a path to an available file (in the ``.nd`` or ``.tvel`` formats) can be provided or a string with the name of one of the default models (see `Basic Usage in Obspy's documentation <https://docs.obspy.org/packages/obspy.taup.html>`_).
+    Station Information File,Either a StationXML file (including the Channel layer) or a simple space-delimited text file where each row represents a station in the following format: ``Station Network Latitude_in_dd Longitude_in_dd Elevation_in_m``.
+    Calculate Incidence,Select whether the angle of incidence will be calculated anew through TauP for each pair or the one obtained from the catalogue will be used.
+
+AR-AIC
+~~~~~~
+
+.. topic:: Auto Regressive - Akaike Information Criterion Picker
+
+    The Obspy's implementation of AR-AIC is used in the current software. For further details concerning the settings please see `their documentation <https://docs.obspy.org/packages/autogen/obspy.signal.trigger.ar_pick.html>`_. For more information about the algorithm itself, see `Akazawa (2004) <http://www.iitk.ac.in/nicee/wcee/article/13_786.pdf>`_.

@@ -1,0 +1,161 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>5. Other Features &#8212; Pytheas 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="shortcut icon" href="../_static/Pytheas_ICO.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="6. Preferences" href="preferences.html" />
+    <link rel="prev" title="4. Basic Description" href="descriptions.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="preferences.html" title="6. Preferences"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="descriptions.html" title="4. Basic Description"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="other-features">
+<h1>5. Other Features<a class="headerlink" href="#other-features" title="Permalink to this headline">¶</a></h1>
+<p>Pytheas also offers a wide variety of secondary features that enable the faster and more effective analysis of shear-wave splitting.</p>
+<div class="section" id="taup">
+<h2>5.1. TauP<a class="headerlink" href="#taup" title="Permalink to this headline">¶</a></h2>
+<p>The TauP software <a class="reference external" href="https://doi.org/10.1785/gssrl.70.2.154">(Crotwell et al., 1999)</a> is a collection of tools used for estimating phase arrivals and ray-paths. In Pytheas, we use <a class="reference external" href="https://docs.obspy.org/packages/obspy.taup.html">Obspy’s implementation of TauP</a> to calculate arrivals of shear-waves and the angle of incidence of each ray. The former parameter is useful when identifying the S<sub>fast</sub> visually, as noise can complicate this. The latter is used to calculate the precise angle of incidence, a quantity of great importance for shear-wave splitting studies. This angle is used for rejecting potential secondary arrivals misidentified as direct S-waves by setting the shear-wave window <a class="reference external" href="https://doi.org/10.1111/j.1365-246X.1985.tb05154.x">(Booth and Crampin, 1985)</a> and for rotating the waveforms to a ray-defined system for the EV and ME methods.</p>
+<p>The velocity model used by TauP, defined in the Preferences, can either take a value of builtin models (e.g. <code class="docutils literal notranslate"><span class="pre">IASP91</span></code> or <code class="docutils literal notranslate"><span class="pre">ak135</span></code>) or a custom model file can be specified. In this case, the file format should be either of <code class="docutils literal notranslate"><span class="pre">.nd</span></code> or <code class="docutils literal notranslate"><span class="pre">.tvel</span></code> type. For more information about custom model building please see the <a class="reference external" href="https://www.seis.sc.edu/downloads/TauP/taup.pdf">original TauP documentation</a>. A simple <code class="docutils literal notranslate"><span class="pre">.nd</span></code> file example is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ceiling_depth_km Vp Vs Density</span>
+<span class="mf">0.0</span> <span class="mf">5.0</span> <span class="mf">3.0</span> <span class="mf">2.7</span>
+<span class="mi">20</span> <span class="mf">5.0</span> <span class="mf">3.0</span> <span class="mf">2.7</span>
+<span class="mi">20</span> <span class="mf">6.5</span> <span class="mf">3.7</span> <span class="mf">2.9</span>
+<span class="mi">33</span> <span class="mf">6.5</span> <span class="mf">3.7</span> <span class="mf">2.9</span>
+<span class="n">mantle</span>
+<span class="mi">33</span> <span class="mf">7.8</span> <span class="mf">4.4</span> <span class="mf">3.3</span>
+<span class="mi">410</span> <span class="mf">8.9</span> <span class="mf">4.7</span> <span class="mf">3.5</span>
+<span class="mi">410</span> <span class="mf">9.1</span> <span class="mf">4.9</span> <span class="mf">3.7</span>
+<span class="mi">670</span> <span class="mf">10.2</span> <span class="mf">5.5</span> <span class="mf">4.0</span>
+<span class="mi">670</span> <span class="mf">10.7</span> <span class="mf">5.9</span> <span class="mf">4.4</span>
+<span class="mi">2891</span> <span class="mf">13.7</span> <span class="mf">7.2</span> <span class="mf">5.6</span>
+<span class="n">outer</span><span class="o">-</span><span class="n">core</span>
+<span class="mi">2891</span> <span class="mf">8.0</span> <span class="mf">0.0</span> <span class="mf">9.9</span>
+<span class="mf">5149.5</span> <span class="mf">10.3</span> <span class="mf">0.0</span> <span class="mf">12.2</span>
+<span class="n">inner</span><span class="o">-</span><span class="n">core</span>
+<span class="mf">5149.5</span> <span class="mi">11</span> <span class="mf">3.5</span> <span class="mf">12.7</span>
+<span class="mi">6371</span> <span class="mf">11.3</span> <span class="mf">3.7</span> <span class="mi">13</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="database">
+<h2>5.2. Database<a class="headerlink" href="#database" title="Permalink to this headline">¶</a></h2>
+<p>We have integrated the Python implementation of <a class="reference external" href="https://www.sqlite.org/index.html">SQLite</a> to enable reading, writing and seeking results faster. The database is comprised by three tables: (a) <cite>Event</cite> contains the information concerning the event (i.e. origin time and location information), (b) <cite>Station</cite> contains information concerning the event-station pair (e.g. epicentral distance in km, backazimuth, angle of incidence, observed/theoretical/automatic S-arrivals) and (c) <cite>Method</cite> contains information concerning the splitting measurement(s) for each pair. Tables are connected through the event, station and method codes. Each measurement is characterized by a unique combination. If the program finds the combination in the database, it will overwrite the entry. We have not implemented an in-program way to remove entries from the database, to avoid erroneous removals. Thus, any such action should either be conducted on the exported results files or through a third-party database editor (see below).</p>
+<p>Each database is saved locally on a user-specified path. There are various actions available through the Database toolbar menu, such as copying the database, loading a new one or extracting information in more user-friendly formats. Concerning the latter, there is the option to extract a common CSV file, which is easily processed with any spreadsheet editor, such as <a class="reference external" href="https://www.openoffice.org/">OpenOffice’s Calc</a>. The user can also export a custom text format (<cite>spl</cite>) which contains less information and is more human-readable.</p>
+<p>The database, except simple values corresponding to each measurement such as φ, t<sub>d</sub> and their corresponding errors, also contains any arrays generated through processing concerning the EV, ME, RC and CA methods, such as the distribution of the second eigenvalue per parameters pair and the cluster labels for each number of clusters. This information is used to generate figures on demand, through the toolbar menu. However, it is not possible to access the arrays themselves through the program (as of now). If a user wishes to do so (and they have a rudimentary knowledge of Python and SQLite) they can look up the data conversion code in the <cite>db_handler</cite> module.</p>
+<p>A relative simple way to access the database itself is through third-party software. <a class="reference external" href="https://sqlitebrowser.org/">DB Browser</a> is a great tool that offers this, exclusively through a GUI. You can add, remove or edit entries and even export specific selections from the database.</p>
+</div>
+<div class="section" id="figures">
+<h2>5.3. Figures<a class="headerlink" href="#figures" title="Permalink to this headline">¶</a></h2>
+<p>Figures are an essential part of every scientific publication. Thus, we have implemented the generation of figures that meet the specifications set by <a class="reference external" href="https://www.elsevier.com/authors/author-schemas/artwork-and-media-instructions">Elsevier</a> to produce publication-ready figures. These specifications include:</p>
+<ul class="simple">
+<li>Font sizes of at least 7 pt.</li>
+<li>The dpi set at 720 (maximum accepted for line art is 1000).</li>
+<li>Figure size of 7 x 6” (177.8 x 152.4 mm), meeting the <cite>Double Column</cite> width size (i.e. less than 190.0 mm)</li>
+</ul>
+<p>To avoid further dependecies we are restricted to the image format types compatible with the used Matplotlib backend, i.e. Qt5. The available formats for figure generation are: PS, EPS, SVG, PDF, PNG and JPG. Sorry, no TIFF option available!</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/splash_color_55px.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5. Other Features</a><ul>
+<li><a class="reference internal" href="#taup">5.1. TauP</a></li>
+<li><a class="reference internal" href="#database">5.2. Database</a></li>
+<li><a class="reference internal" href="#figures">5.3. Figures</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="descriptions.html"
+                        title="previous chapter">4. Basic Description</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="preferences.html"
+                        title="next chapter">6. Preferences</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/application/features.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="preferences.html" title="6. Preferences"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="descriptions.html" title="4. Basic Description"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Ioannis Spingos.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

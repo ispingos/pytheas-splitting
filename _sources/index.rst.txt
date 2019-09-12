@@ -1,0 +1,21 @@
+.. Pytheas documentation master file, created by Sphinx
+
+|
+
+The current User's Guide documents the functionality of the corresponding software version.
+
+Table of Contents
+=================
+
+.. toctree::
+   :maxdepth: 3
+   :numbered:
+
+   introduction/intro
+   introduction/installation
+   introduction/quickstart
+   application/descriptions
+   application/features
+   application/preferences
+   application/keybindings
+   supl/faq

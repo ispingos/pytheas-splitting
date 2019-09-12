@@ -1,0 +1,366 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>6. Preferences &#8212; Pytheas 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="shortcut icon" href="../_static/Pytheas_ICO.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="7. Controls" href="keybindings.html" />
+    <link rel="prev" title="5. Other Features" href="features.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="keybindings.html" title="7. Controls"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="features.html" title="5. Other Features"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="preferences">
+<h1>6. Preferences<a class="headerlink" href="#preferences" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="general">
+<h2>6.1. General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="colwidths-given docutils" id="id1">
+<caption><span class="caption-text"><strong>General</strong></span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Setting</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Clean Logs</td>
+<td>Sets the amount of days prior for which to delete log files.</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<table border="1" class="colwidths-given docutils" id="id2">
+<caption><span class="caption-text"><strong>Waveforms</strong></span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Setting</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Offset for matching event folders to origin times</td>
+<td>Sets the maximum accepted difference (in s) when attempting to match event folder codes to origin times from the catalogue.</td>
+</tr>
+<tr class="row-odd"><td>Trim waveforms</td>
+<td>Select whether or not you want waveforms to be trimmed when displayed. This is very important as it can dramatically increase performance.</td>
+</tr>
+<tr class="row-even"><td>Start time from S-arrival</td>
+<td>Time from the S-arrival (in s) to use as the trimming window start point.</td>
+</tr>
+<tr class="row-odd"><td>End time from S-arrival</td>
+<td>Time from the S-arrival (in s) to use as the trimming window end point.</td>
+</tr>
+<tr class="row-even"><td>Channel Code Preference</td>
+<td>Provide a comma-separated list of the first two channel code letters (according to SEED) in the sequence Pytheas will preferrentially look for them. For example, if both HH and HN type channels exist in the dataset for the same station/event pair and the user has provided the list ‘HH,HN’, the HH channels will be used. If none of the preferred codes is found, the program will read any channels it’ll find first.</td>
+</tr>
+<tr class="row-odd"><td>Instrument Orientation Correction</td>
+<td>Select whether to perform orientation correction on non-oriented waveforms. Requires the use of a StationXML file with information down to the Channel layer.</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<table border="1" class="colwidths-given docutils" id="id3">
+<caption><span class="caption-text"><strong>SNR</strong></span><a class="headerlink" href="#id3" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Setting</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Start of noise window</td>
+<td>Time from the S-arrival (in s) to use as the noise window start point. The end point is defined as the S-arrival.</td>
+</tr>
+<tr class="row-odd"><td>End of signal window</td>
+<td>Time from the S-arrival (in s) to use as the signal window end point. The start point is defined as the S-arrival.</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<table border="1" class="colwidths-given docutils" id="id4">
+<caption><span class="caption-text"><strong>Splitting</strong></span><a class="headerlink" href="#id4" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Setting</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Maximum accepted t<sub>d</sub></td>
+<td>The maximum time-delay (in ms) to use when defining test ranges in the EV, ME and RC methods. This does not affect any measurements with the MAN method.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="grading">
+<h2>6.2. Grading<a class="headerlink" href="#grading" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="colwidths-given docutils" id="id5">
+<caption><span class="caption-text"><strong>Thresholds</strong></span><a class="headerlink" href="#id5" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Setting</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Polarization difference for nulls</td>
+<td>Sets the angular maximum differences for which the S<sub>fast</sub> direction and the corrected S-wave polarization (<em>pol</em>) will be considered parallel or perpendicular. In other words the value <em>offset</em> specified here is used as: 0 - <em>offset</em> &lt;= φ - <em>pol</em> &lt;= 0 + <em>offset</em> OR 90 - <em>offset</em> &lt;= φ - <em>pol</em> &lt;= 90 + <em>offset</em>. If any of these conditions are met the measurement is considered null (‘N’ grade).</td>
+</tr>
+<tr class="row-odd"><td>SNR<sub>min</sub></td>
+<td>Set the minimum accepted SNR.</td>
+</tr>
+<tr class="row-even"><td>δφ<sub>max</sub></td>
+<td>Set the maximum accepted error for the S<sub>fast</sub> polarization direction (in degrees).</td>
+</tr>
+<tr class="row-odd"><td>δt<sub>dmax</sub></td>
+<td>Set the maximum accepted error for the time-delay (in ms).</td>
+</tr>
+<tr class="row-even"><td>Minimum Correlation Coefficient (FxS)</td>
+<td>Set the minimum accepted correlation coefficient for the correlation in the FS axial system.</td>
+</tr>
+<tr class="row-odd"><td>Minimum Correlation Coefficient (NxE)</td>
+<td>Set the minimum accepted correlation coefficient for the correlation in the corrected NE axial system.</td>
+</tr>
+<tr class="row-even"><td>Grades</td>
+<td>Set the upper bounds for which the grading algorithm will match scores to grades. The maximum attainable score is 1.0, so individual values should be set accordingly. Any score greater than the one specified for ‘D’ will be graded as ‘E’.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="clustering">
+<h2>6.3. Clustering<a class="headerlink" href="#clustering" title="Permalink to this headline">¶</a></h2>
+<div class="topic">
+<p class="topic-title first">Cluster Analysis</p>
+<p>To fully understand the settings in this section we <strong>strongly</strong> recommend reading the article of <a class="reference external" href="http://dx.doi.org/10.1785/0120030123">Teanby et al. (2004)</a>. For the parameters concerning the definition of the <strong>Windows Bounds</strong> range you can also see <a class="reference external" href="https://doi.org/10.1029/2010JB007722">Savage et al. (2010)</a>.</p>
+</div>
+<table border="1" class="colwidths-given docutils" id="id6">
+<caption><span class="caption-text"><strong>Thresholds</strong></span><a class="headerlink" href="#id6" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Setting</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Minimum window start point (T<sub>beg1</sub>)</td>
+<td>Set the minimum accepted window start (i.e. the closest to the S-arrival), relative to the S-arrival (in s).</td>
+</tr>
+<tr class="row-odd"><td>Step for window start points (DT<sub>beg</sub>)</td>
+<td>Set the step with which the start points of candidate windows will be generated (in s).</td>
+</tr>
+<tr class="row-even"><td>Step for window end points (DT<sub>end</sub>)</td>
+<td>Set the step with which the end points of candidate windows will be generated (in s).</td>
+</tr>
+<tr class="row-odd"><td>Minimum window end point (T<sub>end0</sub>)</td>
+<td>Set the minimum accepted window end (i.e. the closest to the S-arrival), relative to the S-arrival (in s).</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<table border="1" class="colwidths-given docutils" id="id7">
+<caption><span class="caption-text"><strong>Windows Bounds</strong></span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Setting</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Maximum t<sub>S</sub>-t<sub>P</sub></td>
+<td>The maximum accepted S-P time (in s). This constraint is use in case of errors or overestimation in the provided times. If an error occurs during the process (e.g. there is no provided S-P time in the catalogue) or the given time exceeds this limit the S-P time used is this. This parameter is used to determine the maximum window start point (T<sub>beg0</sub>) which is the half of the S-P time (i.e. T<sub>beg0</sub>=(t<sub>S</sub>-t<sub>P</sub>)/2).</td>
+</tr>
+<tr class="row-odd"><td>Time from S-arrival for period determination</td>
+<td>Set the end of the time window used for determining the S-wave’s period (in s).</td>
+</tr>
+<tr class="row-even"><td>Minimum S-wave period</td>
+<td>The minimum accepted S-wave period. If a measurement exceeds the limit this will be the value used.</td>
+</tr>
+<tr class="row-odd"><td>Maximum S-wave period</td>
+<td>The maximum accepted S-wave period. If a measurement exceeds the limit this will be the value used.</td>
+</tr>
+<tr class="row-even"><td>Period factor</td>
+<td>Set the factor (f<sub>T</sub> ) used to obtain the maximum window end point (T<sub>end1</sub>) which is defined as: T<sub>end1</sub> = f<sub>T</sub> *T<sub>S</sub> where T<sub>S</sub> the period of the S-waves.</td>
+</tr>
+<tr class="row-odd"><td>C<sub>critical</sub></td>
+<td>The critical value for which to reject the null hypothesis in the <a class="reference external" href="https://www.wiley.com/en-us/Pattern+Classification%2C+2nd+Edition-p-9780471056690">Duda and Hart (1974)</a> criterion.</td>
+</tr>
+<tr class="row-even"><td>Maximum number of clusters</td>
+<td>Set the maximum number of clusters the program can look for.</td>
+</tr>
+<tr class="row-odd"><td>Minimum number of points per cluster</td>
+<td>Any clusters containing less than the number of points set here will be rejected.</td>
+</tr>
+<tr class="row-even"><td>Linkage Criterion</td>
+<td>Set which of the available criteria will be used when linking clusters. For more information you can see <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.AgglomerativeClustering.html">sci-kit learn’s page</a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="taup">
+<h2>6.4. TauP<a class="headerlink" href="#taup" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="colwidths-given docutils" id="id8">
+<caption><span class="caption-text"><strong>TauP</strong></span><a class="headerlink" href="#id8" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Setting</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Model</td>
+<td>Select the velocity model used for TauP. Either a path to an available file (in the <code class="docutils literal notranslate"><span class="pre">.nd</span></code> or <code class="docutils literal notranslate"><span class="pre">.tvel</span></code> formats) can be provided or a string with the name of one of the default models (see <a class="reference external" href="https://docs.obspy.org/packages/obspy.taup.html">Basic Usage in Obspy’s documentation</a>).</td>
+</tr>
+<tr class="row-odd"><td>Station Information File</td>
+<td>Either a StationXML file (including the Channel layer) or a simple space-delimited text file where each row represents a station in the following format: <code class="docutils literal notranslate"><span class="pre">Station</span> <span class="pre">Network</span> <span class="pre">Latitude_in_dd</span> <span class="pre">Longitude_in_dd</span> <span class="pre">Elevation_in_m</span></code>.</td>
+</tr>
+<tr class="row-even"><td>Calculate Incidence</td>
+<td>Select whether the angle of incidence will be calculated anew through TauP for each pair or the one obtained from the catalogue will be used.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="ar-aic">
+<h2>6.5. AR-AIC<a class="headerlink" href="#ar-aic" title="Permalink to this headline">¶</a></h2>
+<div class="topic">
+<p class="topic-title first">Auto Regressive - Akaike Information Criterion Picker</p>
+<p>The Obspy’s implementation of AR-AIC is used in the current software. For further details concerning the settings please see <a class="reference external" href="https://docs.obspy.org/packages/autogen/obspy.signal.trigger.ar_pick.html">their documentation</a>. For more information about the algorithm itself, see <a class="reference external" href="http://www.iitk.ac.in/nicee/wcee/article/13_786.pdf">Akazawa (2004)</a>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/splash_color_55px.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">6. Preferences</a><ul>
+<li><a class="reference internal" href="#general">6.1. General</a></li>
+<li><a class="reference internal" href="#grading">6.2. Grading</a></li>
+<li><a class="reference internal" href="#clustering">6.3. Clustering</a></li>
+<li><a class="reference internal" href="#taup">6.4. TauP</a></li>
+<li><a class="reference internal" href="#ar-aic">6.5. AR-AIC</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="features.html"
+                        title="previous chapter">5. Other Features</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="keybindings.html"
+                        title="next chapter">7. Controls</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/application/preferences.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="keybindings.html" title="7. Controls"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="features.html" title="5. Other Features"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Ioannis Spingos.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

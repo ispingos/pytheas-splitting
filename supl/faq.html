@@ -1,0 +1,120 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>8. Frequently Asked Questions (FAQ) &#8212; Pytheas 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="shortcut icon" href="../_static/Pytheas_ICO.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="7. Controls" href="../application/keybindings.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../application/keybindings.html" title="7. Controls"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="frequently-asked-questions-faq">
+<h1>8. Frequently Asked Questions (FAQ)<a class="headerlink" href="#frequently-asked-questions-faq" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt><strong>The program doesn’t start all! I can’t see any splash screen or window!</strong></dt>
+<dd>Please check the requirements in the relevant documentation page and make sure you have a suitable version of Python (3.7+) and each dependency. If the problem persists, please send us a description of the problem and the latest generated log file located in <em>~pytheas/logs/</em>.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>The program simply stopped working. Even when pressing any keyboard keysm or using the mouse, nothing happens.</strong></dt>
+<dd>An underlying exception has occured. Please restart the program and send us a description of the problem, as well as the relevant log file.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>How does Pytheas handles angles of incidence?</strong></dt>
+<dd>If a QuakeML is provided that includes the <code class="docutils literal notranslate"><span class="pre">takeoff_angle</span></code> field in the <code class="docutils literal notranslate"><span class="pre">Arrival</span></code> field, this angle will be used, after using the given velocity model, to estimate the incidence angle. If this condition is not met, the QuakeML has no <code class="docutils literal notranslate"><span class="pre">Arrival</span></code> or a simple text catalogue is provided instead, the angle will be calculated assuming a linear path between the focus and the station (assumed to be at sea-level). This value will be used for selecting events based on the shear-wave window. However, if the respective option is seleced in Preferences, the incidence angle will be calculated from TauP with the given velocity model upon opening the event-station pair. In this case, the TauP value will be used instead.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>How does the program find stations if no Arrivals are specified in the QuakeML or a text catalogue is given?</strong></dt>
+<dd>In those cases, the station codes will be retrieved from the station information file provided. If a station name is not present in the QuakeML or the station file, but the waveforms exist in the event directory, it will be ignored by the program. Be sure to at least include all stations in the station file!</dd>
+</dl>
+</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/splash_color_55px.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../application/keybindings.html"
+                        title="previous chapter">7. Controls</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/supl/faq.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../application/keybindings.html" title="7. Controls"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Ioannis Spingos.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

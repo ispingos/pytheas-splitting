@@ -1,0 +1,219 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>2. Installation &#8212; Pytheas 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="shortcut icon" href="../_static/Pytheas_ICO.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3. Getting Started" href="quickstart.html" />
+    <link rel="prev" title="1. What is Pytheas?" href="intro.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="quickstart.html" title="3. Getting Started"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="1. What is Pytheas?"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installation">
+<h1>2. Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="compatibility">
+<h2>2.1. Compatibility<a class="headerlink" href="#compatibility" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>Pytheas has been tested on various systems running Windows 10, using Python 3.7.2. The program has been tested on the following versions of individual packages:</p>
+<ul class="simple">
+<li>obspy 1.1.1</li>
+<li>PyQt5 5.11.3</li>
+<li>scikit-learn 0.20.2</li>
+<li>matplotlib 3.0.2</li>
+<li>numpy 1.16.0</li>
+<li>scipy 1.2.0</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="dependencies-and-installation">
+<h2>2.2. Dependencies and Installation<a class="headerlink" href="#dependencies-and-installation" title="Permalink to this headline">¶</a></h2>
+<p>To use Pytheas you first need to install <a class="reference external" href="https://www.python.org/downloads/">Python 3</a> and then the following dependencies:</p>
+<ul class="simple">
+<li>obspy</li>
+<li>PyQt5</li>
+<li>scikit-learn</li>
+<li>configparser</li>
+</ul>
+<p>You can use the provided scripts to install dependencies. For Windows users this is <code class="docutils literal notranslate"><span class="pre">install_reqs_windows.bat</span></code> and for Linux users <code class="docutils literal notranslate"><span class="pre">install_reqs_linux.sh</span></code>.</p>
+<p>Alternatively, you can install the packages by <code class="docutils literal notranslate"><span class="pre">pip</span></code> using the following commands in a terminal (Linux/MacOS) or command prompt (Windows):</p>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">obspy</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">PyQt5</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">scikit-learn</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">configparser</span></code></div>
+</div>
+<p>Remember to also update <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy</span></code> and <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>:</p>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">numpy</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">scipy</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">matplotlib</span></code></div>
+</div>
+<p>Another option is using a distribution like <a class="reference external" href="https://www.anaconda.com/">Anaconda</a>.</p>
+<p>No matter which one of the above you prefer, the program runs by using the <code class="docutils literal notranslate"><span class="pre">LaunchPytheas.pyw</span></code> file. Windows users can use <code class="docutils literal notranslate"><span class="pre">LaunchPytheas.exe</span></code> instead.</p>
+</div>
+<div class="section" id="download">
+<h2>2.3. Download<a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h2>
+<p>You can download the Python code and related files from <a class="reference external" href="https://www.github.com/ispingos/pytheas-splitting">https://www.github.com/ispingos/pytheas-splitting</a> .</p>
+</div>
+<div class="section" id="system-requirements">
+<h2>2.4. System Requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h2>
+<p>Hardware requirements are largely dependent on the analyzed waveforms. We tested Pytheas on four different systems with the following results.</p>
+<table border="1" class="colwidths-given docutils" id="id1">
+<caption><span class="caption-text"><strong>System Requirements</strong></span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">System</th>
+<th class="head">CPU</th>
+<th class="head">RAM</th>
+<th class="head">GPU</th>
+<th class="head">User Experience*</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ASUS Vivobook X5600UD</td>
+<td>Intel Core i7 8550U</td>
+<td>8 GB</td>
+<td>Nvidia GTX 1050 (4 GB)</td>
+<td>A+</td>
+</tr>
+<tr class="row-odd"><td>Custom Desktop</td>
+<td>Intel Core i5 8400</td>
+<td>8 GB</td>
+<td>Nvidia GTX 950 (2 GB)</td>
+<td>A+</td>
+</tr>
+<tr class="row-even"><td>Dell Inspiron 15 5567-1753</td>
+<td>Intel Core i7 7200U</td>
+<td>8 GB</td>
+<td>AMD Radeon R7 M445 (4 GB)</td>
+<td>A</td>
+</tr>
+<tr class="row-odd"><td>Custom Desktop</td>
+<td>Intel Core i5 3470</td>
+<td>4 GB</td>
+<td>Nvidia GT 640 (2 GB)</td>
+<td>B</td>
+</tr>
+<tr class="row-even"><td>Toshiba Satellite m50-a-110</td>
+<td>Intel Core i5 4200U</td>
+<td>4 GB</td>
+<td>Nvidia GT 740M (2 GB)</td>
+<td>B-</td>
+</tr>
+</tbody>
+</table>
+<p><em>User Experience is based on subjective criteria, among three different analysts.</em></p>
+<p>A dedicated GPU is generally recommended, especially if you intend to work extensively with the MAN method.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/splash_color_55px.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2. Installation</a><ul>
+<li><a class="reference internal" href="#compatibility">2.1. Compatibility</a></li>
+<li><a class="reference internal" href="#dependencies-and-installation">2.2. Dependencies and Installation</a></li>
+<li><a class="reference internal" href="#download">2.3. Download</a></li>
+<li><a class="reference internal" href="#system-requirements">2.4. System Requirements</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="previous chapter">1. What is Pytheas?</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="quickstart.html"
+                        title="next chapter">3. Getting Started</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/introduction/installation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="quickstart.html" title="3. Getting Started"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="1. What is Pytheas?"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Ioannis Spingos.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

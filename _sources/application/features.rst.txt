@@ -1,0 +1,48 @@
+Other Features
+==============
+Pytheas also offers a wide variety of secondary features that enable the faster and more effective analysis of shear-wave splitting.
+
+TauP
+~~~~
+The TauP software `(Crotwell et al., 1999) <https://doi.org/10.1785/gssrl.70.2.154>`_ is a collection of tools used for estimating phase arrivals and ray-paths. In Pytheas, we use `Obspy's implementation of TauP <https://docs.obspy.org/packages/obspy.taup.html>`_ to calculate arrivals of shear-waves and the angle of incidence of each ray. The former parameter is useful when identifying the S\ :sub:`fast` \ visually, as noise can complicate this. The latter is used to calculate the precise angle of incidence, a quantity of great importance for shear-wave splitting studies. This angle is used for rejecting potential secondary arrivals misidentified as direct S-waves by setting the shear-wave window `(Booth and Crampin, 1985) <https://doi.org/10.1111/j.1365-246X.1985.tb05154.x>`_ and for rotating the waveforms to a ray-defined system for the EV and ME methods.
+
+The velocity model used by TauP, defined in the Preferences, can either take a value of builtin models (e.g. ``IASP91`` or ``ak135``) or a custom model file can be specified. In this case, the file format should be either of ``.nd`` or ``.tvel`` type. For more information about custom model building please see the `original TauP documentation <https://www.seis.sc.edu/downloads/TauP/taup.pdf>`_. A simple ``.nd`` file example is as follows::
+
+    # Ceiling_depth_km Vp Vs Density
+    0.0 5.0 3.0 2.7
+    20 5.0 3.0 2.7
+    20 6.5 3.7 2.9
+    33 6.5 3.7 2.9
+    mantle
+    33 7.8 4.4 3.3
+    410 8.9 4.7 3.5
+    410 9.1 4.9 3.7
+    670 10.2 5.5 4.0
+    670 10.7 5.9 4.4
+    2891 13.7 7.2 5.6
+    outer-core
+    2891 8.0 0.0 9.9
+    5149.5 10.3 0.0 12.2
+    inner-core 
+    5149.5 11 3.5 12.7
+    6371 11.3 3.7 13
+
+Database
+~~~~~~~~
+We have integrated the Python implementation of `SQLite <https://www.sqlite.org/index.html>`_ to enable reading, writing and seeking results faster. The database is comprised by three tables: (a) `Event` contains the information concerning the event (i.e. origin time and location information), (b) `Station` contains information concerning the event-station pair (e.g. epicentral distance in km, backazimuth, angle of incidence, observed/theoretical/automatic S-arrivals) and (c) `Method` contains information concerning the splitting measurement(s) for each pair. Tables are connected through the event, station and method codes. Each measurement is characterized by a unique combination. If the program finds the combination in the database, it will overwrite the entry. We have not implemented an in-program way to remove entries from the database, to avoid erroneous removals. Thus, any such action should either be conducted on the exported results files or through a third-party database editor (see below).
+
+Each database is saved locally on a user-specified path. There are various actions available through the Database toolbar menu, such as copying the database, loading a new one or extracting information in more user-friendly formats. Concerning the latter, there is the option to extract a common CSV file, which is easily processed with any spreadsheet editor, such as `OpenOffice's Calc <https://www.openoffice.org/>`_. The user can also export a custom text format (`spl`) which contains less information and is more human-readable.
+
+The database, except simple values corresponding to each measurement such as φ, t\ :sub:`d` \ and their corresponding errors, also contains any arrays generated through processing concerning the EV, ME, RC and CA methods, such as the distribution of the second eigenvalue per parameters pair and the cluster labels for each number of clusters. This information is used to generate figures on demand, through the toolbar menu. However, it is not possible to access the arrays themselves through the program (as of now). If a user wishes to do so (and they have a rudimentary knowledge of Python and SQLite) they can look up the data conversion code in the `db_handler` module.
+
+A relative simple way to access the database itself is through third-party software. `DB Browser <https://sqlitebrowser.org/>`_ is a great tool that offers this, exclusively through a GUI. You can add, remove or edit entries and even export specific selections from the database.
+
+Figures
+~~~~~~~
+Figures are an essential part of every scientific publication. Thus, we have implemented the generation of figures that meet the specifications set by `Elsevier <https://www.elsevier.com/authors/author-schemas/artwork-and-media-instructions>`_ to produce publication-ready figures. These specifications include:
+
+* Font sizes of at least 7 pt.
+* The dpi set at 720 (maximum accepted for line art is 1000).
+* Figure size of 7 x 6" (177.8 x 152.4 mm), meeting the `Double Column` width size (i.e. less than 190.0 mm)
+
+To avoid further dependecies we are restricted to the image format types compatible with the used Matplotlib backend, i.e. Qt5. The available formats for figure generation are: PS, EPS, SVG, PDF, PNG and JPG. Sorry, no TIFF option available!
