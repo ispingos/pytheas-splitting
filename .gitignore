@@ -111,3 +111,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+*.mseed
+*.idx
+*.dat
+*.cat
+*.cnf
+*.exp
+*.cnf
+*.db3
