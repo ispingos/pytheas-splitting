@@ -49,8 +49,8 @@ LIC_STR=("""
 
 global VERSION
 global VERDATE
-VERSION="0.1.0"
-VERDATE="15/04/2019"
+VERSION="0.1.1"
+VERDATE="12/12/2019"
 
 ## first get script's path
 import os
@@ -395,7 +395,8 @@ class Pytheas(QtWidgets.QMainWindow):
         self.cleanLogs()
         # read inventory
         try:
-            self.inventory,self.xmlInventory=self.readStations(self.tpCNF.stations)
+            self.inventory, self.xmlInventory = self.readStations(self.tpCNF.stations)
+            logging.info(str(self.inventory))
         except: # no station file! show a warning to the user...
             logging.exception("Could not find station file %s" % self.tpCNF.stations)
             winTitle="StationXML Warning"
@@ -695,6 +696,13 @@ class Pytheas(QtWidgets.QMainWindow):
 
         """
         try:
+            # simple check to validate file is of xml type, as obspy's
+            # read_inventory sometimes parses non-xml files as xml
+            with open(staFile, 'r') as fid:
+                check_line = fid.readline()
+            if not '?xml version' in check_line:
+                raise TypeError('Input file is not StationXML')
+            # read the xml
             xml=read_inventory(staFile)
             inventory={}
             for net in xml:
@@ -704,7 +712,8 @@ class Pytheas(QtWidgets.QMainWindow):
             return inventory, xml
         except TypeError:
             xml=None
-            with open(staFile,"r") as fid: staLines=fid.readlines()
+            with open(staFile,"r") as fid: 
+                staLines=fid.readlines()
             return {x.split()[0]:
                      {
                        "network":x.split()[1],"latitude":float(x.split()[2]),
@@ -740,6 +749,8 @@ class Pytheas(QtWidgets.QMainWindow):
               evlat=float(line[23:].strip().split()[0])
               evlon=float(line[23:].strip().split()[1])
               evdep=float(line[23:].strip().split()[2])
+              if not evdep:
+                evdep = 0.1  # temporary fix
               mag=float(line[23:].strip().split()[3])
               evDict["YEAR"]=origin.year
               evDict["Mo"]=origin.month
@@ -808,10 +819,15 @@ class Pytheas(QtWidgets.QMainWindow):
                                        hour=origin.hour,minute=origin.minute,second=0)
                 lat=prefOrig.latitude
                 lon=prefOrig.longitude
+                if tools.isnone(lat) or tools.isnone(lon):
+                    logging.warning('Event %s does not have location information. Skipping...' % origin)
+                    continue
                 try:
-                    dep=prefOrig.depth/1000. # depth should be in km
+                    dep = prefOrig.depth / 1000. # depth should be in km
+                    if not dep:
+                        dep = 0.1  # temporary fix
                 except TypeError: # is depth None?
-                    dep=1.0
+                    dep = 0.1
                 # set pref mag before searching for corresponding r-id
                 mag=event.preferred_magnitude()
                 if mag is None:
@@ -924,9 +940,11 @@ class Pytheas(QtWidgets.QMainWindow):
                                                       self.inventory[station]["latitude"],
                                                       self.inventory[station]["longitude"])
                         # calculate ain for direct linear raypath #
-                        if dep == 0.0: dep = 1.0 # hack to permit ain calc
+                        if not dep: 
+                            dep = 0.1 # temporary fix
                         ain=np.rad2deg(np.arctan((dist/1000.)/dep))
-                        if tools.isnone(ain): ain = 0.0
+                        if tools.isnone(ain):
+                            ain = 0.0
                         # store values to dictionary
                         tempDict['STA']=station
                         tempDict['NET']=self.inventory[station]['network']
