@@ -1,8 +1,8 @@
 Pytheas: an open-source software solution for local shear-wave splitting studies
 ================================================================================
 
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.2642099.svg
-   :target: https://doi.org/10.5281/zenodo.2642099
+.. image:: https://zenodo.org/badge/181635686.svg
+   :target: https://zenodo.org/badge/latestdoi/181635686
 
 Pytheas is a tool that aims to introduce a new mentality in shear-wave splitting analysis from local recordings, incorporating manual, semi- and fully- automatic methods under one Graphical User Interface. Integrating databases and offering compatibility with popular data and metadata file formats, Pytheas is designed with the simplification of analysis in mind, while, at the same time, enhanching the effectiveness of processing and quality control of results.
 
