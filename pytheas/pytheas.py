@@ -49,8 +49,8 @@ LIC_STR=("""
 
 global VERSION
 global VERDATE
-VERSION="0.1.1"
-VERDATE="12/12/2019"
+VERSION="0.1.2"
+VERDATE="19/12/2019"
 
 ## first get script's path
 import os
@@ -3426,7 +3426,7 @@ class Pytheas(QtWidgets.QMainWindow):
         logging.debug("Dominant period is %.4f s" % dPer)
         # calculate window parameters
         self.caCNF.Tbeg0=-tpts/2.
-        self.caCNF.Tend0=dPer#+self.caCNF.Tbeg1
+        #self.caCNF.Tend0=dPer#+self.caCNF.Tend0  # maybe consider this for the future?
         self.caCNF.Tend1=(self.caCNF.multPeriod*dPer)#+self.caCNF.Tbeg0
         self.caCNF.Nbeg=int(np.ceil((self.caCNF.Tbeg1-self.caCNF.Tbeg0)/self.caCNF.DTbeg))
         self.caCNF.Nend=int(np.ceil((self.caCNF.Tend1-self.caCNF.Tend0)/self.caCNF.DTend))
