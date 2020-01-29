@@ -27,5 +27,4 @@ For any issues, comments or suggestions please contact us at ispingos@geol.uoa.g
    Pytheas: An open-source software solution for local shear-wave splitting studies. Comput. Geosci. 134, 104346. 
    doi: 10.1016/j.cageo.2019.104346
 
-The published article is freely available through Elsevier (until the 3rd of January 2020) via the following link: 
-https://authors.elsevier.com/a/1a3Q4MMTPakbe
+The published article can be accessed through Elsevier via the following link: https://www.sciencedirect.com/science/article/pii/S0098300419303784
