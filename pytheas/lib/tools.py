@@ -13,7 +13,7 @@ while, at the same time, enhanching the effectiveness of processing and quality 
 
 Pytheas is released under the GNU GPLv3 license.
 
-Authors: Spingos I. & Kaviris G. (c) 2019
+Authors: Spingos I. & Kaviris G. (c) 2019-2020
 Special thanks to Millas C. for testing the software and providing valuable feedback from the 
 very early stages of this endeavor!
 
@@ -36,6 +36,7 @@ from matplotlib.collections import LineCollection
 from obspy import UTCDateTime
 from obspy.signal.trigger import ar_pick
 from obspy.signal.cross_correlation import correlate
+from obspy.signal.polarization import particle_motion_odr
 import scipy.signal
 
 ## archiving
@@ -254,6 +255,50 @@ def hodogram(A,D,norm=False):
     if norm:
         pairList=pairList/abs(pairList).max()
     return pairList
+
+def estimateOrientation(streamOrig,idx,baz,offset=0.1,method='first'):
+    """
+    Estimate the instrument orientation correction by comparing the p polarization
+    to the one obtained from the location process.
+
+    :type streamOrig: :class:`~obspy.core.stream.Stream`
+    :param streamOrig: the stream containing the 3 components.
+    :type idx: int
+    :param idx: integer of the picked P arrival.
+    :type baz: float
+    :param baz: the event's backazimuth at the station.
+    :type offset: float, optional
+    :param offset: +/- offset for the window selection where the polarization will be 
+        calculated (in s). Defaults to 0.1.
+    :type method: str, optional
+    :param offset: the method with which to calculate the polarization. 'first' uses the motion
+        at the picked arrival. 'odr' uses obspy's :class: `~obspy.signal.polarization.particle_motion_odr`
+        which employs an orthogonal regression algorithm to obtain the polarziation from particle motion.
+    :returns: the counter-clockwise orientation correction. Defaults to 'first'.
+    
+    """
+    logging.debug('Selected method for polarization analysis is %s' % method)
+    stream=streamOrig.copy()
+    ppick=stream[0].times()[idx]
+    if method is 'first':
+        AZ=stream.select(component="Z")[0].data[idx]
+        AN=stream.select(component="N")[0].data[idx]
+        AE=stream.select(component="E")[0].data[idx]
+        # calculate the polarization of the p wave
+        pol=np.rad2deg(np.arctan(AN/AE)) % 360
+        # offset of vertical channel?
+        pol=pol if AZ < 0 else ((pol+180) % 360)
+        Zsign='Z<0' if AZ < 0 else 'Z>0' 
+        logging.debug('p polarization is %.1f (%s)' % (pol,Zsign))
+    elif method is 'odr': 
+        window=(stream[0].times(type='utcdatetime')[idx]-offset,
+                stream[0].times(type='utcdatetime')[idx]+offset)
+        stream.trim(starttime=window[0],endtime=window[1])
+        res=particle_motion_odr(stream)
+        pol,inc,azm_low,azm_hi=res
+        logging.debug('p polarization is %.2f +/- (%.2f,%.2f) and incidence %.1f' % (pol,azm_low,azm_hi,inc))
+    # return the difference
+    return (pol - baz) % 360
 
 ## auto grading routines
 def autoGrading(null,values,bounds,grade_dict,

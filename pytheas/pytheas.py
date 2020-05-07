@@ -14,7 +14,7 @@ while, at the same time, enhanching the effectiveness of processing and quality 
 
 Pytheas is released under the GNU GPLv3 license.
 
-Authors: Spingos I. & Kaviris G. (c) 2019
+Authors: Spingos I. & Kaviris G. (c) 2019-2020
 Special thanks to Millas C. for testing the software and providing valuable feedback from the 
 very early stages of this endeavor!
 
@@ -27,7 +27,7 @@ LIC_STR=("""
 
      Pytheas // PYThon sHear - wavE Analysis Suite
 
-  Copyright (C) 2019 Spingos I. & Kaviris G.
+  Copyright (C) 2019-2020 Spingos I. & Kaviris G.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,8 +49,8 @@ LIC_STR=("""
 
 global VERSION
 global VERDATE
-VERSION="0.1.2"
-VERDATE="19/12/2019"
+VERSION="0.2.0"
+VERDATE="07/05/2020"
 
 ## first get script's path
 import os
@@ -61,17 +61,17 @@ WORKDIR=os.path.dirname(os.path.realpath(__file__))
 print("..: Starting module imports...")
 # using tk cause it's easier/faster for this (and is in the PSL)
 import tkinter as tk
-splroot=tk.Tk()
+splroot = tk.Tk()
 splroot.overrideredirect(True)
 # get screen width/height and set as global
 global SCWIDTH 
 global SCHEIGHT
-SCWIDTH=splroot.winfo_screenwidth()
-SCHEIGHT=splroot.winfo_screenheight()
+SCWIDTH = splroot.winfo_screenwidth()
+SCHEIGHT = splroot.winfo_screenheight()
 # grab image file and get its dimensions
-splfile=WORKDIR+os.sep+"etc/images/splash_color.png"
-splimage=tk.PhotoImage(file=splfile)
-iwidth=splimage.width(); iheight=splimage.height()
+splfile = os.path.join(WORKDIR, 'etc', 'images', 'splash_color.png')
+splimage = tk.PhotoImage(file=splfile)
+iwidth = splimage.width(); iheight=splimage.height()
 # scale it to 40% of screen for better display
 scale=SCWIDTH*0.4/iwidth
 splimage=splimage.subsample(int(round(1/scale)))
@@ -89,9 +89,14 @@ splroot.update()
 
 ## imports ##
 print("..: Loading modules...")    
-import sys, shutil
-import logging, traceback 
-import time, datetime
+import sys
+import shutil
+import logging
+from logging.handlers import RotatingFileHandler
+import operator
+import traceback 
+import time
+import datetime
 from glob import glob
 import numpy as np
 import scipy
@@ -107,6 +112,7 @@ from matplotlib.collections import LineCollection
 from matplotlib.backends.backend_qt5agg \
 import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backend_bases import MouseEvent
+from matplotlib.widgets import MultiCursor
 import configparser
 from obspy import read, Stream, UTCDateTime, read_events, read_inventory
 from obspy.geodetics.base import degrees2kilometers, gps2dist_azimuth
@@ -115,25 +121,34 @@ from obspy.taup.taup_create import get_builtin_model_files as taup_get_builtin_m
 from obspy.taup.velocity_model import VelocityModel
 # pytheas imports
 from lib import eigenvalue as SC
-from lib import clustering as TB
+from lib import clustering as CA
 from lib import rotationcorrelation as RC
 from lib import db_handler as DB
 from lib import tools
 from lib import parsers
 # make 'logs' directory
 try:
-    os.makedirs(WORKDIR+os.sep+"logs")
+    os.makedirs(os.path.join(WORKDIR, 'logs'))
 except: # if folder already exists
     pass
 
 # init the log file
 logfile=WORKDIR+os.sep+"logs%s%s_Pytheas.log" % (os.sep,UTCDateTime().strftime("%Y%m%d%H%M%S"))
-logging.basicConfig(
-                        filename=logfile,
-                        level=logging.DEBUG,
-                        format='%(asctime)s %(levelname)s %(message)s'
-                   )
-
+# read the last used maxBytes value
+try:
+    with open(WORKDIR + os.sep + "etc%soptions%slog_max_bytes" % (os.sep,os.sep), 'r') as fid:
+        MAX_BYTES = float(fid.read())
+except FileNotFoundError:
+    MAX_BYTES = 50.
+    with open(WORKDIR + os.sep + "etc%soptions%slog_max_bytes" % (os.sep,os.sep), 'w') as fid:
+        fid.write(str(MAX_BYTES))
+# setup rotating files
+ROOT_LOGGER = logging.getLogger()
+ROOT_LOGGER.setLevel(logging.DEBUG)
+root_handler = RotatingFileHandler(logfile, maxBytes=MAX_BYTES * 1000000,  # 50 MB
+                                   backupCount=100)
+root_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+ROOT_LOGGER.addHandler(root_handler)
 # setup logging to terminal
 terminal=logging.StreamHandler()
 terminal.setLevel(logging.DEBUG)
@@ -157,20 +172,30 @@ class Pytheas(QtWidgets.QMainWindow):
         logging.info("Start Application...")
         # init the main window
         QtWidgets.QMainWindow.__init__(self)
+        # variables
+        self.evWin = None
+        self.stWin = None
         # check for default dirs. create them if needed
         self.checkDefaultDirs()
+        # read configuration files
+        self.generalCNF = parsers.parseGeneralCnf(os.path.join(WORKDIR, 'etc', 'options', 'general.cnf'))
+        self.pkCNF = parsers.parsePickerCnf(os.path.join(WORKDIR, 'etc', 'options', 'picker.cnf'))
+        self.caCNF = parsers.parseClusteringCnf(os.path.join(WORKDIR, 'etc', 'options', 'clustering.cnf'))
+        self.tpCNF = parsers.parseTaupCnf(os.path.join(WORKDIR, 'etc', 'options', 'taup.cnf'))
+        self.gradeCNF = parsers.parseGradeCnf(os.path.join(WORKDIR, 'etc', 'options', 'grading.cnf'))
+        self.filterCNF = parsers.ParseFilterCnf(os.path.join(WORKDIR, 'etc', 'options', 'filters.cnf'))
         # set icon and initial GUI params
-        self.appIcon=WORKDIR+os.sep+"etc/images/Pytheas_ICO.ico"
-        self.globalName="Pytheas"
+        self.appIcon = os.path.join(WORKDIR, 'etc', 'images', 'Pytheas_ICO.ico')
+        self.globalName = "Pytheas"
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
-        self.setWindowTitle(self.globalName+" v"+str(VERSION))
+        self.setWindowTitle(self.globalName + ' v' + str(VERSION))
         self.setWindowIcon(QtGui.QIcon(self.appIcon))
         # set validators
-        self.validateInt=QtGui.QIntValidator()
-        self.validateFloat=QtGui.QDoubleValidator()
+        self.validateInt = QtGui.QIntValidator()
+        self.validateFloat = QtGui.QDoubleValidator()
         ## set toolbar menus and actions
-        self.activateMenus=[]
+        self.activateMenus = []
         # set file menu
         logging.debug("Set File Menu...")
         self.fileMenu=QtWidgets.QMenu("&File",self)
@@ -224,7 +249,8 @@ class Pytheas(QtWidgets.QMainWindow):
         self.splitMenu.addSeparator()
         self.actRT=QtWidgets.QAction("&ZRT", checkable=True, checked=True)
         self.actQT=QtWidgets.QAction("&LQT", checkable=True, checked=False)
-        self.rotGrp=QtWidgets.QActionGroup(self, exclusive=True)
+        self.rotGrp=QtWidgets.QActionGroup(self)
+        self.rotGrp.setExclusive(True)
         self.rotGrp.addAction(self.actRT)
         self.rotGrp.addAction(self.actQT)
         self.splitMenu.addAction(self.actRT)
@@ -268,10 +294,14 @@ class Pytheas(QtWidgets.QMainWindow):
         self.toggleAR.triggered.connect(self.changeAR)
         self.toolsMenu.addAction(self.toggleAR)
         self.toolsMenu.addSeparator()
+        # TODO: This is not yet ready
+        # self.toolsMenu.addAction("&Estimate Instrument Orientation",self.estimateOrientationMode,QtCore.Qt.CTRL+QtCore.Qt.Key_P)
+        self.toolsMenu.addSeparator()
         self.toolsMenu.addAction("&Bandpass Filter",self.applyBandFilter,QtCore.Qt.CTRL+QtCore.Qt.Key_B)
-        self.toolsMenu.addAction("&Bandpass 1-20 Hz",self.applyFixed120Filter,QtCore.Qt.CTRL+QtCore.Qt.Key_F)
-        self.toolsMenu.addAction("&Bandpass 1-10 Hz",self.applyFixed110Filter,QtCore.Qt.CTRL+QtCore.Qt.Key_H)
-        self.toolsMenu.addAction("&Recommend Filter",self.applyRecFilter,QtCore.Qt.CTRL+QtCore.Qt.Key_A)
+        self.toolsMenu.addAction("&Bandpass Preset 1", self.apply_preset_filter_1, QtCore.Qt.CTRL+QtCore.Qt.Key_F)
+        self.toolsMenu.addAction("&Bandpass Preset 2", self.apply_preset_filter_2, QtCore.Qt.CTRL+QtCore.Qt.Key_H)
+        self.toolsMenu.addAction("&Recommend Filter",self.applyRecFilter)
+        self.toolsMenu.addAction("&Auto-select Filter", self.automatic_filter_selection, QtCore.Qt.CTRL+QtCore.Qt.Key_A)
         self.toolsMenu.addAction("&Remove filter",self.removeFilter,QtCore.Qt.CTRL+QtCore.Qt.Key_R)
         self.toolsMenu.addAction("&Show Horizontal Spectra",self.plotSpectrum)
         self.menuBar().addMenu(self.toolsMenu)
@@ -383,20 +413,16 @@ class Pytheas(QtWidgets.QMainWindow):
         self.axPart3=self.figDict["HOD3"]
         self.colPal=self.figDict["PALETTE"]
         self.addFig(self.activeFig)
-        # read configuration files
-        self.generalCNF=parsers.parseGeneralCnf(WORKDIR+os.sep+"etc%soptions%sgeneral.cnf"%(os.sep,os.sep))
-        self.pkCNF=parsers.parsePickerCnf(WORKDIR+os.sep+"etc%soptions%spicker.cnf"%(os.sep,os.sep))
-        self.caCNF=parsers.parseClusteringCnf(WORKDIR+os.sep+"etc%soptions%sclustering.cnf"%(os.sep,os.sep))
-        self.tpCNF=parsers.parseTaupCnf(WORKDIR+os.sep+"etc%soptions%staup.cnf"%(os.sep,os.sep))
-        self.gradeCNF=parsers.parseGradeCnf(WORKDIR+os.sep+"etc%soptions%sgrading.cnf"%(os.sep,os.sep))
+        # set the cursor
+        #self.mCursor=MultiCursor(self.activeFig.canvas,(self.axZ,self.axN,self.axE,self.axPolar),
+        #                         horizOn=True,vertOn=True,color='red', linewidth=1.5, linestyle='--')
         # small hack
-        self.caCNF.maxTd=self.generalCNF.maxTd
+        self.caCNF.maxTd = self.generalCNF.maxTd
         # clean logs
         self.cleanLogs()
         # read inventory
         try:
-            self.inventory, self.xmlInventory = self.readStations(self.tpCNF.stations)
-            logging.info(str(self.inventory))
+            self.inventory,self.xmlInventory=self.readStations(self.tpCNF.stations)
         except: # no station file! show a warning to the user...
             logging.exception("Could not find station file %s" % self.tpCNF.stations)
             winTitle="StationXML Warning"
@@ -407,6 +433,7 @@ class Pytheas(QtWidgets.QMainWindow):
         # set flags and various initial parameters
         self.flagReset()
         self.maxAin=np.inf
+        self.minSNR=0.0
         # all done!
         logging.debug("Set focus, central widget and navigation toolbar...")
         self.setCentralWidget(self.mainWidg)
@@ -468,8 +495,10 @@ class Pytheas(QtWidgets.QMainWindow):
     
         """
         # get windows bounds from Preferences?
-        if winNoise is None: winNoise=self.generalCNF.snrStart
-        if winSignal is None: winSignal=self.generalCNF.snrEnd
+        if winNoise is None:
+            winNoise=self.generalCNF.snrStart
+        if winSignal is None:
+            winSignal=self.generalCNF.snrEnd
         # grab the two horizontal waveforms
         if self.stageRotated:
             M1=self.stream.select(component="R")[0].data
@@ -612,15 +641,18 @@ class Pytheas(QtWidgets.QMainWindow):
     ## ARCHIVING FUNCTIONS ##
     def checkDefaultDirs(self):
         """Make the default directories."""
-        if not os.path.isdir(WORKDIR+os.sep+"etc%sindex"%os.sep):
-            os.makedirs(WORKDIR+os.sep+"etc%sindex"%os.sep)
-            logging.debug("Created etc%sindex."%os.sep)
-        if not os.path.isdir(WORKDIR+os.sep+"etc%soptions"%os.sep):
-            os.makedirs(WORKDIR+os.sep+"etc%soptions"%os.sep)
-            logging.debug("Created etc%soptions."%os.sep)
-        if not os.path.isdir(WORKDIR+os.sep+"etc%sevcor"%os.sep):
-            os.makedirs(WORKDIR+os.sep+"etc%sevcor"%os.sep)
-            logging.debug("Created etc%sevcor"%os.sep)
+        index_dir = os.path.join(WORKDIR, 'etc', 'index')
+        options_dir = os.path.join(WORKDIR, 'etc', 'options')
+        evcor_dir = os.path.join(WORKDIR, 'etc', 'evcor')
+        if not os.path.isdir(index_dir):
+            os.makedirs(index_dir)
+            logging.debug("Created %s" % index_dir)
+        if not os.path.isdir(options_dir):
+            os.makedirs(options_dir)
+            logging.debug("Created %s" % options_dir)
+        if not os.path.isdir(evcor_dir):
+            os.makedirs(evcor_dir)
+            logging.debug("Created %s" % evcor_dir)
 
     def getTree(self,path):
         """
@@ -656,6 +688,7 @@ class Pytheas(QtWidgets.QMainWindow):
         activeStations=[]
         for station in staList:
             path=evFolder+os.sep+"*."+station+".*"
+            path = os.path.join(evFolder, '*.%s.*' % station)
             try:
                 if glob(path)[0]:
                     activeStations.append(station)
@@ -712,8 +745,7 @@ class Pytheas(QtWidgets.QMainWindow):
             return inventory, xml
         except TypeError:
             xml=None
-            with open(staFile,"r") as fid: 
-                staLines=fid.readlines()
+            with open(staFile,"r") as fid: staLines=fid.readlines()
             return {x.split()[0]:
                      {
                        "network":x.split()[1],"latitude":float(x.split()[2]),
@@ -821,11 +853,11 @@ class Pytheas(QtWidgets.QMainWindow):
                 lon=prefOrig.longitude
                 if tools.isnone(lat) or tools.isnone(lon):
                     logging.warning('Event %s does not have location information. Skipping...' % origin)
-                    continue
+                    continue                
                 try:
-                    dep = prefOrig.depth / 1000. # depth should be in km
+                    dep = prefOrig.depth/1000. # depth should be in km
                     if not dep:
-                        dep = 0.1  # temporary fix
+                        dep = 0.1  # temporary fix                    
                 except TypeError: # is depth None?
                     dep = 0.1
                 # set pref mag before searching for corresponding r-id
@@ -853,7 +885,7 @@ class Pytheas(QtWidgets.QMainWindow):
                     try: # distance should be written in the file
                         dist=degrees2kilometers(arr.distance)
                     except:
-                        dist=None
+                        dist=np.nan
                     # get the backazimuth
                     try:
                         baz=arr.backazimuth
@@ -940,11 +972,10 @@ class Pytheas(QtWidgets.QMainWindow):
                                                       self.inventory[station]["latitude"],
                                                       self.inventory[station]["longitude"])
                         # calculate ain for direct linear raypath #
-                        if not dep: 
-                            dep = 0.1 # temporary fix
+                        if dep == 0.0:
+                            dep = 0.1 # hack to permit ain calc
                         ain=np.rad2deg(np.arctan((dist/1000.)/dep))
-                        if tools.isnone(ain):
-                            ain = 0.0
+                        if tools.isnone(ain): ain = 0.0
                         # store values to dictionary
                         tempDict['STA']=station
                         tempDict['NET']=self.inventory[station]['network']
@@ -980,17 +1011,18 @@ class Pytheas(QtWidgets.QMainWindow):
             the matched ones from the data directory)
 
        """
-       tOff=self.generalCNF.matching
-       keyTrash=[]
+       tOff = self.generalCNF.matching
+       keyTrash = []
        logging.debug("Performing keys correction...")
        # get previous corrections
+       evcor_file = os.path.join(WORKDIR, 'etc', 'evcor', 'evcor.dat')
        try: # if it exists
-           with open(WORKDIR+os.sep+"etc%sevcor%sevcor.dat"%(os.sep,os.sep)) as fid:
-               corList=fid.readlines()
-               corDict={x.split()[0].strip():x.split()[1].strip() for x in corList}
+           with open(evcor_file, 'r') as fid:
+               corList = fid.readlines()
+           corDict = {x.split()[0].strip():x.split()[1].strip() for x in corList}
        except IOError: # if file doesn't exist
-           with open(WORKDIR+os.sep+"etc%sevcor%sevcor.dat"%(os.sep,os.sep),"w") as fid:
-               fid.write("# INITIAL CORRECTED \n")
+           with open(evcor_file, 'w') as fid:
+               fid.write("# INITIAL CORRECTED\n")
            corDict={}
        # get keys. catalogue keys are rounded to 0 microseconds
        catalogueKeys=np.asarray([round(UTCDateTime(x).timestamp) for x in sorted(evsDict)])
@@ -998,11 +1030,11 @@ class Pytheas(QtWidgets.QMainWindow):
        keyFrmt="%Y-%m-%d-%H-%M-%S"
        # we want to match the CATALOGUE keys to the DIRECTORY keys
        for eTms in catalogueKeys:
-           diff=directoryKeys-eTms
+           diff = directoryKeys - eTms
            if abs(diff).min() == 0:
                continue
            # get indices
-           didx=np.abs(diff)<=tOff
+           didx = np.abs(diff) <= tOff
            if np.count_nonzero(didx) == 1: # only 1 solution found, good!
                pTms=directoryKeys[didx]
            elif np.count_nonzero(didx) > 1:
@@ -1596,15 +1628,17 @@ class Pytheas(QtWidgets.QMainWindow):
         else:
             try:
                 if self.sPick:
-                    self.SNR=self.calcSNR(self.sPick)
+                    self.SNR = self.calcSNR(self.sPick)
                 else:
-                    raise ValueError("No S pick set.")
-            except:
-                self.SNR=self.calcSNR(round(int((self.minPick+self.maxPick)/2)))
+                    raise ValueError('No S pick set.')
+            except ValueError:
+                logging.exception('No S pick set.')
+                self.SNR = self.calcSNR(int(round((self.minPick+self.maxPick)/2)))
             finally:
-                self.SNR=np.nan    
+                logging.exception('Could not calculate SNR')
+                self.SNR = np.nan
         # update the title
-        self.updateTitle()
+        self.updateTitle()              
         # fix the limits, if need
         if keepAxisLimits: # Only in axN because both y n x -axis are shared
             self.axN.set_ylim(bottom,top)
@@ -1634,7 +1668,11 @@ class Pytheas(QtWidgets.QMainWindow):
         #else:
         #    for ax in self.activeFig.get_axes():
         #        ax.set_facecolor(bkgClr)           
-        #    self.activeFig.set_facecolor(bkgClr)
+        #    self.activeFig.set_facecolor(bkgClr) 
+        # update the splitting dict (mainly for SNR)
+        # self.updateSplittingDict()
+        # update the title and draw
+        # self.updateTitle()
         self.canvas.draw()
 
     def updateTitle(self):
@@ -1892,6 +1930,10 @@ class Pytheas(QtWidgets.QMainWindow):
         :param event: the mouse event     
 
         """
+        # first check
+        if self.pPolMode: 
+            return # do nothing if orientation estimation mode
+        # carry on, otherwise
         if event.inaxes in (self.axZ, self.axE, self.axN, self.axPolar):
             qMods=QtWidgets.QApplication.keyboardModifiers()
             if qMods == QtCore.Qt.ControlModifier:
@@ -2007,22 +2049,39 @@ class Pytheas(QtWidgets.QMainWindow):
             elif qMods == QtCore.Qt.ControlModifier:
                 # get t closest to pick
                 idx=np.abs(self.stream[0].times()-event.xdata).argmin()
-                self.sPick=self.stream[0].times()[idx]
-                self.sArr=self.stream[0].stats.starttime+self.sPick
-                self.spickDict[self.activeEvent][self.station]=self.sArr
-                logging.info("S picked @ %s" % self.spickDict[self.activeEvent][self.station])
-                # get SNR
-                try:
-                    self.SNR=self.calcSNR(self.sPick)
-                except:
-                    self.SNR=np.nan
-                self.V2H=self.calcV2H(self.sPick)
-                # Draw pick lines
-                for ax in (self.axZ,self.axE,self.axN):
-                    ax.lines[1].set_xdata(self.sPick)
-                self.axPolar.lines[0].set_xdata(self.sPick)
-                self.updateSplittingDict(splitting=False)
-                self.updateTitle()
+                if self.pPolMode:
+                    try:
+                        orientation=tools.estimateOrientation(self.stream,idx,
+                                    self.statsDict[self.activeEvent][self.station]['BAZ'],
+                                    offset=0.1, method='first'
+                                                              )
+                        #
+                        winTitle="Estimated Orientation"
+                        genText="Instrument Orientation was successfully estimated!"
+                        infText="The orienation correction is %.1f" % orientation
+                        self.infoMsgBox(genText,infText,winTitle,modality=False)
+                    except:
+                        logging.exception("Could not estimate instrument orientation")
+                    self.activeFig.set_facecolor('white')
+                    self.pPolMode=False
+                    #self.orientCorr=orientation
+                else:
+                    self.sPick=self.stream[0].times()[idx]
+                    self.sArr=self.stream[0].stats.starttime+self.sPick
+                    self.spickDict[self.activeEvent][self.station]=self.sArr
+                    logging.info("S picked @ %s" % self.spickDict[self.activeEvent][self.station])
+                    # get SNR
+                    try:
+                        self.SNR=self.calcSNR(self.sPick)
+                    except:
+                        self.SNR=np.nan
+                    self.V2H=self.calcV2H(self.sPick)
+                    # Draw pick lines
+                    for ax in (self.axZ,self.axE,self.axN):
+                        ax.lines[1].set_xdata(self.sPick)
+                    self.axPolar.lines[0].set_xdata(self.sPick)
+                    self.updateSplittingDict(splitting=False)
+                    self.updateTitle()
                 self.canvas.draw()
 
     def keyPressEvent(self,event):
@@ -2688,6 +2747,8 @@ class Pytheas(QtWidgets.QMainWindow):
              Scalable Vector Graphics (*.svg);; Portable Document Format (*.pdf);;All files (*)")
         if len(figFile) == 0:
             return
+        # close previous mpl windows
+        plt.close()
         # get dict with solution
         metDict=self.splittingDict[self.activeEvent][self.station][method]
         # make the figure(s)
@@ -3162,14 +3223,23 @@ class Pytheas(QtWidgets.QMainWindow):
             return
         self.setAxisLimits(self.axPolar,"x",float(axLimits[0]),float(axLimits[1]))
 
+    def estimateOrientationMode(self):
+        """Turn orientation estimation mode on."""
+        if not self.pPolMode:
+            self.pPolMode=True
+            bkgClr='lightgreen'
+        else:
+            bkgClr='white'
+        self.activeFig.set_facecolor(bkgClr)
+        self.canvas.draw()
 
-    def applyFixed110Filter(self):
-        """Apply a fixed 1-10 Hz filter."""
-        self.applyBandFilter(freqmin=1,freqmax=10)
-
-    def applyFixed120Filter(self):
-        """Apply a fixed 1-20 Hz filter."""
-        self.applyBandFilter(freqmin=1,freqmax=20)
+    def apply_preset_filter_1(self):
+        """Apply the preset filter 1."""
+        self.applyBandFilter(freqmin=self.filterCNF.filter_preset_1[0], freqmax=self.filterCNF.filter_preset_1[1])
+    
+    def apply_preset_filter_2(self):
+        """Apply the preset filter 2"""
+        self.applyBandFilter(freqmin=self.filterCNF.filter_preset_2[0], freqmax=self.filterCNF.filter_preset_2[1])
 
     def applyRecFilter(self):
         """
@@ -3196,6 +3266,83 @@ class Pytheas(QtWidgets.QMainWindow):
         if self.method.startswith("M"):
             self.updateSplittingDict()
         self.updateFig(keepAxisLimits=True)
+
+
+    def automatic_filter_selection(self, update_figure=True):
+        """
+        Apply a range of filters to the stream and select the one with
+        the highest SNR, as proposed by Savage et al. (2010).
+
+        :type update_figure: bool, optional
+        :param update_figure: update the figure, after selecting
+            the filter. Defaults to True.
+
+        ..note:
+            Savage, M., Wessel, A., Teanby, N. A., Hurst, W., 2010.
+                Automatic measurement of shear wave splitting and applications to time
+                varying anisotropy at Mount Ruapehu volcano, New Zealand. 
+                Journal of Geophysical Research, 115(B12321), doi: 10.1029/2010JB007722
+
+        """
+        # start
+        # get filter ranges
+        filter_ranges = self.filterCNF.filter_ranges  # skip the two presets
+        logging.info('Starting the Savage et al. (2010) automatic filtering process...')
+        logging.info('#%i were set for trials' % len(filter_ranges))
+        # first, remove previous filters just in case
+        self.removeFilter(update_figure=update_figure)
+        # create temp stream object for the tests
+        stream_initial = self.stream.copy()
+        # start iterating
+        try:
+            snr_dict = {k : np.nan for k in range(len(filter_ranges))}
+            logging.debug('Will test for %i filters' % len(snr_dict))
+            for f_idx, filter_row in enumerate(filter_ranges):
+                self.stream = stream_initial.copy()
+                filter_test = filter_row[1:]
+                if not (tools.isnone(filter_test[0]) and tools.isnone(filter_test[1])):
+                    self.stream.filter(
+                    					type='bandpass', 
+                    					freqmin=np.nanmin(filter_test),
+                                        freqmax=np.nanmax(filter_test), 
+                                        corners=4,
+                                        zerophase=True)
+                try:
+                    if self.sPick:
+                        snr = self.calcSNR(self.sPick)
+                    else:
+                        logging.warning("No S pick set.")
+                        snr = self.calcSNR(int(round((self.minPick+self.maxPick)/2)))
+                except:
+                    logging.exception('Could not estimate SNR')
+                    snr = np.nan
+                logging.debug('Filter %i: %s -> SNR: %.3f' % (filter_row[0], str(filter_test), snr))
+                snr_dict[f_idx] = snr
+            # reset stream
+            self.stream = stream_initial.copy()
+            # check if all SNR values are nan
+            snr_vals = np.asarray(list(snr_dict.values()))
+            if np.all(np.isnan(snr_vals)):
+                raise ValueError('All test filters yielded %.3f SNR' % np.nan)
+            # get the best filter
+            b_idx, b_snr = max(snr_dict.items(), key=operator.itemgetter(1))
+        except:
+            logging.exception('Could not find an optimal filter')
+            # display warning msg
+            winTitle = 'Unable to find filter'
+            genText = 'Could not select filter automatically.'
+            infText = 'Try different ranges, or (re)pick the S-arrival.'
+            self.warnMsgBox(genText,infText,winTitle)
+            return
+        logging.info('The best filter is %s with SNR=%.3f' % (str(filter_ranges[b_idx]), b_snr))
+        self.freqmin, self.freqmax = filter_ranges[b_idx][1:]
+        self.SNR = b_snr
+        # apply the filter
+        self.filtered = True
+        if self.method.startswith("M"):
+            self.updateSplittingDict()
+        if update_figure:
+            self.updateFig(keepAxisLimits=True)
 
     def applyBandFilter(self,freqmin=False,freqmax=False):
         """
@@ -3226,13 +3373,21 @@ class Pytheas(QtWidgets.QMainWindow):
             self.updateSplittingDict()
         self.updateFig(keepAxisLimits=True)
 
-    def removeFilter(self):
-        """Removes any filter applied in the traces."""
+    def removeFilter(self, update_figure=True):
+        """
+        Removes any filter applied in the traces.
+
+        :type update_figure: bool, optional
+        :param update_figure: update the figure, after selecting
+            the filter. Defaults to True.
+
+        """
         self.filtered=False
         self.freqmin=np.nan; self.freqmax=np.nan     
         if self.method.startswith("M"):
-            self.updateSplittingDict()        
-        self.updateFig(keepAxisLimits=True)
+            self.updateSplittingDict()
+        if update_figure:        
+            self.updateFig(keepAxisLimits=True)
 
     def goToInitial(self):
         """Goes to the initial stage."""
@@ -3448,7 +3603,7 @@ class Pytheas(QtWidgets.QMainWindow):
         else:
             logging.debug("Will rotate to ZRT")
             ain=0.            
-        self.CAthread=TB.clustering(tbStream,meth,sPick,baz,ain,self.caCNF)
+        self.CAthread=CA.clustering(tbStream,meth,sPick,baz,ain,self.caCNF)
         if not runMult:
             if showProg:
                 self.CAthread.iterDone.connect(self.updateProgBar)
@@ -3516,6 +3671,9 @@ class Pytheas(QtWidgets.QMainWindow):
         metDict=self.splittingDict[self.activeEvent][self.station][method]
         # make the figure(s)
         titleInfo=str(self.origtime),self.ain,self.dist,self.mag,metDict["grade"]
+        # close previous plt windows
+        plt.close()
+        # show the figures
         tools.qcFigSWS(
                        self.streamIni.copy(),metDict["phi"],metDict["td"]/(10**3),metDict["pol"],
                        (metDict["err_phi"],metDict["err_td"]/(10**3)),
@@ -3544,7 +3702,10 @@ class Pytheas(QtWidgets.QMainWindow):
 
 
     ## cluster analysis multi
-    def applyCCA(self,meth,selectedStations,maxAin,filterBounds,skipPairs,skipFailed):
+    def applyCCA(self, meth, selectedStations,
+                      maxAin, minSNR, filterBounds, 
+                      skipPairs, skipFailed,
+                      auto_filter_flag):
         """
         Function to apply Cluster Analysis on the whole catalogue.
 
@@ -3554,12 +3715,18 @@ class Pytheas(QtWidgets.QMainWindow):
         :param selectedStations: list of stations to be used in the analysis
         :type maxAin: float
         :param maxAin: the incidence angle corresponding to the shear-wave window
+        :type minSNR: float
+        :param minSNR: the minimum accepted SNR. Pairs with a lesser SNR, will be
+            skipped altogether.
         :type filterBounds: tuple-like
         :param filterBounds: the minimum and maximum filter boundaries
         :type skipPairs: bool
         :param skipPairs: select whether to skip pairs that already exist in the database
         :type skipFailed: bool
         :param skipFailed: select whether to skip pairs that previously led to errors during CA
+        :type auto_filter_flag: bool
+        :param auto_filter_flag: select whether to ignore given filter bounds and select
+            the best ones automatically
 
         """
         logging.debug("===================================================")
@@ -3572,26 +3739,30 @@ class Pytheas(QtWidgets.QMainWindow):
                   self.minPick,self.maxPick,self.comment,self.maxAin,self.stream.copy()
                 )
         # set values
-        self.freqmin=filterBounds[0]
-        self.freqmax=filterBounds[1]
-        self.maxAin=maxAin
+        self.freqmin = filterBounds[0]
+        self.freqmax = filterBounds[1]
+        self.maxAin = maxAin
+        self.minSNR = minSNR
         # init custom logging file for process
-        tic=UTCDateTime()
-        actEvList=sorted(self.getActiveEvents())
+        tic = UTCDateTime()
+        actEvList = sorted(self.getActiveEvents())
         if meth == "EV":
-            self.method="AEV"
+            self.method = "AEV"
         elif meth == "ME":
-            self.method="AME"
+            self.method = "AME"
         elif meth == "RC":
-            self.method="ARC"
+            self.method = "ARC"
         ######################################
-        self.progBar=self.prgBar("Initiating Catalogue Cluster Analysis...",minVal=0,maxVal=100,runMult=True)
+        self.progBar = self.prgBar("Initiating Catalogue Cluster Analysis...",minVal=0,maxVal=100,runMult=True)
         self.progBar.setWindowTitle("Cluster Analysis")
         self.progBar.setWindowIcon(QtGui.QIcon(self.appIcon))
         self.progBar.setValue(0)
         self.progBar.show()          
         ## thread
-        self.CCAthread=applyCAMult(self,self.method,selectedStations,maxAin,filterBounds,skipPairs,skipFailed,actEvList)
+        self.CCAthread = applyCAMult(self,self.method,
+                                   selectedStations, maxAin, minSNR, 
+                                   filterBounds, auto_filter_flag,
+                                   skipPairs, skipFailed, actEvList)
         self.CCAthread.iterDone.connect(self.updateProgBar)
         self.CCAthread.iterFail.connect(self.failCCA)
         self.CCAthread.finished.connect(self.doneCCA)
@@ -3730,6 +3901,8 @@ class Pytheas(QtWidgets.QMainWindow):
             # get dict with solution
             method="M"+meth
             metDict=self.splittingDict[self.activeEvent][self.station][method]
+            # close previous mpl windows
+            plt.close()
             # make the figure(s)
             titleInfo=str(self.origtime),self.ain,self.dist,self.mag,metDict["grade"]
             tools.qcFigSWS(
@@ -3819,6 +3992,8 @@ class Pytheas(QtWidgets.QMainWindow):
             method="M"+meth
             # get dict with solution
             metDict=self.splittingDict[self.activeEvent][self.station][method]
+            # close previous mpl windows
+            plt.close()            
             # make the figure(s)
             titleInfo=str(self.origtime),self.ain,self.dist,self.mag,metDict["grade"]
             tools.qcFigSWS(
@@ -3933,6 +4108,7 @@ class Pytheas(QtWidgets.QMainWindow):
 
         """
         if general:
+            self.pPolMode=False
             self.V2H=False
             self.filtered=False
             self.freqmin=np.nan
@@ -4055,7 +4231,7 @@ class Pytheas(QtWidgets.QMainWindow):
         else:
             self.progBar.setValue(int(float(i))) # the int(float()) thing is for compatibility with Python 2
 
-    def infoMsgBox(self,genText,infText,winTitle):
+    def infoMsgBox(self,genText,infText,winTitle,modality=True):
         """
         Information message box
 
@@ -4071,6 +4247,7 @@ class Pytheas(QtWidgets.QMainWindow):
         self.iMsg=QtWidgets.QMessageBox(self)
         self.iMsg.setIcon(QtWidgets.QMessageBox.Information)
         self.iMsg.setText(genText)
+        self.iMsg.setModal(modality)
         self.iMsg.setInformativeText(infText)
         self.iMsg.setWindowTitle(winTitle)
         self.iMsg.setWindowIcon(QtGui.QIcon(self.appIcon))
@@ -4140,13 +4317,20 @@ class Pytheas(QtWidgets.QMainWindow):
         if ok == QtWidgets.QMessageBox.No:
             return
         # now evcor
-        evcdir=WORKDIR+os.sep+"etc%sevcor%s" % (os.sep,os.sep)
+        evcdir = os.path.join(WORKDIR, 'etc', 'evcor')
+        logging.debug('Removing files from %s' % evcdir)
         for fl in os.listdir(evcdir):
-            os.remove(evcdir+fl)
+            os.remove(os.path.join(evcdir, fl))
         # now indices
-        inddir=WORKDIR+os.sep+"etc%sindex%s" % (os.sep,os.sep)
+        inddir = os.path.join(WORKDIR, 'etc', 'index')
+        logging.debug('Removing files from %s' % inddir)
         for fl in os.listdir(inddir):
-            os.remove(inddir+fl)
+            os.remove(os.path.join(inddir, fl))
+        # now preferences
+        prefdir = os.path.join(WORKDIR, 'etc', 'options')
+        logging.debug('Removing files from %s' % prefdir)
+        for fl in os.listdir(prefdir):
+            os.remove(os.path.join(prefdir, fl))
         # now logs
         self.cleanLogs()
         # now quit
@@ -4156,12 +4340,13 @@ class Pytheas(QtWidgets.QMainWindow):
     def cleanLogs(self):
         """Cleans logs created in periods greater than specified days."""
         logging.debug("Cleaning logs...")
-        days=self.generalCNF.cleanLogs
-        days_in_sec=3600.*24*days
-        logs=os.listdir(WORKDIR+os.sep+"logs"+os.sep)
-        logs=[WORKDIR+os.sep+"logs"+os.sep+x for x in logs]
-        now=UTCDateTime()
-        for log in logs:
+        days = self.generalCNF.cleanLogs
+        days_in_sec = 3600. * 24 * days
+        logdir = os.path.join(WORKDIR, 'logs')
+        logfiles = os.listdir(logdir)
+        now = UTCDateTime()
+        for logfile in logfiles:
+            log = os.path.join(logdir, logfile)
             if  (now - os.path.getmtime(log)) > days_in_sec:
                 logging.debug("Removing logfile %s" % log)
                 os.remove(log)
@@ -4202,7 +4387,7 @@ class Pytheas(QtWidgets.QMainWindow):
         # various parameters
         self.loadCatalogue=False
         self.ocWin=QtWidgets.QDialog(self)
-        self.ocWin.setModal(False)
+        self.ocWin.setModal(True)
         self.ocWin.setWindowTitle("Open Catalogue")
         self.ocWin.setWindowIcon(QtGui.QIcon(self.appIcon))
         self.ocWin.setMinimumSize(600,300)
@@ -4357,30 +4542,41 @@ class Pytheas(QtWidgets.QMainWindow):
         self.cmMaxAinInp.setValidator(self.validateFloat)
         self.cmWinDum.gBox.addWidget(self.cmMaxAinLbl,1,1)
         self.cmWinDum.gBox.addWidget(self.cmMaxAinInp,1,2)
+        # minimum accepted SNR
+        self.cmMinSNRLbl = QtWidgets.QLabel("Minium SNR",font=self.cmWin.setsFont2)
+        self.cmMinSNRInp = QtWidgets.QLineEdit("{:.3f}".format(self.minSNR),font=self.cmWin.setsFont2)
+        self.cmMinSNRInp.setValidator(self.validateFloat)
+        self.cmWinDum.gBox.addWidget(self.cmMinSNRLbl,2,1)
+        self.cmWinDum.gBox.addWidget(self.cmMinSNRInp,2,2)
         # filters
         self.cmF1Lbl=QtWidgets.QLabel("Filter lower bound (Hz)",font=self.cmWin.setsFont2)
         self.cmF1Inp=QtWidgets.QLineEdit("{:.2f}".format(self.freqmin),font=self.cmWin.setsFont2)
         self.cmF2Lbl=QtWidgets.QLabel("Filter upper bound (Hz)",font=self.cmWin.setsFont2)
         self.cmF2Inp=QtWidgets.QLineEdit("{:.2f}".format(self.freqmax),font=self.cmWin.setsFont2)        
-        self.cmWinDum.gBox.addWidget(self.cmF1Lbl,2,1)
-        self.cmWinDum.gBox.addWidget(self.cmF1Inp,2,2)
-        self.cmWinDum.gBox.addWidget(self.cmF2Inp,3,1)
-        self.cmWinDum.gBox.addWidget(self.cmF2Inp,3,2)
+        self.cmWinDum.gBox.addWidget(self.cmF1Lbl,3,1)
+        self.cmWinDum.gBox.addWidget(self.cmF1Inp,3,2)
+        self.cmWinDum.gBox.addWidget(self.cmF2Inp,4,1)
+        self.cmWinDum.gBox.addWidget(self.cmF2Inp,4,2)
+        # check box for automatic filtering
+        self.cmWinDum.afFlag = QtWidgets.QCheckBox('Automatic Filtering',font=self.cmWin.setsFont2)        
+        self.cmWinDum.afFlag.setChecked(False)
+        self.cmWinDum.gBox.addWidget(self.cmWinDum.afFlag, 5, 1)
         # selected method
         self.cmMetLbl=QtWidgets.QLabel("Method",font=self.cmWin.setsFont2)
         self.cmMetInp=QtWidgets.QComboBox()
         accMethods=sorted(("RC", "EV", "ME"))
-        for itm in accMethods: self.cmMetInp.addItem(itm)
-        self.cmWinDum.gBox.addWidget(self.cmMetLbl,4,1)
-        self.cmWinDum.gBox.addWidget(self.cmMetInp,4,2)
+        for itm in accMethods:
+            self.cmMetInp.addItem(itm)
+        self.cmWinDum.gBox.addWidget(self.cmMetLbl, 6, 1)
+        self.cmWinDum.gBox.addWidget(self.cmMetInp, 6, 2)
         # checkbox for skipping pairs
         self.cmWinDum.skipFlag=QtWidgets.QCheckBox('Skip existing pairs',font=self.cmWin.setsFont2)        
         self.cmWinDum.skipFlag.setChecked(True)
-        self.cmWinDum.gBox.addWidget(self.cmWinDum.skipFlag,5,1)
+        self.cmWinDum.gBox.addWidget(self.cmWinDum.skipFlag, 7, 1)
         # checkbox for skipping failed pairs
         self.cmWinDum.skipFailedFlag=QtWidgets.QCheckBox('Skip previously failed pairs',font=self.cmWin.setsFont2)        
         self.cmWinDum.skipFailedFlag.setChecked(True)
-        self.cmWinDum.gBox.addWidget(self.cmWinDum.skipFailedFlag,5,2)
+        self.cmWinDum.gBox.addWidget(self.cmWinDum.skipFailedFlag, 8, 2)
         #
         self.cmWin.vBox.addWidget(self.cmWinDum)
         #
@@ -4401,15 +4597,19 @@ class Pytheas(QtWidgets.QMainWindow):
         rep=self.replyMsgBox(infText,winTitle)
         if rep == QtWidgets.QMessageBox.No:
             return
-        filterBounds=(float(self.cmF1Inp.text()),float(self.cmF2Inp.text()))
-        if not any(filterBounds): filterBounds=(np.nan,np.nan)
-        maxAin=self.cmMaxAinInp.text()
-        maxAin=np.inf if maxAin.upper() == "INF" else float(maxAin)
-        method=self.cmMetInp.currentText()
-        skipPairs=self.cmWinDum.skipFlag.isChecked()
-        skipFailed=self.cmWinDum.skipFailedFlag.isChecked()
+        filterBounds=(np.float(self.cmF1Inp.text()), np.float(self.cmF2Inp.text()))
+        if not any(filterBounds):
+            filterBounds=(np.nan,np.nan)
+        auto_filter_flag = self.cmWinDum.afFlag.isChecked()
+        maxAin = np.float(self.cmMaxAinInp.text())
+        minSNR = np.float(self.cmMinSNRInp.text())
+        method = self.cmMetInp.currentText()
+        skipPairs = self.cmWinDum.skipFlag.isChecked()
+        skipFailed = self.cmWinDum.skipFailedFlag.isChecked()
         self.cmWin.close()
-        self.applyCCA(method,selectedStations,maxAin,filterBounds,skipPairs,skipFailed)
+        self.applyCCA(method, selectedStations,
+                      maxAin, minSNR, filterBounds, skipPairs,
+                      skipFailed, auto_filter_flag)
         
 
     def cmWinCancel(self):
@@ -4436,65 +4636,85 @@ class Pytheas(QtWidgets.QMainWindow):
     ## Preferences window related
     def prefWindow(self):
         """ Open up and set the preferences window."""
-        self.pfWin=QtWidgets.QDialog(self)
+        self.pfWin = QtWidgets.QDialog(self)
         self.pfWin.setModal(True)
         self.pfWin.setWindowTitle("Preferences")
         self.pfWin.setWindowIcon(QtGui.QIcon(self.appIcon))
         #self.pfWin.resize(200,500)      
         ## set tabs ##
-        self.pfTabs=QtWidgets.QTabWidget()
+        self.pfTabs = QtWidgets.QTabWidget()
         # set default fonts
-        self.pfWin.setsFont1=QtGui.QFont("Calibri",14,QtGui.QFont.Bold)
-        self.pfWin.setsFont2=QtGui.QFont("Calibri",11,QtGui.QFont.Normal)
+        self.pfWin.setsFont1 = QtGui.QFont("Calibri",14,QtGui.QFont.Bold)
+        self.pfWin.setsFont2 = QtGui.QFont("Calibri",11,QtGui.QFont.Normal)
         # general
         self.gnTab=QtWidgets.QWidget()
-        self.gnTab.gBox=QtWidgets.QGridLayout()
+        self.gnTab.gBox = QtWidgets.QGridLayout()
         self.gnTab.setLayout(self.gnTab.gBox)
+
         self.gnTab.gBox.addWidget(QtWidgets.QLabel("General",font=self.pfWin.setsFont1),1,1)
+
         self.gnTab.gBox.addWidget(QtWidgets.QLabel("Clean Logs (days)",font=self.pfWin.setsFont2),2,1)
-        self.gnTab.cleanLogs=QtWidgets.QLineEdit(str(self.generalCNF.cleanLogs),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)        
+        self.gnTab.cleanLogs = QtWidgets.QLineEdit(str(self.generalCNF.cleanLogs),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)        
         self.gnTab.cleanLogs.setValidator(self.validateFloat)
         self.gnTab.gBox.addWidget(self.gnTab.cleanLogs,2,2)
-        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Waveforms (appropriate values in s)",font=self.pfWin.setsFont1),3,1)
-        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Offset for matching event folders to origin times",font=self.pfWin.setsFont2),4,1)
-        self.gnTab.matching=QtWidgets.QLineEdit(str(self.generalCNF.matching),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)        
+
+        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Maximum Log Size (MB)",font=self.pfWin.setsFont2),3,1)
+        self.gnTab.max_log_size = QtWidgets.QLineEdit(str(self.generalCNF.max_log_size),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)        
+        self.gnTab.max_log_size.setValidator(self.validateFloat)
+        self.gnTab.gBox.addWidget(self.gnTab.max_log_size,3,2)        
+        
+        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Waveforms (appropriate values in s)",font=self.pfWin.setsFont1),4,1)
+        
+        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Offset for matching event folders to origin times",font=self.pfWin.setsFont2),5,1)
+        self.gnTab.matching = QtWidgets.QLineEdit(str(self.generalCNF.matching),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)
         self.gnTab.matching.setValidator(self.validateFloat)
-        self.gnTab.gBox.addWidget(self.gnTab.matching,4,2)
-        self.gnTab.trimFlag=QtWidgets.QCheckBox('Trim waveforms',font=self.pfWin.setsFont2)        
+        self.gnTab.gBox.addWidget(self.gnTab.matching,5,2)
+
+        self.gnTab.trimFlag = QtWidgets.QCheckBox('Trim waveforms',font=self.pfWin.setsFont2)
         self.gnTab.trimFlag.setChecked(self.generalCNF.trimFlag)
-        self.gnTab.gBox.addWidget(self.gnTab.trimFlag,5,1)        
-        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Start time from S-arrival",font=self.pfWin.setsFont2),6,1)
-        self.gnTab.trimStart=QtWidgets.QLineEdit(str(self.generalCNF.trimStart),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)        
+        self.gnTab.gBox.addWidget(self.gnTab.trimFlag,6,1)        
+        
+        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Start time from S-arrival",font=self.pfWin.setsFont2),7,1)
+        self.gnTab.trimStart = QtWidgets.QLineEdit(str(self.generalCNF.trimStart),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)
         self.gnTab.trimStart.setValidator(self.validateFloat)
-        self.gnTab.gBox.addWidget(self.gnTab.trimStart,6,2)
-        self.gnTab.gBox.addWidget(QtWidgets.QLabel("End time from S-arrival",font=self.pfWin.setsFont2),7,1)
-        self.gnTab.trimEnd=QtWidgets.QLineEdit(str(self.generalCNF.trimEnd),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)        
+        self.gnTab.gBox.addWidget(self.gnTab.trimStart,7,2)
+        
+        self.gnTab.gBox.addWidget(QtWidgets.QLabel("End time from S-arrival",font=self.pfWin.setsFont2),8,1)
+        self.gnTab.trimEnd = QtWidgets.QLineEdit(str(self.generalCNF.trimEnd),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)        
         self.gnTab.trimEnd.setValidator(self.validateFloat)
-        self.gnTab.gBox.addWidget(self.gnTab.trimEnd,7,2)        
-        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Channel Code Preference",font=self.pfWin.setsFont2),8,1)
-        self.gnTab.chanPref=QtWidgets.QLineEdit(str(self.generalCNF.chanPref),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)
-        self.gnTab.gBox.addWidget(self.gnTab.chanPref,8,2)
-        self.gnTab.orientFlag=QtWidgets.QCheckBox('Instrument Orientation Correction',font=self.pfWin.setsFont2)
-        self.gnTab.gBox.addWidget(self.gnTab.orientFlag,9,1)
+        self.gnTab.gBox.addWidget(self.gnTab.trimEnd,8,2)
+
+        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Channel Code Preference",font=self.pfWin.setsFont2),9,1)
+        self.gnTab.chanPref = QtWidgets.QLineEdit(str(self.generalCNF.chanPref),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)
+        self.gnTab.gBox.addWidget(self.gnTab.chanPref,9,2)
+
+        self.gnTab.orientFlag = QtWidgets.QCheckBox('Instrument Orientation Correction',font=self.pfWin.setsFont2)
+        self.gnTab.gBox.addWidget(self.gnTab.orientFlag,10,1)
         self.gnTab.orientFlag.setChecked(self.generalCNF.orientFlag)        
-        self.gnTab.gBox.addWidget(QtWidgets.QLabel("SNR (values in s)",font=self.pfWin.setsFont1),10,1)
-        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Start of noise window",font=self.pfWin.setsFont2),11,1)
-        self.gnTab.snrStart=QtWidgets.QLineEdit(str(self.generalCNF.snrStart),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)        
+
+        self.gnTab.gBox.addWidget(QtWidgets.QLabel("SNR (values in s)",font=self.pfWin.setsFont1),11,1)
+        
+        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Start of noise window",font=self.pfWin.setsFont2),12,1)
+        self.gnTab.snrStart = QtWidgets.QLineEdit(str(self.generalCNF.snrStart),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)        
         self.gnTab.snrStart.setValidator(self.validateFloat)
-        self.gnTab.gBox.addWidget(self.gnTab.snrStart,11,2)
-        self.gnTab.gBox.addWidget(QtWidgets.QLabel("End of signal window",font=self.pfWin.setsFont2),12,1)
+        self.gnTab.gBox.addWidget(self.gnTab.snrStart,12,2)
+        
+        self.gnTab.gBox.addWidget(QtWidgets.QLabel("End of signal window",font=self.pfWin.setsFont2),13,1)
         self.gnTab.snrEnd=QtWidgets.QLineEdit(str(self.generalCNF.snrEnd),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)        
         self.gnTab.snrEnd.setValidator(self.validateFloat)
-        self.gnTab.gBox.addWidget(self.gnTab.snrEnd,12,2)  
-        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Splitting",font=self.pfWin.setsFont1),13,1)
-        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Maximum accepted t<sub>d</sub> (ms)",font=self.pfWin.setsFont2),14,1)
-        self.gnTab.maxTd=QtWidgets.QLineEdit(str(self.generalCNF.maxTd),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)        
+        self.gnTab.gBox.addWidget(self.gnTab.snrEnd,13,2)  
+
+        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Splitting",font=self.pfWin.setsFont1),14,1)
+        
+        self.gnTab.gBox.addWidget(QtWidgets.QLabel("Maximum accepted t<sub>d</sub> (ms)",font=self.pfWin.setsFont2),15,1)
+        self.gnTab.maxTd = QtWidgets.QLineEdit(str(self.generalCNF.maxTd),font=self.pfWin.setsFont2,alignment=QtCore.Qt.AlignCenter)        
         self.gnTab.maxTd.setValidator(self.validateFloat)
-        self.gnTab.gBox.addWidget(self.gnTab.maxTd,15,2)
-        self.gnTab.resetBtn=QtWidgets.QPushButton("Reset Settings",font=self.pfWin.setsFont2)
+        self.gnTab.gBox.addWidget(self.gnTab.maxTd,16,2)
+
+        self.gnTab.resetBtn = QtWidgets.QPushButton("Reset Settings",font=self.pfWin.setsFont2)
         self.gnTab.resetBtn.clicked.connect(self.cleanAll)
         self.gnTab.resetBtn.setFixedSize(110,32)
-        self.gnTab.gBox.addWidget(self.gnTab.resetBtn,16,1)
+        self.gnTab.gBox.addWidget(self.gnTab.resetBtn,17,1)
         # grading
         self.grTab=QtWidgets.QWidget()
         self.grTab.setMaximumSize(1024,350)
@@ -4625,7 +4845,94 @@ class Pytheas(QtWidgets.QMainWindow):
         self.tauTab.ainFlag=QtWidgets.QCheckBox('Calculate incidence',font=self.pfWin.setsFont2)
         self.tauTab.gBox.addWidget(self.tauTab.ainFlag,5,1)
         self.tauTab.ainFlag.setChecked(self.tpCNF.ainFlag)
-        # AR-AIC
+        # Filters
+        self.filtTab = QtWidgets.QWidget()
+        self.filtTab.vLayout = QtWidgets.QVBoxLayout()
+        self.filtTab.vLayout.setAlignment(QtCore.Qt.AlignCenter)
+        self.filtTab.setLayout(self.filtTab.vLayout)
+        self.filtTab.filtTable = QtWidgets.QTableWidget()
+        self.filtTab.filtTable.setColumnCount(4)
+        self.filtTab.filtTable.verticalHeader().setVisible(False)
+        self.filtTab.filtTable.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
+        self.filtTab.filtTable.setRowCount(self.filterCNF.filter_ranges.shape[0] + 2 - 1)  # add 2 for the presets, minus 1 for the (nan, nan)
+        self.filtTab.filtTable.setHorizontalHeaderLabels(['Name', 'fmin', 'fmax', 'Remove'])
+        # add presets first
+        for i_p, h_p, f_p in zip([0, 1], ['Preset 1', 'Preset 2'], [self.filterCNF.filter_preset_1, self.filterCNF.filter_preset_2]):
+
+            itm_phash = QtWidgets.QTableWidgetItem(h_p)
+            itm_phash.setTextAlignment(QtCore.Qt.AlignHCenter)
+            itm_phash.setFlags(QtCore.Qt.ItemIsEditable)
+
+            itm_pfmin = QTableWidgetNumItem(str(f_p[0]))
+            itm_pfmin.setTextAlignment(QtCore.Qt.AlignHCenter)
+
+            itm_pfmax = QTableWidgetNumItem(str(f_p[1]))
+            itm_pfmax.setTextAlignment(QtCore.Qt.AlignHCenter)
+
+            self.filtTab.filtTable.setItem(i_p, 0, itm_phash)
+            self.filtTab.filtTable.setItem(i_p, 1, itm_pfmin)
+            self.filtTab.filtTable.setItem(i_p, 2, itm_pfmax)
+            
+
+            btn_dummy = QtWidgets.QPushButton()
+            btn_dummy.setIcon(QtGui.QIcon(os.path.join(WORKDIR, 'etc', 'images', 'icon_remove.png')))
+            btn_dummy.setIconSize(QtCore.QSize(24, 24))
+            btn_dummy.resize(24, 24)
+            btn_dummy.setEnabled(False)
+            self.filtTab.filtTable.setCellWidget(i_p, 3, btn_dummy)
+
+
+        # now add the rest
+        i_filt_row = 2  # add after presets
+        self.filt_table_btn_dict = {}
+        for filt_row in self.filterCNF.filter_ranges:
+
+            itm_hash = QtWidgets.QTableWidgetItem('%i' % filt_row[0])
+            itm_hash.setTextAlignment(QtCore.Qt.AlignHCenter)
+            itm_hash.setFlags(QtCore.Qt.ItemIsEditable)
+
+            itm_fmin = QTableWidgetNumItem(str(filt_row[1]))
+            itm_fmin.setTextAlignment(QtCore.Qt.AlignHCenter)
+
+            itm_fmax = QTableWidgetNumItem(str(filt_row[2]))
+            itm_fmax.setTextAlignment(QtCore.Qt.AlignHCenter)
+
+            self.filtTab.filtTable.setItem(i_filt_row, 0, itm_hash) 
+            self.filtTab.filtTable.setItem(i_filt_row, 1, itm_fmin)
+            self.filtTab.filtTable.setItem(i_filt_row, 2, itm_fmax)
+
+            # add a removal button
+            self.filt_table_btn_dict[i_filt_row] = QtWidgets.QPushButton()
+            self.filt_table_btn_dict[i_filt_row].setIcon(QtGui.QIcon(os.path.join(WORKDIR, 'etc', 'images', 'icon_remove.png')))
+            self.filt_table_btn_dict[i_filt_row].setIconSize(QtCore.QSize(24, 24))
+            self.filt_table_btn_dict[i_filt_row].resize(24, 24)
+            self.filtTab.filtTable.setCellWidget(i_filt_row, 3, self.filt_table_btn_dict[i_filt_row])
+            self.filt_table_btn_dict[i_filt_row].clicked.connect(self.pfWinRemFilterButton)
+
+            i_filt_row += 1
+
+        # resize
+        hdr = self.filtTab.filtTable.horizontalHeader()
+        filt_table_total_width = 0
+        for hi in range(self.filtTab.filtTable.columnCount()): 
+            # hdr.setSectionResizeMode(hi, QtWidgets.QHeaderView.ResizeToContents)
+            filt_table_total_width += self.filtTab.filtTable.columnWidth(hi)
+        filt_table_total_width += 40  # this is to account for the scroll bar, but must find a better
+                                      # way, as it will not scale to different resolutions
+        filt_table_total_height = self.filtTab.filtTable.frameGeometry().height()
+        self.filtTab.filtTable.setMaximumSize(filt_table_total_width, filt_table_total_height)
+
+        self.filtTab.filtTable.setSortingEnabled(True)
+        self.filtTab.filtTable.setDragDropOverwriteMode(False) 
+        self.filtTab.filtTable.setDragDropMode(QtWidgets.QAbstractItemView.NoDragDrop) 
+        
+        self.filtTab.vLayout.addWidget(self.filtTab.filtTable)
+
+        self.filtTab.filtAddBtn = QtWidgets.QPushButton('Add Row', font=self.pfWin.setsFont2)
+        self.filtTab.filtAddBtn.clicked.connect(self.pfWinAddFilterButton)
+        self.filtTab.vLayout.addWidget(self.filtTab.filtAddBtn)
+
+        #-- AR-AIC
         self.arTab=QtWidgets.QWidget()
         self.arTab.gBox=QtWidgets.QGridLayout()
         self.arTab.setLayout(self.arTab.gBox)
@@ -4674,7 +4981,8 @@ class Pytheas(QtWidgets.QMainWindow):
         self.pfTabs.addTab(self.grTab,"Grading")
         self.pfTabs.addTab(self.caTab,"Cluster Analysis")
         self.pfTabs.addTab(self.tauTab,"TauP")
-        self.pfTabs.addTab(self.arTab,"AR-AIC")        
+        self.pfTabs.addTab(self.filtTab, 'Filters')
+        self.pfTabs.addTab(self.arTab,"AR-AIC")   
         # finalize
         self.pfWin.vBox=QtWidgets.QVBoxLayout(self.pfWin)
         self.pfWin.vBox.addWidget(self.pfTabs)
@@ -4682,11 +4990,59 @@ class Pytheas(QtWidgets.QMainWindow):
                                                       QtWidgets.QDialogButtonBox.Apply|
                                                       QtWidgets.QDialogButtonBox.Cancel)
         self.pfWin.diagBox.accepted.connect(self.pfWinOk)
+        # this needs a fix, as it currently saves preferences TWICE,
+        # i.e. how to connect the Apply button only?
         self.pfWin.diagBox.clicked.connect(self.pfWinSave)
         self.pfWin.diagBox.rejected.connect(self.pfWinCancel)
         self.pfWin.vBox.addWidget(self.pfWin.diagBox)
         #
         self.pfWin.show()
+
+    def pfWinRemFilterButton(self):
+        """Remove the active table row"""
+        sender = self.sender()
+        index = self.filtTab.filtTable.indexAt(sender.pos())
+        logging.debug('Removing row #%i from filter table' % index.row())
+        self.filtTab.filtTable.removeRow(index.row())
+        self.pfWinRenewFilterIndices()
+
+    def pfWinAddFilterButton(self):
+        """Add a row to the table"""
+        i_filt_row = self.filtTab.filtTable.rowCount() #+ 1
+        self.filtTab.filtTable.insertRow(self.filtTab.filtTable.rowCount())
+        logging.debug('Adding row #%i to filter table' % i_filt_row)
+        itm_hash = QtWidgets.QTableWidgetItem('%i' % (i_filt_row - 2))
+        itm_hash.setTextAlignment(QtCore.Qt.AlignHCenter)
+        itm_hash.setFlags(QtCore.Qt.ItemIsEditable)
+        itm_fmin = QTableWidgetNumItem(str(1.0))
+        itm_fmin.setTextAlignment(QtCore.Qt.AlignHCenter)
+        itm_fmax = QTableWidgetNumItem(str(20.0))
+        itm_fmax.setTextAlignment(QtCore.Qt.AlignHCenter)
+        self.filtTab.filtTable.setItem(i_filt_row, 0, itm_hash)
+        self.filtTab.filtTable.setItem(i_filt_row, 1, itm_fmin)
+        self.filtTab.filtTable.setItem(i_filt_row, 2, itm_fmax)
+
+        # add a removal button
+        self.filt_table_btn_dict[i_filt_row] = QtWidgets.QPushButton()
+        self.filt_table_btn_dict[i_filt_row].setIcon(QtGui.QIcon(os.path.join(WORKDIR, 'etc', 'images', 'icon_remove.png')))
+        self.filt_table_btn_dict[i_filt_row].setIconSize(QtCore.QSize(24, 24))
+        self.filt_table_btn_dict[i_filt_row].resize(24, 24)
+        self.filtTab.filtTable.setCellWidget(i_filt_row, 3, self.filt_table_btn_dict[i_filt_row])
+        self.filt_table_btn_dict[i_filt_row].clicked.connect(self.pfWinRemFilterButton)
+
+        self.filtTab.filtTable.scrollToItem(itm_hash, QtWidgets.QAbstractItemView.PositionAtTop)
+        self.filtTab.filtTable.selectRow(itm_hash.row())
+        self.pfWinRenewFilterIndices()
+
+    def pfWinRenewFilterIndices(self):
+        """ Renew the filter indices upon changes"""
+        for i in range(2, self.filtTab.filtTable.rowCount()):
+            itm_hash = QtWidgets.QTableWidgetItem('%i' % (i - 2))
+            itm_hash.setTextAlignment(QtCore.Qt.AlignHCenter)
+            itm_hash.setFlags(QtCore.Qt.ItemIsEditable)
+
+            self.filtTab.filtTable.setItem(i, 0, itm_hash)
+
 
     def pfWinGetModel(self):
         """Get a new location for the model file."""
@@ -4718,6 +5074,7 @@ class Pytheas(QtWidgets.QMainWindow):
         """Save preferences to files."""
         # general
         self.generalCNF.cleanLogs=float(self.gnTab.cleanLogs.text())
+        self.generalCNF.max_log_size=float(self.gnTab.max_log_size.text())
         self.generalCNF.matching=float(self.gnTab.matching.text())
         self.generalCNF.chanPref=str(self.gnTab.chanPref.text())
         self.generalCNF.orientFlag=self.gnTab.orientFlag.isChecked()
@@ -4728,6 +5085,9 @@ class Pytheas(QtWidgets.QMainWindow):
         self.generalCNF.snrEnd=float(self.gnTab.snrEnd.text())
         self.generalCNF.maxTd=float(self.gnTab.maxTd.text())
         self.generalCNF.write(WORKDIR+os.sep+"etc%soptions%sgeneral.cnf"%(os.sep,os.sep))
+        # write the maximum bytes for the logs to an independent file for easy reading
+        with open(WORKDIR + os.sep + "etc%soptions%slog_max_bytes" % (os.sep,os.sep), 'w') as fid:
+            fid.write(str(self.generalCNF.max_log_size))
         # grading 
         self.gradeCNF.polOff=float(self.grTab.polOff.text())
         self.gradeCNF.snr_bound=float(self.grTab.snr_bound.text())
@@ -4763,6 +5123,42 @@ class Pytheas(QtWidgets.QMainWindow):
         self.tpCNF.stations=str(self.tauTab.stations.text())
         self.tpCNF.ainFlag=self.tauTab.ainFlag.isChecked()
         self.tpCNF.write(WORKDIR+os.sep+"etc%soptions%staup.cnf"%(os.sep,os.sep))
+        # -- Filters
+        n_filters = self.filtTab.filtTable.rowCount() - 2
+        self.filterCNF.filter_ranges = np.zeros((n_filters, 3))
+        # set preset 1
+        self.filterCNF.filter_preset_1 = np.zeros(2)
+        try:
+            self.filterCNF.filter_preset_1[0] = np.float(self.filtTab.filtTable.item(0, 1).text())
+        except ValueError:
+            self.filterCNF.filter_preset_1[0] = np.nan
+        try:
+            self.filterCNF.filter_preset_1[1] = np.float(self.filtTab.filtTable.item(0, 2).text())
+        except ValueError:
+            self.filterCNF.filter_preset_1[1] = np.nan
+        # set preset 2
+        self.filterCNF.filter_preset_2 = np.zeros(2)
+        try:
+            self.filterCNF.filter_preset_2[0] = np.float(self.filtTab.filtTable.item(1, 1).text())
+        except ValueError:
+            self.filterCNF.filter_preset_2[0] = np.nan
+        try:
+            self.filterCNF.filter_preset_2[1] = np.float(self.filtTab.filtTable.item(1, 2).text())
+        except ValueError:
+            self.filterCNF.filter_preset_2[1] = np.nan
+        # now, get each one and set it to the filters array
+        for n_row in range(n_filters):
+            n_row_table = n_row + 2  # skip first two
+            self.filterCNF.filter_ranges[n_row, 0] = np.int(self.filtTab.filtTable.item(n_row_table, 0).text())
+            try:
+                self.filterCNF.filter_ranges[n_row, 1] = np.float(self.filtTab.filtTable.item(n_row_table, 1).text())
+            except ValueError:
+                self.filterCNF.filter_ranges[n_row, 1] = np.nan
+            try:
+                self.filterCNF.filter_ranges[n_row, 2] = np.float(self.filtTab.filtTable.item(n_row_table, 2).text())
+            except ValueError:
+                self.filterCNF.filter_ranges[n_row, 2] = np.nan
+        self.filterCNF.write(os.path.join(WORKDIR, 'etc', 'options', 'filters.cnf'))
         # AR-AIC
         self.pkCNF.arFMIN=float(self.arTab.arFMIN.text())
         self.pkCNF.arFMAX=float(self.arTab.arFMAX.text())
@@ -4876,22 +5272,22 @@ class Pytheas(QtWidgets.QMainWindow):
         doesn't exist? Maybe events from catalogue that do not correspond
         to an event in folder with warnings (and not selectable).
         """
-        self.evWin=QtWidgets.QDialog(self)
+        self.evWin = QtWidgets.QDialog(self)
         self.evWin.setModal(True)
         self.evWin.setWindowTitle("Events' List")
         self.evWin.setWindowIcon(QtGui.QIcon(self.appIcon))
-        self.evWin.vBox=QtWidgets.QVBoxLayout(self.evWin)
+        self.evWin.vBox = QtWidgets.QVBoxLayout(self.evWin)
         self.evWin.setLayout(self.evWin.vBox)
-        self.evWin.selectEv=QtWidgets.QTableWidget()
+        self.evWin.selectEv = QtWidgets.QTableWidget()
         self.evWin.selectEv.setColumnCount(4)
         self.evWin.selectEv.verticalHeader().setVisible(False)
         self.evWin.selectEv.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         self.evWin.vBox.addWidget(self.evWin.selectEv)
-        allEvList=sorted(self.evsDict)
-        actEvList=sorted(self.getActiveEvents())
-        maxLen=len(allEvList)
+        allEvList = sorted(self.evsDict)
+        actEvList = sorted(self.getActiveEvents())
+        maxLen = len(allEvList)
         self.evWin.selectEv.setRowCount(maxLen)
-        self.evWin.selectEv.setHorizontalHeaderLabels(["#","Event","Magnitude","Depth"])
+        self.evWin.selectEv.setHorizontalHeaderLabels(["#", "Event", "Magnitude", "Depth"])
         hdr=self.evWin.selectEv.horizontalHeader()
         for hi in range(self.evWin.selectEv.columnCount()): 
             hdr.setSectionResizeMode(hi, QtWidgets.QHeaderView.ResizeToContents)
@@ -4929,13 +5325,17 @@ class Pytheas(QtWidgets.QMainWindow):
         # final properties
         self.evWin.selectEv.setSortingEnabled(True)
         self.evWin.selectEv.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.evWin.selectEv.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.evWin.selectEv.setDragDropOverwriteMode(False) 
+        self.evWin.selectEv.setDragDropMode(QtWidgets.QAbstractItemView.NoDragDrop) 
+        self.evWin.selectEv.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.evWin.show()
 
     def evScroll(self):
         """Scroll to current event."""
         try:
-            lookup=str(UTCDateTime(self.activeEvent)).split(".")[0]
-            item=self.evWin.selectEv.findItems(lookup,QtCore.Qt.MatchExactly)[0]
+            lookup = str(UTCDateTime(self.activeEvent)).split(".")[0]
+            item = self.evWin.selectEv.findItems(lookup, QtCore.Qt.MatchExactly)[0]
             self.evWin.selectEv.selectRow(item.row())
             self.evWin.selectEv.scrollToItem(item,QtWidgets.QAbstractItemView.PositionAtTop)
         except:
@@ -4961,7 +5361,7 @@ class Pytheas(QtWidgets.QMainWindow):
         to an event in folder with warnings (and not selectable).
         """
         self.stWin=QtWidgets.QDialog(self)
-        self.stWin.setModal(False)
+        self.stWin.setModal(True)
         self.stWin.setWindowTitle("Station List")
         self.setWindowIcon(QtGui.QIcon(self.appIcon))
         self.stWin.vBox=QtWidgets.QVBoxLayout(self.stWin)
@@ -5015,6 +5415,10 @@ class Pytheas(QtWidgets.QMainWindow):
         # final properties
         self.stWin.selectSt.setSortingEnabled(True)
         self.stWin.selectSt.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.stWin.selectSt.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.stWin.selectSt.setDragDropOverwriteMode(False) 
+        self.stWin.selectSt.setDragDropMode(QtWidgets.QAbstractItemView.NoDragDrop) 
+        self.stWin.selectSt.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.stScroll()
         self.stWin.show()
 
@@ -5063,7 +5467,11 @@ class applyCAMult(QtCore.QThread):
     iterDone=QtCore.pyqtSignal(list)
     iterFail=QtCore.pyqtSignal(Exception)
 
-    def __init__(self,pytheas,meth,selectedStations,maxAin,filterBounds,skipPairs,skipFailed,actEvList,parent=None):
+    def __init__(self,pytheas, meth, selectedStations,
+                 maxAin, minSNR,  
+                 filterBounds, auto_filter_flag,
+                 skipPairs, skipFailed,
+                 actEvList, parent=None):
         """
         Initilization
 
@@ -5076,8 +5484,14 @@ class applyCAMult(QtCore.QThread):
         :param selectedStations: list of stations to be used in the analysis
         :type maxAin: float
         :param maxAin: the incidence angle corresponding to the shear-wave window
+        :type minSNR: float
+        :param minSNR: the minimum accepted SNR. Pairs with a lesser SNR, will be
+            skipped altogether.
         :type filterBounds: tuple-like
         :param filterBounds: the minimum and maximum filter boundaries
+        :type auto_filter_flag: bool
+        :param auto_filter_flag: select whether to ignore given filter bounds and select
+            the best ones automatically
         :type skipPairs: bool
         :param skipPairs: select whether to skip pairs that already exist in the database
         :type skipFailed: bool
@@ -5087,24 +5501,26 @@ class applyCAMult(QtCore.QThread):
 
         """
         QtCore.QThread.__init__(self,parent)
-        self.pytheas=pytheas
-        self.meth=meth
-        self.selectedStations=selectedStations
-        self.maxAin=maxAin
-        self.filterBounds=filterBounds
-        self.freqmin=filterBounds[0]
-        self.freqmax=filterBounds[1]
-        self.skipPairs=skipPairs
-        self.skipFailed=skipFailed
-        self.actEvList=actEvList
-        self.excFlag=False
-        self._isRunning=True
+        self.pytheas = pytheas
+        self.meth = meth
+        self.selectedStations = selectedStations
+        self.maxAin = maxAin
+        self.minSNR = minSNR
+        self.filterBounds = filterBounds
+        self.auto_filter_flag = auto_filter_flag
+        self.freqmin = filterBounds[0]
+        self.freqmax = filterBounds[1]
+        self.skipPairs = skipPairs
+        self.skipFailed = skipFailed
+        self.actEvList = actEvList
+        self.excFlag = False
+        self._isRunning = True
 
     def stop(self):
         """Set flag to stop iterating over windows."""
-        self._isRunning=False
+        self._isRunning = False
         try:
-            self.pytheas.CAthread._isRunning=False
+            self.pytheas.CAthread._isRunning = False
         except:
             pass
         self.wait()
@@ -5113,11 +5529,11 @@ class applyCAMult(QtCore.QThread):
         """Run the full catalogue."""
         try:
             # get start time
-            tic=UTCDateTime()
-            self.tic=tic
+            tic = UTCDateTime()
+            self.tic = tic
             # setup the log for the CA
             logfileCA=WORKDIR+os.sep+"logs"+os.sep+"CA_%s.log" % tic.strftime("%Y%m%d_%H%M%S")
-            self.logfileCA=logfileCA
+            self.logfileCA = logfileCA
             logging.info("Will save CA related information to %s" % logfileCA)
             with open(logfileCA,"w") as fid:
                 fid.write("# Shear-wave Window: %.1f deg | Filter (Hz): %.1f - %.1f\n" % (self.maxAin,self.freqmin,self.freqmax))
@@ -5278,11 +5694,23 @@ class applyCAMult(QtCore.QThread):
                             self.pytheas.updateSplittingDict()
                             DB.addValues(self.dbConn,self.dbCur,self.pytheas.splittingDict)
                             continue
-                        # TODO: make filter(s) defined in the TB config file
-                        # get SNR
-                        if not tools.isnone(self.pytheas.freqmin) or not tools.isnone(self.pytheas.freqmax):
-                            stream.filter(type="bandpass",freqmin=self.pytheas.freqmin,freqmax=self.pytheas.freqmax,zerophase=True,corners=4)
-                        SNR=self.pytheas.calcSNR(self.pytheas.sPick)
+                        # apply filter
+                        if self.auto_filter_flag:
+                            self.pytheas.automatic_filter_selection(update_figure=False)
+                            SNR = self.pytheas.SNR
+                        else:
+                            if not tools.isnone(self.pytheas.freqmin) or not tools.isnone(self.pytheas.freqmax):
+                                stream.filter(type="bandpass",freqmin=self.pytheas.freqmin,freqmax=self.pytheas.freqmax,zerophase=True,corners=4)
+                            # get SNR, if needed
+                            SNR = self.pytheas.calcSNR(self.pytheas.sPick)
+                        # is the pair outside the shear-wave window?
+                        if SNR < self.pytheas.minSNR:
+                            logging.warning("SNR too low (%.3f < %.3f), skipping..." % (SNR, self.pytheas.minSNR))
+                            #skip = True  # not really needed here, can just use 'continue'
+                            with open(logfileCA,"a") as fid: 
+                                state = " SKIP SNR\n"
+                                fid.write(event.ljust(25) + station.rjust(6) + state)
+                            continue
                         # deal with ain
                         if self.pytheas.actQT.isChecked():
                             logging.debug("Will rotate to LQT")

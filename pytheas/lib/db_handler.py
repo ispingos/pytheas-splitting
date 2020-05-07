@@ -13,7 +13,7 @@ while, at the same time, enhanching the effectiveness of processing and quality 
 
 Pytheas is released under the GNU GPLv3 license.
 
-Authors: Spingos I. & Kaviris G. (c) 2019
+Authors: Spingos I. & Kaviris G. (c) 2019-2020
 Special thanks to Millas C. for testing the software and providing valuable feedback from the 
 very early stages of this endeavor!
 

@@ -13,7 +13,7 @@ while, at the same time, enhanching the effectiveness of processing and quality 
 
 Pytheas is released under the GNU GPLv3 license.
 
-Authors: Spingos I. & Kaviris G. (c) 2019
+Authors: Spingos I. & Kaviris G. (c) 2019-2020
 Special thanks to Millas C. for testing the software and providing valuable feedback from the 
 very early stages of this endeavor!
 
@@ -28,8 +28,10 @@ at https://www.github.com/ispingos/pytheas-splitting
 ####################################################################
 
 ## imports 
+import os
 import logging
-from configparser import ConfigParser
+import numpy as np
+from configparser import *
 
 class parseGeneralCnf():
     """
@@ -38,7 +40,7 @@ class parseGeneralCnf():
 
     """
 
-    def __init__(self,filename):
+    def __init__(self, filename):
         """
         Reads a configuration file and returns the settings.
         
@@ -46,23 +48,72 @@ class parseGeneralCnf():
         :param filename: the path to the file        
 
         """
+        self.default_sections = ['GENERAL', 'WAVEFORMS', 'SNR', 'SPLITTING']
          # initiate the configparser object and read the file
-        cnf=ConfigParser(inline_comment_prefixes="!")
-        with open(filename,"r") as fid: cnf.read_file(fid)
+        cnf = ConfigParser(inline_comment_prefixes="!")
+        try:
+            with open(filename, 'r') as fid:
+                cnf.read_file(fid)
+            # check for missing sections
+            current_sections = cnf.sections()
+            diff_sections = list(set(self.default_sections).difference(set(current_sections)))
+            for section in diff_sections:
+                cnf.add_section(section)
+            # remove sections that exist in the file, but not in the defaults
+            diff_sections_file = list(set(current_sections).difference(set(self.default_sections)))
+            for section_r in diff_sections_file:
+                cnf.remove_section(section)
+        except FileNotFoundError:
+            for section in self.default_sections:
+                cnf.add_section(section)
         # parse
-        self.cleanLogs=cnf.getfloat('GENERAL','cleanLogs')
-        self.matching=cnf.getfloat('WAVEFORMS','matching')
-        self.chanPref=cnf.get('WAVEFORMS','prefOrder')
-        self.orientFlag=cnf.getboolean('WAVEFORMS','orientation')
-        self.trimStart=cnf.getfloat('WAVEFORMS','trimStart')
-        self.trimEnd=cnf.getfloat('WAVEFORMS','trimEnd')
-        self.trimFlag=cnf.getboolean('WAVEFORMS','trim')
-        self.snrStart=cnf.getfloat('SNR','snrStart')
-        self.snrEnd=cnf.getfloat('SNR','snrEnd')
-        self.maxTd=cnf.getfloat('SPLITTING','maxTd')
+        try:
+            self.cleanLogs = cnf.getfloat('GENERAL', 'cleanLogs')
+        except NoOptionError:
+            self.cleanLogs = 1.
+        try:
+            self.max_log_size = cnf.getfloat('GENERAL', 'max_log_size')
+        except NoOptionError:
+            self.max_log_size = 50.
+        try:
+            self.matching = cnf.getfloat('WAVEFORMS', 'matching')
+        except NoOptionError:
+            self.matching = 5.0
+        try:
+            self.chanPref = cnf.get('WAVEFORMS', 'prefOrder')
+        except NoOptionError:
+            self.chanPref = 'HH,EN,HN,EH,BH,BN'
+        try:
+            self.orientFlag = cnf.getboolean('WAVEFORMS', 'orientation')
+        except NoOptionError:
+            self.orientFlag = True
+        try:
+            self.trimStart = cnf.getfloat('WAVEFORMS', 'trimStart')
+        except NoOptionError:
+            self.trimStart = -5.
+        try:
+            self.trimEnd = cnf.getfloat('WAVEFORMS', 'trimEnd')
+        except NoOptionError:
+            self.trimEnd = 5.
+        try:
+            self.trimFlag = cnf.getboolean('WAVEFORMS', 'trim')
+        except NoOptionError:
+            self.trimFlag = False
+        try:
+            self.snrStart = cnf.getfloat('SNR', 'snrStart')
+        except NoOptionError:
+            self.snrStart = -0.2
+        try:
+            self.snrEnd = cnf.getfloat('SNR', 'snrEnd')
+        except NoOptionError:
+            self.snrEnd = 0.2
+        try:
+            self.maxTd = cnf.getfloat('SPLITTING', 'maxTd')
+        except NoOptionError:
+            self.maxTd = 250.
 
 
-    def write(self,filename):
+    def write(self, filename):
         """
         Write values to file.
 
@@ -70,19 +121,35 @@ class parseGeneralCnf():
         :param filename: the path to the file
 
         """
-        cnf=ConfigParser(inline_comment_prefixes="!")
-        with open(filename,"r") as fid: cnf.read_file(fid)
-        cnf.set('GENERAL','cleanLogs',str(self.cleanLogs))
-        cnf.set('WAVEFORMS','matching',str(self.matching))
-        cnf.set('WAVEFORMS','trimStart',str(self.trimStart))        
-        cnf.set('WAVEFORMS','trimEnd',str(self.trimEnd))      
-        cnf.set('WAVEFORMS','trim',str(self.trimFlag))          
-        cnf.set('WAVEFORMS','prefOrder',str(self.chanPref))
-        cnf.set('WAVEFORMS','orientation',str(self.orientFlag))
-        cnf.set('SNR','snrStart',str(self.snrStart))
-        cnf.set('SNR','snrEnd',str(self.snrEnd))
-        cnf.set('SPLITTING','maxTd',str(self.maxTd))
-        with open(filename,"w") as fid: cnf.write(fid)
+        cnf = ConfigParser(inline_comment_prefixes="!")
+        try:
+            with open(filename, 'r') as fid:
+                cnf.read_file(fid)
+            # check for missing sections
+            current_sections = cnf.sections()
+            diff_sections = list(set(self.default_sections).difference(set(current_sections)))
+            for section in diff_sections:
+                cnf.add_section(section)
+            # remove sections that exist in the file, but not in the defaults
+            diff_sections_file = list(set(current_sections).difference(set(self.default_sections)))
+            for section_r in diff_sections_file:
+                cnf.remove_section(section)
+        except FileNotFoundError:
+            for section in self.default_sections:
+                cnf.add_section(section)
+        cnf.set('GENERAL', 'cleanLogs', str(self.cleanLogs))
+        cnf.set('GENERAL','max_log_size', str(self.max_log_size))
+        cnf.set('WAVEFORMS', 'matching', str(self.matching))
+        cnf.set('WAVEFORMS', 'trimStart', str(self.trimStart))        
+        cnf.set('WAVEFORMS', 'trimEnd', str(self.trimEnd))      
+        cnf.set('WAVEFORMS', 'trim', str(self.trimFlag))          
+        cnf.set('WAVEFORMS', 'prefOrder', str(self.chanPref))
+        cnf.set('WAVEFORMS', 'orientation', str(self.orientFlag))
+        cnf.set('SNR', 'snrStart', str(self.snrStart))
+        cnf.set('SNR', 'snrEnd', str(self.snrEnd))
+        cnf.set('SPLITTING', 'maxTd', str(self.maxTd))
+        with open(filename, "w") as fid:
+            cnf.write(fid)
         logging.debug("Saved General settings to %s" % filename)        
 
 class parsePickerCnf():
@@ -100,20 +167,65 @@ class parsePickerCnf():
         :param filename: the path to the file
 
         """
+        self.default_sections = ['ARPICKER']
         # initiate the configparser object and read the file
-        cnf=ConfigParser(inline_comment_prefixes="!")
-        with open(filename,"r") as fid: cnf.read_file(fid)
+        cnf = ConfigParser(inline_comment_prefixes="!")
+        try:
+            with open(filename, 'r') as fid:
+                cnf.read_file(fid)
+            # check for missing sections
+            current_sections = cnf.sections()
+            diff_sections = list(set(self.default_sections).difference(set(current_sections)))
+            for section in diff_sections:
+                cnf.add_section(section)
+            # remove sections that exist in the file, but not in the defaults
+            diff_sections_file = list(set(current_sections).difference(set(self.default_sections)))
+            for section_r in diff_sections_file:
+                cnf.remove_section(section)
+        except FileNotFoundError:
+            for section in self.default_sections:
+                cnf.add_section(section)
         # parse the defaults first
-        self.arFMIN=cnf.getfloat('ARPICKER','f1')
-        self.arFMAX=cnf.getfloat('ARPICKER','f2')
-        self.arLTAP=cnf.getfloat('ARPICKER','lta_p')
-        self.arSTAP=cnf.getfloat('ARPICKER','sta_p')
-        self.arLTAS=cnf.getfloat('ARPICKER','lta_s')
-        self.arSTAS=cnf.getfloat('ARPICKER','sta_s')
-        self.arMP=cnf.getint('ARPICKER','m_p')
-        self.arMS=cnf.getint('ARPICKER','m_s')
-        self.arLP=cnf.getfloat('ARPICKER','l_p')
-        self.arLS=cnf.getfloat('ARPICKER','l_s')
+        try:
+            self.arFMIN = cnf.getfloat('ARPICKER', 'f1')
+        except NoOptionError:
+            self.arFMIN = 1.
+        try:
+            self.arFMAX = cnf.getfloat('ARPICKER', 'f2')
+        except NoOptionError:
+            self.arFMAX = 10.
+        try:
+            self.arLTAP = cnf.getfloat('ARPICKER','lta_p')
+        except NoOptionError:
+            self.arLTAP = 1.
+        try:
+            self.arSTAP = cnf.getfloat('ARPICKER','sta_p')
+        except NoOptionError:
+            self.arSTAP = 0.5
+        try:
+            self.arLTAS = cnf.getfloat('ARPICKER','lta_s')
+        except NoOptionError:
+            self.arLTAS = 2.0
+        try:
+            self.arSTAS = cnf.getfloat('ARPICKER','sta_s')
+        except NoOptionError:
+            self.arSTAS = 1.0
+        try:
+            self.arMP = cnf.getint('ARPICKER','m_p')
+        except NoOptionError:
+            self.arMP = 2
+        try:
+            self.arMS = cnf.getint('ARPICKER','m_s')
+        except NoOptionError:
+            self.arMS = 8
+        try:
+            self.arLP = cnf.getfloat('ARPICKER','l_p')
+        except NoOptionError:
+            self.arLP = 0.2
+        try:
+            self.arLS = cnf.getfloat('ARPICKER','l_s')
+        except NoOptionError:
+            self.arLS = 0.2
 
     def write(self,filename):
         """
@@ -123,8 +235,22 @@ class parsePickerCnf():
         :param filename: the path to the file
 
         """
-        cnf=ConfigParser(inline_comment_prefixes="!")
-        with open(filename,"r") as fid: cnf.read_file(fid)
+        cnf = ConfigParser(inline_comment_prefixes="!")
+        try:
+            with open(filename, 'r') as fid:
+                cnf.read_file(fid)
+            # check for missing sections
+            current_sections = cnf.sections()
+            diff_sections = list(set(self.default_sections).difference(set(current_sections)))
+            for section in diff_sections:
+                cnf.add_section(section)
+            # remove sections that exist in the file, but not in the defaults
+            diff_sections_file = list(set(current_sections).difference(set(self.default_sections)))
+            for section_r in diff_sections_file:
+                cnf.remove_section(section)
+        except FileNotFoundError:
+            for section in self.default_sections:
+                cnf.add_section(section)        
         cnf.set('ARPICKER','f1',str(self.arFMIN))        
         cnf.set('ARPICKER','f2',str(self.arFMAX))
         cnf.set('ARPICKER','lta_p',str(self.arLTAP))
@@ -135,7 +261,8 @@ class parsePickerCnf():
         cnf.set('ARPICKER','m_s',str(self.arMS))
         cnf.set('ARPICKER','l_p',str(self.arLP))
         cnf.set('ARPICKER','l_p',str(self.arLS))
-        with open(filename,"w") as fid: cnf.write(fid)
+        with open(filename,"w") as fid:
+            cnf.write(fid)
         logging.debug("Saved AR-AIC settings to %s" % filename)
 
 class parseClusteringCnf():
@@ -153,24 +280,77 @@ class parseClusteringCnf():
         :param filename: the path to the file
 
         """
+        self.default_sections = ['WINDOWS', 'CLUSTERING']
         # initiate the configparser object and read the file
-        cnf=ConfigParser(inline_comment_prefixes="!")
-        with open(filename,"r") as fid: cnf.read_file(fid)
-        # parse the windows settings
-        self.Tbeg1=cnf.getfloat('WINDOWS','Tbeg1')
-        self.DTbeg=cnf.getfloat('WINDOWS','DTbeg')
-        self.DTend=cnf.getfloat('WINDOWS','DTend')
-        self.Tend0=cnf.getfloat('WINDOWS','Tend0')
-        self.tptsMax=cnf.getfloat('WINDOWS','tptsMax')
-        self.specWindow=cnf.getfloat('WINDOWS','specWindow')
-        self.multPeriod=cnf.getfloat('WINDOWS','multPeriod')
-        self.minPeriod=cnf.getfloat('WINDOWS','minPeriod')
-        self.maxPeriod=cnf.getfloat('WINDOWS','maxPeriod')
+        cnf = ConfigParser(inline_comment_prefixes="!")
+        try:
+            with open(filename, 'r') as fid:
+                cnf.read_file(fid)
+            # check for missing sections
+            current_sections = cnf.sections()
+            diff_sections = list(set(self.default_sections).difference(set(current_sections)))
+            for section in diff_sections:
+                cnf.add_section(section)
+            # remove sections that exist in the file, but not in the defaults
+            diff_sections_file = list(set(current_sections).difference(set(self.default_sections)))
+            for section_r in diff_sections_file:
+                cnf.remove_section(section)
+        except FileNotFoundError:
+            for section in self.default_sections:
+                cnf.add_section(section)        # parse the windows settings
+        try:
+            self.Tbeg1 = cnf.getfloat('WINDOWS','Tbeg1')
+        except NoOptionError:
+            self.Tbeg1 = -0.1
+        try:
+            self.DTbeg = cnf.getfloat('WINDOWS','DTbeg')
+        except NoOptionError:
+            self.DTbeg = 0.2
+        try:
+            self.DTend = cnf.getfloat('WINDOWS','DTend')
+        except NoOptionError:
+            self.DTend = 0.02
+        try:
+            self.Tend0 = cnf.getfloat('WINDOWS','Tend0')
+        except NoOptionError:
+            self.Tend0 = 0.1
+        try:
+            self.tptsMax = cnf.getfloat('WINDOWS','tptsMax')
+        except NoOptionError:
+            self.tptsMax = 1.5
+        try:
+            self.specWindow = cnf.getfloat('WINDOWS','specWindow')
+        except NoOptionError:
+            self.specWindow = 0.5
+        try:
+            self.multPeriod = cnf.getfloat('WINDOWS','multPeriod')
+        except NoOptionError:
+            self.multPeriod = 3.
+        try:
+            self.minPeriod = cnf.getfloat('WINDOWS','minPeriod')
+        except NoOptionError:
+            self.minPeriod = 0.1
+        try:
+            self.maxPeriod = cnf.getfloat('WINDOWS','maxPeriod')
+        except NoOptionError:
+            self.maxPeriod = 2.0
         # parse the clustering settings
-        self.ccrit=cnf.getfloat('CLUSTERING','ccrit')
-        self.kmax=cnf.getint('CLUSTERING','kmax')
-        self.Ncmin=cnf.getint('CLUSTERING','Ncmin')
-        self.linkage=cnf.get('CLUSTERING','linkage')
+        try:
+            self.ccrit = cnf.getfloat('CLUSTERING','ccrit')
+        except NoOptionError:
+            self.ccrit = 3.2
+        try:
+            self.kmax = cnf.getint('CLUSTERING','kmax')
+        except NoOptionError:
+            self.kmax = 10
+        try:
+            self.Ncmin = cnf.getint('CLUSTERING','Ncmin')
+        except NoOptionError:
+            self.Ncmin = 5
+        try:
+            self.linkage = cnf.get('CLUSTERING','linkage')
+        except NoOptionError:
+            self.linkage = 'ward'
 
     def write(self,filename):
         """
@@ -180,8 +360,22 @@ class parseClusteringCnf():
         :param filename: the path to the file
 
         """
-        cnf=ConfigParser(inline_comment_prefixes="!")
-        with open(filename,"r") as fid: cnf.read_file(fid)
+        cnf = ConfigParser(inline_comment_prefixes="!")
+        try:
+            with open(filename, 'r') as fid:
+                cnf.read_file(fid)
+            # check for missing sections
+            current_sections = cnf.sections()
+            diff_sections = list(set(self.default_sections).difference(set(current_sections)))
+            for section in diff_sections:
+                cnf.add_section(section)
+            # remove sections that exist in the file, but not in the defaults
+            diff_sections_file = list(set(current_sections).difference(set(self.default_sections)))
+            for section_r in diff_sections_file:
+                cnf.remove_section(section)
+        except FileNotFoundError:
+            for section in self.default_sections:
+                cnf.add_section(section)        
         cnf.set('WINDOWS','Tbeg1',str(self.Tbeg1))        
         cnf.set('WINDOWS','DTbeg',str(self.DTbeg))
         cnf.set('WINDOWS','DTend',str(self.DTend))
@@ -195,7 +389,8 @@ class parseClusteringCnf():
         cnf.set('CLUSTERING','kmax',str(self.kmax))
         cnf.set('CLUSTERING','Ncmin',str(self.Ncmin))
         cnf.set('CLUSTERING','linkage',str(self.linkage))
-        with open(filename,"w") as fid: cnf.write(fid)
+        with open(filename,"w") as fid:
+            cnf.write(fid)
         logging.debug("Saved CLUSTERING settings to %s" % filename)
 
 class parseTaupCnf():
@@ -213,14 +408,37 @@ class parseTaupCnf():
         :param filename: the path to the file
 
         """
+        self.default_sections = ['PATHS', 'OPTIONS']
         # initiate the configparser object and read the file
-        cnf=ConfigParser(inline_comment_prefixes="!")
-        with open(filename,"r") as fid: cnf.read_file(fid)
-        # parse the defaults first
-        self.model=cnf.get('PATHS','model').strip()
-        self.stations=cnf.get('PATHS','stations').strip()     
+        cnf = ConfigParser(inline_comment_prefixes="!")
+        try:
+            with open(filename, 'r') as fid:
+                cnf.read_file(fid)
+            # check for missing sections
+            current_sections = cnf.sections()
+            diff_sections = list(set(self.default_sections).difference(set(current_sections)))
+            for section in diff_sections:
+                cnf.add_section(section)
+            # remove sections that exist in the file, but not in the defaults
+            diff_sections_file = list(set(current_sections).difference(set(self.default_sections)))
+            for section_r in diff_sections_file:
+                cnf.remove_section(section)
+        except FileNotFoundError:
+            for section in self.default_sections:
+                cnf.add_section(section)        # parse the defaults first
+        try:
+            self.model = cnf.get('PATHS','model').strip()
+        except NoOptionError:
+            self.model = 'example%srigo_crustal.nd' % os.sep
+        try:
+            self.stations = cnf.get('PATHS','stations').strip()
+        except NoOptionError:
+            self.stations = 'example%swgoc_stations_eida.xml' % os.sep     
         # options
-        self.ainFlag=cnf.getboolean('OPTIONS','ain')
+        try:
+            self.ainFlag = cnf.getboolean('OPTIONS','ain')
+        except NoOptionError:
+            self.ainFlag = True
 
     def write(self,filename):
         """
@@ -230,8 +448,22 @@ class parseTaupCnf():
         :param filename: the path to the file
 
         """
-        cnf=ConfigParser(inline_comment_prefixes="!")
-        with open(filename,"r") as fid: cnf.read_file(fid)
+        cnf = ConfigParser(inline_comment_prefixes="!")
+        try:
+            with open(filename, 'r') as fid:
+                cnf.read_file(fid)
+            # check for missing sections
+            current_sections = cnf.sections()
+            diff_sections = list(set(self.default_sections).difference(set(current_sections)))
+            for section in diff_sections:
+                cnf.add_section(section)
+            # remove sections that exist in the file, but not in the defaults
+            diff_sections_file = list(set(current_sections).difference(set(self.default_sections)))
+            for section_r in diff_sections_file:
+                cnf.remove_section(section)
+        except FileNotFoundError:
+            for section in self.default_sections:
+                cnf.add_section(section)        
         cnf.set('PATHS','model',str(self.model))        
         cnf.set('PATHS','stations',str(self.stations))
         cnf.set('OPTIONS','ain',str(self.ainFlag))
@@ -252,21 +484,63 @@ class parseGradeCnf():
         :param filename: the path to the file
         
         """
+        self.default_sections = ['ANGLE', 'BOUNDS', 'GRADING']
         # initiate the configparser object and read the file
-        cnf=ConfigParser(inline_comment_prefixes="!")
-        with open(filename,"r") as fid: cnf.read_file(fid)
+        cnf = ConfigParser(inline_comment_prefixes="!")
+        try:
+            with open(filename, 'r') as fid:
+                cnf.read_file(fid)
+            # check for missing sections
+            current_sections = cnf.sections()
+            diff_sections = list(set(self.default_sections).difference(set(current_sections)))
+            for section in diff_sections:
+                cnf.add_section(section)
+            # remove sections that exist in the file, but not in the defaults
+            diff_sections_file = list(set(current_sections).difference(set(self.default_sections)))
+            for section_r in diff_sections_file:
+                cnf.remove_section(section)
+        except FileNotFoundError:
+            for section in self.default_sections:
+                cnf.add_section(section) 
         # angle
-        self.polOff=cnf.getfloat('ANGLE','diff')
+        try:
+            self.polOff = cnf.getfloat('ANGLE','diff')
+        except NoOptionError:
+            self.polOff = 10.
         # error bounds
-        self.snr_bound=cnf.getfloat('BOUNDS','SNR')
-        self.error_bounds=[cnf.getfloat('BOUNDS','phi'),cnf.getfloat('BOUNDS','td')]
-        self.CC_FS_bound=cnf.getfloat('BOUNDS','CC_FS')
-        self.CC_NE_bound=cnf.getfloat('BOUNDS','CC_NE')
+        try:
+            self.snr_bound = cnf.getfloat('BOUNDS','SNR')
+        except NoOptionError:
+            self.snr_bound = 1.5
+        try:
+            self.error_bounds = [cnf.getfloat('BOUNDS','phi'),cnf.getfloat('BOUNDS','td')]
+        except NoOptionError:
+            self.error_bounds = [10., 10.]
+        try:
+            self.CC_FS_bound = cnf.getfloat('BOUNDS','CC_FS')
+        except NoOptionError:
+            self.CC_FS_bound = 0.6
+        try:
+            self.CC_NE_bound = cnf.getfloat('BOUNDS','CC_NE')
+        except NoOptionError:
+            self.CC_NE_bound = 0.6
         # grading
-        A=cnf.getfloat('GRADING','A')
-        B=cnf.getfloat('GRADING','B')
-        C=cnf.getfloat('GRADING','C')
-        D=cnf.getfloat('GRADING','D')
+        try:
+            A = cnf.getfloat('GRADING','A')
+        except NoOptionError:
+            A = 0.25
+        try:
+            B = cnf.getfloat('GRADING','B')
+        except NoOptionError:
+            B = 0.50
+        try:
+            C = cnf.getfloat('GRADING','C')
+        except NoOptionError:
+            C = 0.75
+        try:
+            D = cnf.getfloat('GRADING','D')
+        except NoOptionError:
+            D = 1.00
         self.gradeDict={"A":A,"B":B,"C":C,"D":D}
 
     def write(self,filename):
@@ -278,7 +552,21 @@ class parseGradeCnf():
                 
         """
         cnf=ConfigParser(inline_comment_prefixes="!")
-        with open(filename,"r") as fid: cnf.read_file(fid)
+        try:
+            with open(filename, 'r') as fid:
+                cnf.read_file(fid)
+            # check for missing sections
+            current_sections = cnf.sections()
+            diff_sections = list(set(self.default_sections).difference(set(current_sections)))
+            for section in diff_sections:
+                cnf.add_section(section)
+            # remove sections that exist in the file, but not in the defaults
+            diff_sections_file = list(set(current_sections).difference(set(self.default_sections)))
+            for section_r in diff_sections_file:
+                cnf.remove_section(section)
+        except FileNotFoundError:
+            for section in self.default_sections:
+                cnf.add_section(section) 
         cnf.set('ANGLE','diff',str(self.polOff))        
         cnf.set('BOUNDS','SNR',str(self.snr_bound))
         cnf.set('BOUNDS','phi',str(self.error_bounds[0]))
@@ -289,5 +577,85 @@ class parseGradeCnf():
         cnf.set('GRADING','B',str(self.gradeDict["B"]))
         cnf.set('GRADING','C',str(self.gradeDict["C"]))
         cnf.set('GRADING','D',str(self.gradeDict["D"]))
-        with open(filename,"w") as fid: cnf.write(fid)
+        with open(filename,"w") as fid:
+            cnf.write(fid)
         logging.debug("Saved CLUSTERING settings to %s" % filename)
+
+
+class ParseFilterCnf():
+    """
+    class that contains all required settings
+    from the config file concerning filters.
+
+    """
+
+    def __init__(self, filename):
+        """
+        Reads a configuration file and returns the settings.
+        
+        :type filename: str
+        :param filename: the path to the file        
+
+        """
+        # initiate the configparser object and read the file
+        if not os.path.exists(filename):
+        	self.make_default_file(filename)
+        with open(filename,"r") as fid:
+            cnf_filter_lines = fid.readlines()
+        # parse
+        filter_array = np.loadtxt(filename, dtype=np.float, delimiter=',')
+        self.filter_ranges = filter_array[2:]
+        logging.debug('Found %i filters' % self.filter_ranges.shape[0])
+        self.filter_preset_1 = filter_array[0][1:]
+        logging.debug('Filter preset 1: %s' % str(self.filter_preset_1))
+        self.filter_preset_2 = filter_array[1][1:]
+        logging.debug('Filter preset 2: %s' % str(self.filter_preset_2))
+
+    def write(self, filename):
+        """
+        Write values to file.
+
+        :type filename: str
+        :param filename: the path to the file
+
+        """
+        logging.debug('Writing #%i filters to filter file' % (self.filter_ranges.shape[0] + 2))
+        filter_array = np.concatenate(
+                                    [
+            np.insert(self.filter_preset_1, 0, -2).reshape((1, 3)),
+            np.insert(self.filter_preset_2, 0, -1).reshape((1, 3)),
+            self.filter_ranges
+                                    ])
+        np.savetxt(filename, filter_array, fmt='%.0f,%.8f,%.8f')
+        logging.debug("Saved Filter settings to %s" % filename)
+
+    def make_default_file(self, filename):
+    	"""
+        Write a default filters file
+
+        :type filename: str
+        :param filename: the path to the file
+
+    	"""
+    	logging.debug('Creating filters file %s' % filename)
+    	with open(filename, 'w') as fid:
+    		fid.writelines(
+    						['-2,1.00000000,20.00000000\n',
+							 '-1,1.00000000,10.00000000\n',
+							 '0,nan,nan\n',
+							 '1,0.40000000,4.00000000\n',
+							 '2,0.50000000,5.00000000\n',
+							 '3,0.20000000,3.00000000\n',
+							 '4,0.30000000,3.00000000\n',
+							 '5,0.50000000,4.00000000\n',
+							 '6,0.60000000,3.00000000\n',
+							 '7,0.80000000,6.00000000\n',
+							 '8,1.00000000,3.00000000\n',
+							 '9,1.00000000,5.00000000\n',
+							 '10,1.00000000,8.00000000\n',
+							 '11,2.00000000,3.00000000\n',
+							 '12,2.00000000,6.00000000\n',
+							 '13,3.00000000,8.00000000\n',
+							 '14,4.00000000,10.00000000\n',
+							 '15,1.00000000,20.00000000\n']
+						  )
