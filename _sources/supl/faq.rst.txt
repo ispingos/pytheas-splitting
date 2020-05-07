@@ -2,9 +2,9 @@ Frequently Asked Questions (FAQ)
 ================================
 * **The program doesn't start all! I can't see any splash screen or window!**
 	Please check the requirements in the relevant documentation page and make sure you have a suitable version of Python (3.7+) and each dependency. If the problem persists, please send us a description of the problem and the latest generated log file located in *~pytheas/logs/*.
-* **The program simply stopped working. Even when pressing any keyboard keysm or using the mouse, nothing happens.**
+* **The program simply stopped working. Even when pressing any keyboard keys or using the mouse, nothing happens.**
 	An underlying exception has occured. Please restart the program and send us a description of the problem, as well as the relevant log file.
-* **How does Pytheas handles angles of incidence?**
+* **How does Pytheas handle angles of incidence?**
 	If a QuakeML is provided that includes the ``takeoff_angle`` field in the ``Arrival`` field, this angle will be used, after using the given velocity model, to estimate the incidence angle. If this condition is not met, the QuakeML has no ``Arrival`` or a simple text catalogue is provided instead, the angle will be calculated assuming a linear path between the focus and the station (assumed to be at sea-level). This value will be used for selecting events based on the shear-wave window. However, if the respective option is seleced in Preferences, the incidence angle will be calculated from TauP with the given velocity model upon opening the event-station pair. In this case, the TauP value will be used instead.
 * **How does the program find stations if no Arrivals are specified in the QuakeML or a text catalogue is given?**
 	In those cases, the station codes will be retrieved from the station information file provided. If a station name is not present in the QuakeML or the station file, but the waveforms exist in the event directory, it will be ignored by the program. Be sure to at least include all stations in the station file!

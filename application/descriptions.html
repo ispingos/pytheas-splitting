@@ -6,16 +6,13 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>4. Basic Description &#8212; Pytheas 0.1.0 documentation</title>
+    <title>4. Basic Description &#8212; Pytheas 0.2.0 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    
     <link rel="shortcut icon" href="../_static/Pytheas_ICO.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -34,7 +31,7 @@
         <li class="right" >
           <a href="../introduction/quickstart.html" title="3. Getting Started"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.2.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -121,7 +118,8 @@
 <div class="section" id="cluster-analysis-ca">
 <h2>4.4. Cluster Analysis (CA)<a class="headerlink" href="#cluster-analysis-ca" title="Permalink to this headline">¶</a></h2>
 <p>Cluster Analysis automates the window selection process described above. The program conducts measurements over a large number of candidate windows. The measurements, which form a space defined by φ and t<sub>d</sub>, are then clustered. The optimal window is the one that belongs to the most constrained cluster and features the smallest errors. If it is not already provided, the Pytheas user needs only to pick the arrival of the S<sub>fast</sub>. The grading algorithm provides a qualitative grade and two figures are generated; one detailing the clustering process and one showcasing the measurement in the optimal signal window.</p>
-<p>CA can be used in two ways. Either after opening a new station-event pair or by selecting the Catalogue Cluster Analysis option, where the whole catalogue will be processed. The latter offers some refinement options, i.e. the selection of specific stations, the setting of the shear-wave window and a universal filter. Moreover, it offers the ability to skip already analyzed pairs or ones that where previously processed but yielded no result (<em>failed</em> pairs graded with ‘F’). Keep in mind that for EV and me, the waveforms will be rotated in either ZRT or LQT, as defined in the Splitting menu from the toolbar.</p>
+<p>CA can be used in two ways. Either after opening a new station-event pair or by selecting the Catalogue Cluster Analysis option, where the whole catalogue will be processed. The latter offers some refinement options, i.e. the selection of specific stations, the setting of the shear-wave window and a universal filter. Moreover, it offers the ability to skip already analyzed pairs or ones that where previously processed but yielded no result (<em>failed</em> pairs graded with ‘F’). Keep in mind that for EV and ME, the waveforms will be rotated in either ZRT or LQT, as defined in the Splitting menu from the toolbar.</p>
+<p>For the fully automatic Catalog Cluster Analysis (CCA), the user can also select to apply a cutoff SNR, to ignore noisy data. Finally, the Automatic Filtering of <a class="reference external" href="https://doi.org/10.1029/2010JB007722">Savage et al. (2010)</a> can be chosen, to automatically determine a filter for each event-station pair. The filter bounds are saved in the database and can viewed at a later time.</p>
 </div>
 </div>
 
@@ -134,7 +132,7 @@
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/splash_color_55px.png" alt="Logo"/>
             </a></p>
-  <h3><a href="../index.html">Table of Contents</a></h3>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">4. Basic Description</a><ul>
 <li><a class="reference internal" href="#available-methods">4.1. Available Methods</a></li>
@@ -186,12 +184,12 @@
         <li class="right" >
           <a href="../introduction/quickstart.html" title="3. Getting Started"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.1.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Pytheas 0.2.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2019, Ioannis Spingos.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+        &#169; Copyright 2019-2020, Ioannis Spingos.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.
     </div>
   </body>
 </html>

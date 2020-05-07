@@ -7,6 +7,7 @@ General
     :widths: 50,250
 
     Clean Logs,Sets the amount of days prior for which to delete log files.
+    Maximum Log Size,Sets the maximum size of log files before splitting them.
 
 | 
 
@@ -94,6 +95,14 @@ TauP
     Model,Select the velocity model used for TauP. Either a path to an available file (in the ``.nd`` or ``.tvel`` formats) can be provided or a string with the name of one of the default models (see `Basic Usage in Obspy's documentation <https://docs.obspy.org/packages/obspy.taup.html>`_).
     Station Information File,Either a StationXML file (including the Channel layer) or a simple space-delimited text file where each row represents a station in the following format: ``Station Network Latitude_in_dd Longitude_in_dd Elevation_in_m``.
     Calculate Incidence,Select whether the angle of incidence will be calculated anew through TauP for each pair or the one obtained from the catalogue will be used.
+
+Filters
+~~~~~~~
+
+.. topic:: Automatic Filtering and Presets
+
+    You can add, edit and remove filters to include in the automatic filter selection process of `Savage et al. (2010) <https://doi.org/10.1029/2010JB007722>`_. The two top rows refer to presets for manual analysis and ARE NOT used in the filter selection. If no value needs to be applied for a specific filter corner, nan can be used instead.
+
 
 AR-AIC
 ~~~~~~

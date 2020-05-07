@@ -26,6 +26,13 @@ Every modern programmer would be omissive to not acknowledge the `StackOverflow 
 
 Finally, we would like to thank the developers of `Sphinx <http://www.sphinx-doc.org/>`_ for providing the tools to generate this lovely documentation.
 
+How to cite?
+~~~~~~~~~~~~
+If you use Pytheas at your work, please consider citing `our paper <https://doi.org/10.1016/j.cageo.2019.104346>`_
+
+.. topic:: Reference
+	Spingos, I., Kaviris, G., Millas, C., Papadimitriou, P., Voulgaris, N., 2020. Pytheas: An open-source software solution for local shear-wave splitting studies. Comput. Geosci. 134, 104346. doi: 10.1016/j.cageo.2019.104346
+
 Got any feedback?
 ~~~~~~~~~~~~~~~~~
-If you have any issue, comment or suggestion feel free to contact us at ispingos@geol.uoa.gr. You can also use the software's dedicated GitHub page at https://ispingos.github.com/pytheas/
+If you have any issue, comment or suggestion feel free to contact us at ispingos@geol.uoa.gr. You can also use the software's dedicated GitHub page at https://ispingos.github.com/pytheas-splitting/

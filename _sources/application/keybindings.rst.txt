@@ -102,9 +102,10 @@ Various functions can be accessed through the toolbar.
 
     AR-AIC,Toggle to turn the AR-AIC auto-picker on or off.
     Bandpass Filter,Apply a bandpass filter to the waveforms. A user prompt will ask for the filter boundaries.
-    Bandpass 1-20 Hz,Apply a bandpass filter in the 1-20 Hz range.
-    Bandpass 1-10 Hz,Apply a bandpass filter in the 1-10 Hz range.
+    Bandpass Preset 1,Apply the Preset 1 filter.
+    Bandpass Preset 2,Apply the Preset 2 filter.
     Recommmend Filter,Apply a filter with recommended frequency bounds defined as 0.5*T\ :sub:`S` \ and 1.5*T\ :sub:`S` \ Hz.
+    Auto-select Filter,Apply the Automatic Filtering process of Savage et al. (2010).
     Remove Filter,Remove any filter and display the raw waveforms.
     Show Horizontal Spectra,Display the spectrum of each active horizontal component. Requires a window to first be picked. 
 
@@ -157,6 +158,6 @@ The following key bindings are offered in Pytheas.
     Next Event,Shift + N
     Previous Event,Shift + B
     Apply Bandpass Filter,Ctrl + B
-    Apply 1-20 Hz BP Filter,Ctrl + F
-    Apply 1-10 Hz BP Filter,Ctrl + H
+    Apply Filter Preset 1,Ctrl + F
+    Apply Filter Preset 2,Ctrl + H
     Remove Filter,Ctrl + R
