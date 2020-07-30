@@ -19,7 +19,7 @@ Special thanks to Millas C. for testing the software and providing valuable feed
 
 Pytheas on YouTube: https://www.youtube.com/channel/UC7USfZT9PfnNTNqMiY1AgTg
 
-For any issues, comments or suggestions please contact us at ispingos@geol.uoa.gr or through GitHub at https://www.github.com/ispingos/pytheas-splitting
+For any issues, comments or suggestions please contact us at pytheas.splitting@gmail.com or through GitHub at https://www.github.com/ispingos/pytheas-splitting
 
 **How to cite**
 
