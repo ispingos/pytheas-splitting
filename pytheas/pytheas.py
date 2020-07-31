@@ -49,8 +49,8 @@ LIC_STR=("""
 
 global VERSION
 global VERDATE
-VERSION="0.2.0"
-VERDATE="07/05/2020"
+VERSION="0.2.1"
+VERDATE="31/07/2020"
 
 ## first get script's path
 import os
@@ -126,11 +126,24 @@ from lib import rotationcorrelation as RC
 from lib import db_handler as DB
 from lib import tools
 from lib import parsers
-# make 'logs' directory
+
+#-- make required directories
 try:
     os.makedirs(os.path.join(WORKDIR, 'logs'))
 except: # if folder already exists
     pass
+try:
+    os.makedirs(os.path.join(WORKDIR, 'etc', 'options'))
+except: # if folder already exists
+    pass
+try:
+    os.makedirs(os.path.join(WORKDIR, 'etc', 'evcor'))
+except: # if folder already exists
+    pass
+try:
+    os.makedirs(os.path.join(WORKDIR, 'etc', 'index'))
+except: # if folder already exists
+    pass  
 
 # init the log file
 logfile=WORKDIR+os.sep+"logs%s%s_Pytheas.log" % (os.sep,UTCDateTime().strftime("%Y%m%d%H%M%S"))
