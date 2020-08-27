@@ -3,9 +3,9 @@
 ## input parameters ##
 # catalogue of events. either a QuakeML or a simple text file with the following structure:
 #   YYYY mm dd HH MM SS.ffff  LAT_in_DD LON_in_DD MAG DEPTH_in_km
-catalogue='../example/wgoc_events_example_NKUA.xml'
+catalogue = '../example/wgoc_events_example_NKUA.xml'
 # which networks to download. can use '*' to get all network-station combinations.
-networks=['*']
+networks = ['*']
 # stations can be one of the following: 
 #   - a list containing the names of the stations to download
 #   - a StationXML file, from which all available stations will be acquired
@@ -21,16 +21,16 @@ networks=['*']
 stations = 20. # radius in km
 
 # comma separated STRING of channels. * for all. can use widlcards such as 'HH?,HN?'
-channels="*" 
+channels = "*" 
 # comma separated STRING of SEED location codes. * for all
-locations="*"
+locations = "*"
 
 ## output parameters ##
 # directory for saving data. the underlying structure will be based on the origin time
 #   and will be of the format: destination/YYYY/mm/dd/YYYY-mm-dd-HH-MM-SS/
-destination='../example/data/'
+destination = '../example/data/'
 # either 'MSEED' or 'SAC'
-output='MSEED'
+output = 'MSEED'
 
 ## other parameters ##
 start = -60 # seconds relative to the pick time for start time
@@ -55,8 +55,8 @@ from obspy.geodetics.base import kilometer2degrees
 
 SCRIPT_START=UTCDateTime()
 # initial params
-VERDATE="15/04/2019"
-VERSION="3.0"
+VERDATE="27/08/2020"
+VERSION="3.1"
 # Logging params
 logging.basicConfig(
                     level=logging.DEBUG,
@@ -164,7 +164,7 @@ try:
                         # magnitude selection is not always easy automatically
                         # we use a dummy value
         temp.append(line)
-except TypeError: # if the file is not of QuakeML type, a simple text file will be read
+except:  # if the file is not of QuakeML type, a simple text file will be read
     with open(catalogue,'r') as fid:
         temp=fid.readlines()
 # read catalogue lines into a py container and make the directories
