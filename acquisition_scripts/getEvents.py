@@ -55,8 +55,8 @@ from obspy.geodetics.base import kilometer2degrees
 
 SCRIPT_START=UTCDateTime()
 # initial params
-VERDATE="27/08/2020"
-VERSION="3.1"
+VERDATE="04/09/2020"
+VERSION="3.2"
 # Logging params
 logging.basicConfig(
                     level=logging.DEBUG,
@@ -134,7 +134,7 @@ def makeEventFolders(events,destination):
         try:
             os.makedirs(fullPath)
         except FileExistsError:
-            logging.exception("Event folder already exists?")
+            logging.warning("Event folder already exists!")
         pathDict.update({str(event):fullPath})
     return pathDict
 
@@ -147,6 +147,12 @@ if not any((isinstance(stations,list),isinstance(stations,float),isinstance(stat
     codeList=getInvStations(inv)
 # read the catalogue file
 try:
+    #-- test for quakeml
+    with open(catalogue, 'r') as fid:
+        test = fid.read()
+    if not 'quakeml' in test:  # alternative should be a plain catalogue file, without any such strings
+        raise IOError('File %s is not of QuakeML format' % catalogue)
+    #
     evs=read_events(catalogue)
     # convert to text catalogue format
     temp = []
