@@ -49,8 +49,8 @@ LIC_STR=("""
 
 global VERSION
 global VERDATE
-VERSION="0.2.1"
-VERDATE="31/07/2020"
+VERSION="0.2.2"
+VERDATE="04/09/2020"
 
 ## first get script's path
 import os

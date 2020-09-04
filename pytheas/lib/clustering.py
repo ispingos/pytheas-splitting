@@ -239,7 +239,7 @@ class clustering(QtCore.QThread):
     def critCalHara(self,X,L,Mmax):
         """
         Calculate the Calinski and Harabasz (1974) score from
-        `~sklearn.metrics.calinski_harabaz_score`.
+        `~sklearn.metrics.calinski_harabasz_score`.
 
         :type X: array-like
         :param X: the x,y coordinates of the data.
@@ -255,13 +255,16 @@ class clustering(QtCore.QThread):
                 Commun. Stat. 3, 1–27. doi: 10.1080/03610927408827101
 
         """     
-        M=np.arange(2,Mmax+1)
-        C=np.zeros(M.shape)
+        M = np.arange(2, Mmax + 1)
+        C = np.zeros(M.shape)
         for k in sorted(M): # skip k=1
-            labels=L[k]
-            c=metrics.calinski_harabaz_score(X,labels)
-            C[k-2]=c
-        return M,C
+            labels = L[k]
+            try:
+                c = metrics.calinski_harabaz_score(X, labels)
+            except AttributeError:
+                c = metrics.calinski_harabasz_score(X, labels)
+            C[k - 2] = c
+        return M, C
         
     def critDudaHartSK(self,X,Z,k,ccrit=3.2):   
         """
