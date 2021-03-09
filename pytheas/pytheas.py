@@ -49,8 +49,8 @@ LIC_STR=("""
 
 global VERSION
 global VERDATE
-VERSION="0.2.2"
-VERDATE="04/09/2020"
+VERSION="0.2.3"
+VERDATE="09/03/2021"
 
 ## first get script's path
 import os
@@ -1580,7 +1580,7 @@ class Pytheas(QtWidgets.QMainWindow):
             vert.filter(type="bandpass",freqmin=self.freqmin,freqmax=self.freqmax,zerophase=True,corners=4)
             nort.filter(type="bandpass",freqmin=self.freqmin,freqmax=self.freqmax,zerophase=True,corners=4)
             east.filter(type="bandpass",freqmin=self.freqmin,freqmax=self.freqmax,zerophase=True,corners=4)
-            self.V2H=np.asarray(self.calcV2H(self.sPick))
+            self.V2H = self.calcV2H(self.sPick)
         # get relative times
         tV=vert.times(type="relative")
         tN=nort.times(type="relative")
