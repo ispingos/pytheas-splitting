@@ -13,7 +13,7 @@ while, at the same time, enhanching the effectiveness of processing and quality 
 
 Pytheas is released under the GNU GPLv3 license.
 
-Authors: Spingos I. & Kaviris G. (c) 2019-2020
+Authors: Spingos I. & Kaviris G. (c) 2019-2021
 Special thanks to Millas C. for testing the software and providing valuable feedback from the 
 very early stages of this endeavor!
 
@@ -23,23 +23,154 @@ at https://www.github.com/ispingos/pytheas-splitting
 """
 ####################################################################
 #                                                                  #
-# This module includes a wide variety of complementary tools.      #
+# This module includes a wide variety of complementary tools       #
 #                                                                  #
 ####################################################################
 
 ## imports
 import os, sys, logging
+from glob import glob
+import copy
 import numpy as np
+import operator
+import itertools
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.collections import LineCollection
-from obspy import UTCDateTime
+from obspy import UTCDateTime, Stream, read
 from obspy.signal.trigger import ar_pick
 from obspy.signal.cross_correlation import correlate
 from obspy.signal.polarization import particle_motion_odr
 import scipy.signal
 
+#-- pytheas imports
+from lib import exceptions
+
 ## archiving
+def get_wave_record(path_wave_record, inventory=None, pref_channels="HH,EH,BH,HN", orient_corr=True):
+    """
+    try and grab required waveforms. Order is Vertical -> North -> East     
+
+    :type path_wave_record: str
+    :param path_wave_record: query string for waveforms
+    :type inventory: :class: `~obspy.core.inventory` or None, optional
+    :param inventory: inventory with stored station information or None.
+        Defaults to None.
+    :type pref_channels: str, optional
+    :param pref_channels: string with the order of the channel codes (per SEED) that the
+        program will preferentialy look for, comma-separated. Defaults to 'HH,EH,BH,HN'.
+    :type orient_corr: bool, optional
+    :param orient_corr: perform orientation correction if required. Defaults to True.
+    :returns: (obspy Stream object, instrument orientation correction)
+    """
+    # convert preferred channels object to list
+    pref_channels = pref_channels.split(",")
+    # clean up file name just in case
+    logging.debug("Trying to open %s" % path_wave_record)
+    # start looking for the station/event
+    try:
+        if not glob(path_wave_record):
+            path_wave_record_full = os.path.dirname(path_wave_record)
+            if os.path.exists(path_wave_record_full):
+                raise exceptions.StationException("Could not find station %s" % path_wave_record)
+            else:
+                raise exceptions.EventException("Could not find event %s" % path_wave_record_full)
+        stream_all = read(str(path_wave_record))
+        logging.info("Retrieved stream\n%s" % str(stream_all))
+
+        # look for the channels as provided by the user. if '??' is reached,
+        # the first ones will be used
+        for pref_code in pref_channels + ["??"]:
+            if pref_code == "??":
+                pref_code = stream[0].stats.channel[:2]
+            stream = stream_all.select(channel="%s?" % pref_code)
+            # did we find 3 channels?
+            if len(stream) == 3:
+                logging.debug("Found channels %s?" % stream[0].stats.channel[:2])
+                break
+        # if no 3 channels could be found, raise an exception
+        if len(stream) != 3:
+            raise exceptions.StationException("Station does not have 3 channels (%i total)" % len(stream))
+        # # correct calibration factor if null
+        # for tr in stream:
+        #     if float(tr.stats.calib) == 0.0:
+        #         tr.stats.calib = 1.0
+        # get waveforms and correct orientation from inventory
+        comps = sorted(list(set([tr.stats.channel[-1] for tr in stream])))
+        if "3" in comps:
+            channels_inp_codes = "Z23"
+            if "1" in comps:
+                channels_inp_codes = "123"
+        elif "2" in comps:
+            channels_inp_codes = "Z12"
+        elif "N" in comps:
+            channels_inp_codes = "ZNE"
+        stream_bk = stream.copy() # save a stream backup, apparently Obspy (1.1.1) deletes the
+                                 # data if an exception is raised during rotation. see 
+                                 # obspy/obspy #2372
+        try:
+            if orient_corr:
+                if inventory: 	# is the station in the inventory?
+			                    # the azimuth of the 'north' (second as defined above) is the
+			                    # orientation correction
+                    orCorrection = inventory.select(
+                        network=stream[0].stats.network,
+                        station=stream[0].stats.station,
+                        location=stream[0].stats.location,
+                        channel=stream[0].stats.channel[:2]+channels_inp_codes[1],
+                        time=stream[0].stats.starttime
+                                                    )[0][0][0].azimuth
+                    if orCorrection:                
+                        stream.rotate("->ZNE", inventory=inventory, components=(channels_inp_codes))     
+                else:
+                    raise IOError("No available inventory")
+            else:
+                raise ValueError("Instrument orientation correction disabled.")
+        except:
+            stream = stream_bk.copy()
+            logging.exception("Could not perform orientation correction. Renaming channels...")
+            stream.select(component=channels_inp_codes[0])[0].stats.channel=\
+                            stream.select(component=channels_inp_codes[0])[0].stats.channel[:2]+"Z"
+            stream.select(component=channels_inp_codes[1])[0].stats.channel=\
+                            stream.select(component=channels_inp_codes[1])[0].stats.channel[:2]+"N"
+            stream.select(component=channels_inp_codes[2])[0].stats.channel=\
+                            stream.select(component=channels_inp_codes[2])[0].stats.channel[:2]+"E"
+            orCorrection = 0.
+        # get final combo of channels
+        comps = sorted(list(set([tr.stats.channel[-1] for tr in stream])))
+        # preprocess. we need to remove mean/trend to be able to merge.
+        logging.info("Applying detrend/demean...")
+        try:
+            stream.detrend("linear")
+            stream.detrend("demean")
+        except ValueError:
+            logging.error('could not detrend the stream')
+        stream.merge(method=1, fill_value=0, interpolation_samples=0)
+    except Exception as exc:
+        logging.exception("Could not read stream")
+        return None, None
+    return stream, orCorrection
+
+
+def get_tree(path):
+    """
+    Get tree of directories that contain waveforms. It is mandatory for the
+    final branch to be named after the event code, e.g. %Y-%m-%d-%H-%M-%S
+    :type path: str
+    :param path: master directory that contains separate event folders.
+    :returns: a list of the event directories found
+    """
+    path_full_events = {}
+    n = 0
+    n_files = 0
+    for root, dirs, files in os.walk(path):
+        if files and not dirs:
+            n += 1
+            n_files += len(files)
+            logging.debug("Adding path of event #%s" % '{:,}'.format(n))
+            path_full_events[os.path.split(root)[-1]] = root
+    return path_full_events, n_files
+
 def initSplittingDict(layer):
     """
     Initialize and return an empty splitting 
@@ -56,15 +187,19 @@ def initSplittingDict(layer):
                 "depth":np.nan,"magnitude":np.nan}
     elif layer == "station":
         return {"station":None,"epicentral":np.nan,"azimuth":np.nan,
-                "s_p":np.nan,"incidence":np.nan,"s_obs":np.nan,
-                "s_theo":np.nan,"s_auto":np.nan,"orientation":np.nan}
+                "s_p":np.nan,"incidence":np.nan,
+                "s_obs":None,
+                "s_theo":None,
+                "s_auto":None,
+                "orientation":np.nan}
     elif layer == "method":
-        return {"station":None,"method":None,"phi":np.nan,"td":np.nan,
-                "pol":np.nan,"CC_NE":np.nan,"var_T":np.nan,
+        return {"station":None,"method":None, 'network':None,
+                "phi":np.nan,"td":np.nan,
+                "pol":np.nan,"CC_FS":np.nan,"CC_NE":np.nan,"var_T":np.nan,
                 "err_phi":np.nan,"err_td":np.nan,"N_contours":np.nan,
                 "grade":np.nan,"filter_min":np.nan,"filter_max":np.nan,
                 "window_min":np.nan,"window_max":np.nan,"SNR":np.nan,
-                "s_freq":np.nan,"comment":"",
+                "grade_score":np.nan, "s_freq":np.nan,"comment":"",
                 "C_array":np.empty((1,1)),"C_max":"DOUBLE","phi_test":np.empty((1,1)),"td_test":np.empty((1,1)),
                 "initial_clusters":np.empty((1,1)),"initial_clusters_errors":np.empty((1,1)),"calinski_score":np.empty((1,1)),
                 "clusters1":np.empty((1,1)),"clusters2":np.empty((1,1))}
@@ -125,6 +260,45 @@ def lengthcheck(Wx,Wy):
     elif sizeDiff != 0:
         raise IndexError("Cannot sync waveforms with sizes (%i,%i)" % (Wx.data.size,Wy.data.size))
     return Wx.data,Wy.data
+
+def sync_waveforms(stream_ini):
+    """
+    Sync stream's waveforms so that they all start at the same time and
+    have the same length.
+    
+    :type stream: :class: `~obspy.core.stream.Stream`
+    :param stream: the stream with the waveforms to sync. MUST BE IN 
+        THE ZNE SYSTEM!!
+    :type
+
+    """
+    # grab traces
+    Wz = stream_ini[0]
+    Wy = stream_ini[1]
+    Wx = stream_ini[2]
+    # first x/y
+    Ax, Ay = lengthcheck(Wx, Wy)
+    Wx.data = Ax
+    Wy.data = Ay
+    # now z/y
+    Az, Ay = lengthcheck(Wz, Wy)
+    Wz.data = Az
+    Wy.data = Ay
+    # now x/y again
+    Ax, Ay = lengthcheck(Wx, Wy)
+    Wx.data = Ax
+    Wy.data = Ay
+    # sync starttimes if less than a sample difference
+    delta = stream_ini[0].stats.delta
+    abs_start = min([tr.stats.starttime for tr in stream_ini])
+    abs_end = max([tr.stats.endtime for tr in stream_ini])
+    # since length is the same, setting the endtime is redundant
+    for w in [Wz, Wy, Wx]:
+        w.stats.starttime = abs_start
+    #-- fin
+    stream = Stream([Wz, Wy, Wx])
+    logging.debug('Synced stream %s' % str(stream))
+    return stream
 
 def timedelay(td,stream):
     """
@@ -196,9 +370,11 @@ def polarigram(stream,rotated,filterRange):
         Wx=stream.select(channel="??E")[0]
         logging.debug("POLAR EAST:  "+str(Wx))
     # Filter?
-    if filterRange != (np.nan,np.nan):
+    try:
         Wy.filter(type="bandpass",freqmin=filterRange[0],freqmax=filterRange[1],zerophase=True,corners=4)
         Wx.filter(type="bandpass",freqmin=filterRange[0],freqmax=filterRange[1],zerophase=True,corners=4)
+    except ValueError:
+        logging.exception('Could not apply filter %s' % str(filterRange))
     if Wy.stats.sampling_rate != Wx.stats.sampling_rate:
         raise ValueError("Sampling rates of horizontal channels must match!")
     ## Check length of timeseries
@@ -233,9 +409,9 @@ def hodogram(A,D,norm=False):
     angles arrays. Position of elements in arrays must be in correct chronological order.
 
     :type A: array-like
-    :param A: array containing the Amplitudes of the vectors acquired from `~pytheas.tools.polarigram`.
+    :param A: array containing the Amplitudes of the vectors acquired from `~pytheas.polarigram`.
     :type D: array-like
-    :param D: array containing the Angles of the vectors acquired from `~pytheas.tools.polarigram`.    
+    :param D: array containing the Angles of the vectors acquired from `~pytheas.polarigram`.    
     :returns: list containing the start and end point coordinates for each vector
 
     """
@@ -413,6 +589,121 @@ def xcStatic(s1,s2):
     """
     return correlate(s1,s2,shift=0,demean=True,normalize='naive')[0]
 
+## SNR calculation ##
+def calculate_snr(stream, s_pick, win_noise, win_signal):
+    """
+    Calculates the Signal-to-Noise Ratio (SNR) around the S-arrival (if picked)
+    or the middle of the selected signal window. The equation used is:
+
+    SNR = ( RMSsignal / RMSnoise) ** 2, where RMS = sqrt(sum(A**2))
+
+    The SNR is acquired for each horizontal component and their mean is defined
+    as the final value.
+
+    :type stream: :class:`~obspy.core.stream.Stream`
+    :param stream: the stream object containing the waveforms where the
+        automatic filtering process will be applied to
+    :type s_pick: float
+    :param s_pick: the arrival of the S-wave relative to the trace's start time (in s)
+    :type win_noise: float
+    :param win_noise: start of the noise window (its end is the S-arrival/middle of window).
+    :type win_signal: float
+    :param win_signal: end of the signal window (its start is the S-arrival/middle of window).
+    :returns: the average SNR of the horizontal waveforms
+    
+    """
+    # prep
+    stream = stream.copy()
+    # get indices of the signal and noise windows
+    sps = stream[0].stats.sampling_rate
+    idx_noise = int(np.floor((s_pick + win_noise) * sps))
+    idx_signl = int(np.ceil((s_pick + win_signal) * sps))
+    # however, if the bounds are beyond the length of the waveform...
+    if (idx_noise < 0) or (idx_signl > stream[0].stats.npts):
+        logging.warning("Not enough samples for SNR based on pick")
+        return np.nan
+    idx_pick = int(s_pick * sps)
+    # setup data matrices
+    snr = 0.0
+    n = 0
+    for trace in stream:
+        if trace.stats.channel[2] in ['N', 'R', 'E', 'T']:
+            # noise1 = trace.data[idx_noise:idx_pick]
+            noise1 = trace.data[idx_noise:idx_signl]
+            signl1 = trace.data[idx_pick:idx_signl]        
+            rms_noise1 = np.sqrt(np.mean(noise1 ** 2))
+            rms_signl1 = np.sqrt(np.mean(signl1 ** 2))
+            snr1 = (rms_signl1 / rms_noise1) ** 2
+            snr += snr1
+            n += 1
+    if isnone(snr): # final check, just to be sure
+        snr = np.nan
+    return snr / n
+
+## automatic filtering ##
+def filtering_savage_et_al(stream, s_pick, filter_ranges, win_noise, win_signal):
+    """
+        Apply a range of filters to the stream and select the one with
+        the highest SNR, as proposed by Savage et al. (2010).
+
+        :type stream: :class:`~obspy.core.stream.Stream`
+        :param stream: the stream object containing the waveforms where the
+            automatic filtering process will be applied to
+        :type s_pick: float-like
+        :param s_pick: the arrival time (in s from the start of the stream's
+            start-time) of the S phase
+        :type filter_ranges: array-like
+        :param filter_ranges: a Nx2 containing N number of min/max values of 
+            candidate filters
+        :type win_noise: float
+        :param win_noise: start of the noise window (its end is the S-arrival/middle of window).
+        :type win_signal: float
+        :param win_signal: end of the signal window (its start is the S-arrival/middle of window).
+        :returns: the array index of the best filter, the SNR value of the best filter
+
+        ..note:
+            Savage, M., Wessel, A., Teanby, N. A., Hurst, W., 2010.
+                Automatic measurement of shear wave splitting and applications to time
+                varying anisotropy at Mount Ruapehu volcano, New Zealand. 
+                Journal of Geophysical Research, 115(B12321), doi: 10.1029/2010JB007722
+    """
+    # check for the s arrival
+    if isnone(s_pick) or  not s_pick:
+        raise ValueError('No S arrival given in automatic filtering routine')
+    # makes copies of the stream object
+    stream_initial = stream.copy()
+    snr_dict = {k : np.nan for k in range(len(filter_ranges))}
+    logging.debug('Will test for %i filters' % len(snr_dict))
+    for f_idx, filter_row in enumerate(filter_ranges):
+        stream = stream_initial.copy()
+        filter_test = filter_row[1:]
+        try:
+            stream.filter(
+                           type='bandpass', 
+                           freqmin=np.nanmin(filter_test),
+                           freqmax=np.nanmax(filter_test), 
+                           corners=4,
+                           zerophase=True
+                           )
+        except ValueError:
+            logging.exception('Could not apply filter %s' % str(filter_test))
+        try:
+            snr = calculate_snr(stream, s_pick, win_noise, win_signal)
+        except:
+            logging.exception('Could not estimate SNR')
+            snr = np.nan
+        logging.debug('Filter %i: %s -> SNR: %.3f' % (filter_row[0], str(filter_test), snr))
+        snr_dict[f_idx] = snr
+    # check if all SNR values are nan
+    snr_vals = np.asarray(list(snr_dict.values()))
+    if np.all(np.isnan(snr_vals)):
+        raise ValueError('All test filters yielded %.3f SNR' % np.nan)
+    
+    # get the best filter
+    b_idx, b_snr = max(snr_dict.items(), key=operator.itemgetter(1))
+
+    return b_idx, b_snr
+
 ## other functions ##
 def errorsDelPezzo(D,td,std,sD=0.2):
     """
@@ -526,7 +817,7 @@ def getTheorArrivals(event,station,model,phases=[]):
     logging.info("Found %i phases" % i)
     return arDict
 
-def spectrum(trace1,trace2,sps):
+def spectrum(trace1, trace2, sps):
     """
     Calculate the spectrum for the two horizontal traces using
     `~scipy.signal.periodogram`.
@@ -541,14 +832,51 @@ def spectrum(trace1,trace2,sps):
         two horizontal components.
 
     """
-    specs=[]
-    for data in (trace1,trace2):
-        nfft=int(2**(np.ceil(np.log2(len(data))))) # ensure nfft is power of 2
+    specs = []
+    for data in (trace1, trace2):
+        nfft=int(2**(np.ceil(np.log2(len(data)))))  # ensure nfft is power of 2
         freq,spec=scipy.signal.periodogram(data,sps,window="hann",nfft=nfft,
                                            detrend=False,return_onesided=True,
                                            scaling="spectrum")
-        specs.append((freq,spec))
+        specs.append((freq, spec))
     return specs
+
+
+def get_dom_freq(stream, pickwin):
+    """
+    Calculate the dominant frequency of the horizontal channels in given window
+
+    :type stream: :class: `~obspy.core.stream.Stream`
+    :param stream: the stream containing the waveforms
+    :type pickwin: tuple-like
+    :param pickwin: a list of the two picks defining the signal
+        window
+    :returns: the dominant frequency
+    """
+    #-- check for horizontal tags
+    channel_tags = ''.join([tr.stats.channel[2] for tr in stream])
+    if 'N' in channel_tags:
+        channel_idx = ('N', 'E')
+    elif 'Q' in channel_tags:
+        channel_idx = ('Q', 'T')
+    elif 'R' in channel_tags:
+        channel_idx = ('R', 'T')
+
+    #-- proc
+    sps = stream[0].stats.sampling_rate
+    horz1 = stream.select(component=channel_idx[0])[0].data[pickwin[0]:pickwin[1]]
+    horz2 = stream.select(component=channel_idx[1])[0].data[pickwin[0]:pickwin[1]]
+    specs = spectrum(horz1, horz2, sps)
+    spec_1 = specs[0]
+    spec_2 = specs[1]
+    # filter out frequencies less than 1Hz. 
+    # TODO: add as user option
+    # minFreqIdx = (nSpec[0] >=1, eSpec[0] >= 1)
+    # get max frequency
+    freq_1 = spec_1[0][spec_1[1].argmax()]
+    freq_2 = spec_2[0][spec_2[1].argmax()]
+    freq_d = (freq_1 + freq_2) / 2.
+    return freq_d
 
 def centerColl(ax,coll,axPolar=False):
     """
@@ -661,8 +989,10 @@ def qcFigMAN(streamIni,phi,td,pol,sarr,baz,ain,filterRange,titleInfo,output=Fals
     ax11.set_ylabel("Raw")
     ax11.set_title("Initial")
     # filtered initial
-    if not all((np.isnan(filterRange[0]),np.isnan(filterRange[1]))):
+    try:
         stream.filter(type="bandpass",freqmin=filterRange[0],freqmax=filterRange[1],corners=4,zerophase=True)
+    except ValueError:
+        logging.exception('Could not apply filter %s' % str(filterRange))        
     fHH=np.asarray((
          stream.select(component="N")[0].data[winstart:winend],
          stream.select(component="E")[0].data[winstart:winend]
@@ -793,7 +1123,7 @@ def qcFigMAN(streamIni,phi,td,pol,sarr,baz,ain,filterRange,titleInfo,output=Fals
     if output:
         fig.savefig(output,dpi=720,quality=95)
 
-def qcFigSWS(stream,phi,td,pol,errors,baz,pickwin,Cmatrix,phi_test,td_test,meth,
+def qcFigSWS(stream,phi,td,pol,errors,baz,is_lqt,pickwin,Cmatrix,phi_test,td_test,meth,
                      cEmax,filterRange,titleInfo,output=False):
     """
     Make the Quality Control figure for one of the EV, ME and RC methods.
@@ -810,6 +1140,8 @@ def qcFigSWS(stream,phi,td,pol,errors,baz,pickwin,Cmatrix,phi_test,td_test,meth,
     :param errors: a list of the uncertainties for phi and the time-delay.
     :type baz: float
     :param baz: the backazimuth of the station.
+    :type is_lqt: bool
+    :param is_lqt: decides whether the RT or the QT components will be plotted 
     :type pickwin: tuple-like
     :param pickwin: a list of the signal window start and end (relative to
         the S-arrival in s).
@@ -836,8 +1168,9 @@ def qcFigSWS(stream,phi,td,pol,errors,baz,pickwin,Cmatrix,phi_test,td_test,meth,
         to False.
 
     """
-    ##
-    baz%=360 # ensure backazimuth is in the 0-359 range
+    #-- prepwork
+    baz %= 360 # ensure backazimuth is in the 0-359 range
+    ain = titleInfo[1]  # grab incidence angle
     delta=stream[0].stats.delta # period rate
     station=stream[0].stats.station
     network=stream[0].stats.network
@@ -852,9 +1185,11 @@ def qcFigSWS(stream,phi,td,pol,errors,baz,pickwin,Cmatrix,phi_test,td_test,meth,
     pickwin[1]+=extend
     ## prepare the wf data
     scStream=stream.copy()
-    if filterRange != (np.nan,np.nan):
+    try:
         scStream.filter(type="bandpass",freqmin=filterRange[0],freqmax=filterRange[1],
                         zerophase=True,corners=4)
+    except ValueError:
+    	logging.exception('Could not apply filter %s' % str(filterRange))
     ## correct for time delay
     Wz,Wx,Wy=scStream
     # First two
@@ -880,12 +1215,29 @@ def qcFigSWS(stream,phi,td,pol,errors,baz,pickwin,Cmatrix,phi_test,td_test,meth,
     # Rest
     Az,Ay=lengthcheck(Wz,Wy)
     Wz.data=Az
-    tFS=(scStream.select(component="R")[0].times(),scStream.select(component="T")[0].times())
-    FS=(scStream.select(component="R")[0].data,scStream.select(component="T")[0].data)
+    tQT = (scStream.select(component="R")[0].times(), scStream.select(component="T")[0].times())
+    QT = (scStream.select(component="R")[0].data, scStream.select(component="T")[0].data)
+    qt_labs = ['F', 'S']
+    qt_ylab = 'FS\n(corr)'
     # now NE corrected
     scStream.rotate("RT->NE",phi+180)
     tcNE=(scStream.select(component="N")[0].times(),scStream.select(component="E")[0].times())
     (cN,cE)=(scStream.select(component="N")[0].data,scStream.select(component="E")[0].data)
+    #-- rotate to RT/QT corrected
+    # if is_lqt:
+    #     scStream.rotate("ZNE->LQT", baz % 360, ain)
+    #     tQT=(scStream.select(component="Q")[0].times(),scStream.select(component="T")[0].times())
+    #     QT=(scStream.select(component="Q")[0].data,scStream.select(component="T")[0].data)
+    #     scStream.rotate("LQT->ZNE",baz % 360, ain)
+    #     qt_labs = ['Q', 'T']
+    #     qt_ylab = 'QT\n(corr)'
+    # else:
+    #     scStream.rotate("NE->RT", baz % 360)
+    #     tQT=(scStream.select(component="R")[0].times(),scStream.select(component="T")[0].times())
+    #     QT=(scStream.select(component="R")[0].data,scStream.select(component="T")[0].data)
+    #     scStream.rotate("RT->NE",baz % 360)
+    #     qt_labs = ['R', 'T']
+    #     qt_ylab = 'RT\n(corr)'
     ## make the fig
     if meth in ["EV","ME"]:
         fig=plt.figure("Silver and Chan (1991)",figsize=(7,6))
@@ -899,20 +1251,20 @@ def qcFigSWS(stream,phi,td,pol,errors,baz,pickwin,Cmatrix,phi_test,td_test,meth,
     ax4=fig.add_subplot(5,2,7,autoscale_on=False) # hodogram for original NE 
     ax5=fig.add_subplot(5,2,9,autoscale_on=False) # hodogram for corrected NE
     ##
-    ax1.set_ylabel("NE\n(orig)")
-    ax2.set_ylabel("FS\n(corr)")
     for ax in (ax1,ax2,ax3):
         ax.set_yticklabels([""])
         ax.set_xlim(pickwin)
         ax.axvspan(pickwin[0]+extend,pickwin[1]-extend,alpha=0.3,color='green')
     ## make NE
-    ax1.plot(tNE[0],NE[0],'blue',label="North")
-    ax1.plot(tNE[1],NE[1],'red',label="East")
-    ## make FS
-    ax2.plot(tFS[0],FS[0],'blue',label="Fast")
-    ax2.plot(tFS[1],FS[1],'red',label="Slow")
+    ax1.set_ylabel('NE\n(orig)')
+    ax1.plot(tNE[0],NE[0], 'blue', label="N")
+    ax1.plot(tNE[1],NE[1], 'red', label="E")
+    ## make QT
+    ax2.set_ylabel(qt_ylab)
+    ax2.plot(tQT[0], QT[0], 'blue', label=qt_labs[0])
+    ax2.plot(tQT[1], QT[1], 'red', label=qt_labs[1])
     ## make NE corrected
-    labsWf=("North","East")
+    labsWf=("N", "E")
     ax3.set_ylabel("NE\n(corr)")
     ax3.plot(tcNE[0],cN,'blue',label=labsWf[0])
     ax3.plot(tcNE[1],cE,'red',label=labsWf[1])
@@ -993,7 +1345,7 @@ def qcFigSWS(stream,phi,td,pol,errors,baz,pickwin,Cmatrix,phi_test,td_test,meth,
     csRange=np.arange(1.0,2.0,0.1)
     cbRange=np.arange(1.0,2.0,0.1)
     # make the contours
-    cs=ax.contour(td_test,phi_test,Cmatrix/cEmax,colors='green',linewidth=1.0)
+    cs=ax.contour(td_test,phi_test,Cmatrix/cEmax,colors='green',linewidths=1.0)
     #ax.clabel(cs)
     # make the cross
     ax.axvline(tdCR,linestyle='--',color='blue',linewidth=1.0) 
@@ -1132,6 +1484,124 @@ def qcClusterDiagram(initial,initial_err,calinski,clusters1,clusters2,station,ne
     if output:
         fig.savefig(output,dpi=720,quality=95)
 
+def qcClusterDiagram2(initial,initial_err,calinski,clusters1,clusters2,station,network,baz,
+                    titleInfo,meth,filterRange,output=False):
+    """
+    Make the Quality Control figure for CA.
+
+    :type initial: array-like
+    :param initial: a 2D array of the initial data used in the clustering (phi/td).
+    :type iniital_err: array-like
+    :param intial_err: a 2D array of the initial data errors used in the clustering (phi/td).
+    :type calinski: array-like
+    :param calinski: an array containing the Calinski-Harabasz score for each number of clusters.
+    :type clusters1: tuple-like
+    :param clusters2: data and labels of clusters
+    :type clusters2: tuple-like
+    :param clusters2: data and labels of selected cluster
+    :type station: str
+    :param station: the station name
+    :type network: str
+    :param network: the network name
+    :type baz: str
+    :param baz: the station's backazimuth
+    :titleInfo: tuple-like
+    :param titleInfo: list containing information related to the title of the figure, i.e. 
+        the origin time, the incidence angle, the epicentral distance, the magnitude and
+        the measurement's grade.
+    :type meth: str
+    :param meth: the method used for measuring splitting
+    :type filterRange: tuple-like
+    :param filterRange: the upper and lower filter bounds (in Hz).
+    :type output: str or bool, optional
+    :param output: If not False, the figure will be saved at the specified filepath. Defaults
+        to False.
+
+    """
+    # fonts
+    fontTicksLabel=7
+    fontAxesLabel=7
+    fontAxisTitle=8
+    # unpack
+    phis,tds,lClear=initial
+    sphis,stds=initial_err
+    M,C,CHM=calinski
+    O,L,Mopt=clusters1
+    Dopt,td,phi=clusters2
+    # make the initial figure
+    fig=plt.figure("Cluster Analysis",figsize=(7,6))
+    # initial data figure
+    axIni=fig.add_subplot(311)
+    axIni.scatter(tds*1000,phis)
+    axIni.set_ylabel(r"φ (N$^\circ$E)",fontsize=fontAxesLabel)
+    axIni.set_xlabel(r"$t_d$ (ms)",fontsize=fontAxesLabel)
+    axIni.set_ylim(0,180)
+    axIni.set_title("Initial Data",fontsize=fontAxisTitle)
+    # plot the C-H criterion function
+    # axCH=fig.add_subplot(322)
+    # axCH.plot(M,C, '--bo')
+    # axCH.axvline(CHM)
+    # axCH.axhline(C.max())
+    # axCH.set_title("Calinski-Harabasz Criterion / M=%i" % CHM,fontsize=fontAxisTitle)
+    # axCH.set_xlabel("Number of Clusters",fontsize=fontAxesLabel)
+    # axCH.set_xticks(M[0::3])
+    # axCH.ticklabel_format(axis='y',style='sci',scilimits=(0,0),useOffset=True)
+    # offsetFactor=axCH.yaxis.get_major_formatter().get_offset()
+    # axCH.yaxis.offsetText.set_visible(False)
+    # if not offsetFactor: offsetFactor='1'
+    # axCH.set_ylabel("C-H Score (x %s)" % offsetFactor,fontsize=fontAxesLabel)
+    ## plot the initial clusters
+    axC1=fig.add_subplot(323,sharex=axIni,sharey=axIni)
+    axC1.scatter(O[:,0]*1000,O[:,1],s=60,facecolor="None",edgecolor="k",label="Rejected")
+    for i in lClear:
+        data=O[L[Mopt]==i]
+        axC1.scatter(data[:,0]*1000,data[:,1],s=100,marker="s",edgecolor="k",label="Cluster %i"%(i+1))
+    axC1.set_xlabel(r"$t_d$ (ms)",fontsize=fontAxesLabel)
+    axC1.set_ylabel(r"φ (N$^\circ$E)",fontsize=fontAxesLabel)
+    axC1.set_title("Final Clusters",fontsize=fontAxisTitle)
+    plt.legend(handlelength=0.6,frameon=True,fontsize=8,loc='center left', bbox_to_anchor=(1, 0.5))
+    ## show the final measurement
+    axC2=fig.add_subplot(324,sharex=axIni,sharey=axIni)
+    axC2.scatter(O[:,0]*1000,O[:,1],s=60,facecolor="None",edgecolor="k",label="Rejected Clusters")
+    axC2.scatter(Dopt[:,0]*1000,Dopt[:,1],marker="o",facecolor="red",edgecolor="k",label="Selected Cluster")
+    axC2.axvline(td*1000); axC2.axhline(phi)
+    #axC2.set_ylabel(r"φ (N$^\circ$E)",fontsize=fontAxesLabel)
+    axC2.set_xlabel(r"$t_d$ (ms)",fontsize=fontAxesLabel)
+    plt.legend(handlelength=0.6,frameon=True,fontsize=8)
+    axC2.set_title("Final Result",fontsize=fontAxisTitle)
+    # set limits
+    axIni.set_ylim(min(phis)*0.9,max(phis)*1.1)
+    axIni.set_xlim(min(tds*1000)*0.9,max(tds*1000)*1.1)
+    ## Teanby et al. (2004)-like plots
+    windows=np.arange(1,len(phis)+1)
+    # first for the phi
+    axTB1=fig.add_subplot(325)
+    #axTB1.scatter(windows,phis)
+    axTB1.errorbar(x=windows,y=phis,yerr=sphis,fmt="bo",capsize=3)
+    axTB1.set_xlabel("Window #",fontsize=fontAxesLabel)
+    axTB1.set_ylabel(r"φ (N$^\circ$E)",fontsize=fontAxesLabel)
+    # now for the dt
+    axTB2=fig.add_subplot(326)
+    #axTB1.scatter(windows,phis)
+    axTB2.errorbar(x=windows,y=tds*1000,yerr=stds*1000,fmt="bo",capsize=3)
+    axTB2.set_xlabel("Window #",fontsize=fontAxesLabel)
+    axTB2.set_ylabel(r"$t_d$ (ms)",fontsize=fontAxesLabel)    
+    # finalize
+    fig.subplots_adjust(wspace=0.35,hspace=0.25)
+    origtime,ain,dist,mag,grade=titleInfo
+    fig.suptitle(
+                    #r"$\bf%s$" % str(origtime[:-4])+r" $\bf%s.%s\;%s$" % (network,station,meth),
+                    "%s %s.%s %s (Windows: %s)" % (str(origtime[:-4]),network,station,meth,len(windows)),
+                    fontweight="bold",fontsize=8
+                )
+    # change font size for tick labels
+    for tax in fig.get_axes():
+        tax.tick_params(labelsize=fontTicksLabel,direction="in")
+    fig.tight_layout(rect=[0,0.03,1.00,0.97])
+    # save to file?
+    if output:
+        fig.savefig(output,dpi=720,quality=95)
+
 def Rmatrix2D(baz):
     """
     Returns the clockwise rotation matrix (according to IRIS services) for
@@ -1212,7 +1682,7 @@ def isnone(value):
 
     :type value: any type
     :param value: The string for which the check will be performed
-    :returns: True if the string is datetime, otherwise false.
+    :returns: True if the string is None, nan or inf, otherwise false.
 
     """
     if value is None:
@@ -1223,3 +1693,32 @@ def isnone(value):
         return True
     else:
         return False      
+
+def grid_dimensions(num, max_cols=4):
+    """
+    decide on optimal dimensions based on the given number
+    """
+    rows_num = int(np.ceil(num / max_cols))
+
+    if rows_num == 0:
+        rows_num = 1
+        cols_num = num
+    else:
+        cols_num = int(np.ceil(num / rows_num))
+    return rows_num, cols_num 
+
+
+
+def grouper(n, iterable, fillvalue=None):
+    """
+    original function from `itertools` Recipes @ 
+    https://docs.python.org/3/library/itertools.html#itertools-recipes
+
+    """
+    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
+    args = [iter(iterable)] * n
+    return itertools.zip_longest(fillvalue=fillvalue, *args)
+
+class Dummy():
+    """Dummy class to store settings, values, etc"""
+    pass

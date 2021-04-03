@@ -13,7 +13,7 @@ while, at the same time, enhanching the effectiveness of processing and quality 
 
 Pytheas is released under the GNU GPLv3 license.
 
-Authors: Spingos I. & Kaviris G. (c) 2019-2020
+Authors: Spingos I. & Kaviris G. (c) 2019-2021
 Special thanks to Millas C. for testing the software and providing valuable feedback from the 
 very early stages of this endeavor!
 
@@ -42,7 +42,8 @@ from sklearn.cluster import AgglomerativeClustering as AC
 from lib import eigenvalue as SC
 from lib import rotationcorrelation as RC
 
-class clustering(QtCore.QThread):
+# class clustering(QtCore.QThread):
+class clustering():
     """
     The main clustering class. This is the implementation of
     the method proposed by Teanby et al. (2004), with slight
@@ -58,10 +59,10 @@ class clustering(QtCore.QThread):
     """
 
     # setup custom signals
-    iterDone=QtCore.pyqtSignal(str)
-    iterFail=QtCore.pyqtSignal(Exception)
+    # iterDone=QtCore.pyqtSignal(str)
+    # iterFail=QtCore.pyqtSignal(Exception)
 
-    def __init__(self,stream,method,sPick,bazi,ain,tbCNF,parent=None):
+    def __init__(self,stream,method,sPick,bazi,ain,snr,tbCNF,parent=None):
         """
         Initialize
 
@@ -75,24 +76,32 @@ class clustering(QtCore.QThread):
         :param bazi: the backazimuth of the station.
         :type ain: float
         :param ain: the incidence angle at the station.
+        :type snr: float
+        :param snr: the Signal-to-Noise Ratio
         :type tbCNF: :class:`~pytheas.lib.parsers.parsePickerCnf`
         :param tbCNF: Configuration class containing parameters related to clustering.
 
         """
-        QtCore.QThread.__init__(self,parent)
+        # QtCore.QThread.__init__(self,parent)
         # store arguments to self
         self.stream=stream
         self.method=method
         self.sPick=sPick
         self.bazi=bazi
         self.ain=ain
+        self.snr = snr
         self.caCNF=tbCNF
         self.excFlag=False
         self._isRunning=True
 
-    def __del__(self):
-        """Change the __del__ method."""
-        self.wait()
+    # def stop(self):
+    #     """Set flag to stop iterating over windows."""
+    #     self._isRunning=False
+    #     self.wait()
+
+    # def __del__(self):
+    #     """Change the __del__ method."""
+    #     self.wait()
 
     def windowing(self,TbegA,TendA,DTbeg,DTend,Nbeg,Nend):
         """
@@ -341,11 +350,6 @@ class clustering(QtCore.QThread):
         s2oj = np.nanmax((s2cj,s2dj))
         return s2cj,s2dj,s2oj
 
-    def stop(self):
-        """Set flag to stop iterating over windows."""
-        self._isRunning=False
-        self.wait()
-
     def run(self):
         """Main function to perform the cluster analysis."""
         try:
@@ -391,7 +395,7 @@ class clustering(QtCore.QThread):
                     break
                 except:
                     logging.exception("Error while processing window")
-                self.iterDone.emit(str(round(100*nw/nWindows)))
+                # self.iterDone.emit(str(round(100*nw/nWindows)))
             toc=time.time()
             logging.info("Time to apply window analysis: %.3f"%(toc-tic))
             # pack values in np arrays #
@@ -487,4 +491,4 @@ class clustering(QtCore.QThread):
             self.optWindow=optWindow; self.tempRes=tempResFinal
         except Exception as exc:
             self.excFlag=True
-            self.iterFail.emit(exc)
+            # self.iterFail.emit(exc)

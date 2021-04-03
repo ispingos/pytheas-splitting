@@ -14,7 +14,7 @@ while, at the same time, enhanching the effectiveness of processing and quality 
 
 Pytheas is released under the GNU GPLv3 license.
 
-Authors: Spingos I. & Kaviris G. (c) 2019-2020
+Authors: Spingos I. & Kaviris G. (c) 2019-2021
 Special thanks to Millas C. for testing the software and providing valuable feedback from the 
 very early stages of this endeavor!
 
@@ -27,7 +27,7 @@ LIC_STR=("""
 
      Pytheas // PYThon sHear - wavE Analysis Suite
 
-  Copyright (C) 2019-2020 Spingos I. & Kaviris G.
+  Copyright (C) 2019-2021 Spingos I. & Kaviris G.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,42 +43,62 @@ LIC_STR=("""
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
    
     For additional information, questions or suggestions 
-    please contact: ispingos@geol.uoa.gr
+    please contact: pytheas.splitting@gmail.com
 
 """)
 
-global VERSION
-global VERDATE
-VERSION="0.2.3"
-VERDATE="09/03/2021"
+global _PYTHEAS_VERSION
+global _PYTHEAS_VERDATE
+_PYTHEAS_VERSION = "0.3.0+d11"
+_PYTHEAS_VERDATE = "03/04/2021"
+
+#-- intro
+print('~~~ STARTING PYTHEAS v.%s (%s) ~~~' % (_PYTHEAS_VERSION, _PYTHEAS_VERDATE))
 
 ## first get script's path
 import os
-global WORKDIR
-WORKDIR=os.path.dirname(os.path.realpath(__file__))
+global _DIR_CWD
+_DIR_CWD = os.path.dirname(os.path.realpath(__file__))
+
+# cores?
+import multiprocessing
+global _CURRENT_CPU_CORES
+_CURRENT_CPU_CORES = multiprocessing.cpu_count()
+
+#-- EXPERIMENTAL
+# save system specs
+import platform
+global _CURRENT_SYSTEM_OS, _CURRENT_PYTHON_VER, _CURRENT_PYTHON_BLD
+_CURRENT_SYSTEM_OS = platform.uname()
+_CURRENT_PYTHON_VER = platform.python_version()
+try:
+    _CURRENT_PYTHON_BLD = platform.python_build()[1]
+except:
+    _CURRENT_PYTHON_BLD = 'None'
+
 
 ## splash screen ##
-print("..: Starting module imports...")
+print("~~ Starting module imports...")
 # using tk cause it's easier/faster for this (and is in the PSL)
 import tkinter as tk
 splroot = tk.Tk()
 splroot.overrideredirect(True)
 # get screen width/height and set as global
-global SCWIDTH 
-global SCHEIGHT
-SCWIDTH = splroot.winfo_screenwidth()
-SCHEIGHT = splroot.winfo_screenheight()
+global _GUI_SCREEN_WIDTH 
+global _GUI_SCREEN_HEIGHT
+_GUI_SCREEN_WIDTH = splroot.winfo_screenwidth()
+_GUI_SCREEN_HEIGHT = splroot.winfo_screenheight()
 # grab image file and get its dimensions
-splfile = os.path.join(WORKDIR, 'etc', 'images', 'splash_color.png')
+splfile = os.path.join(_DIR_CWD, 'etc', 'images', 'splash_color.png')
 splimage = tk.PhotoImage(file=splfile)
 iwidth = splimage.width(); iheight=splimage.height()
 # scale it to 40% of screen for better display
-scale=SCWIDTH*0.4/iwidth
+scale=_GUI_SCREEN_WIDTH*0.4/iwidth
 splimage=splimage.subsample(int(round(1/scale)))
 iwidth=splimage.width(); iheight=splimage.height()
 # center image
-x=(SCWIDTH-iwidth)/2
-y=(SCHEIGHT-iheight)/2
+x=(_GUI_SCREEN_WIDTH-iwidth)/2
+y=(_GUI_SCREEN_HEIGHT-iheight)/2
 splroot.geometry('%dx%d+%d+%d' % (iwidth, iheight, x, y))
 # init canvas
 canvas=tk.Canvas(splroot,height=iheight,width=iwidth)
@@ -88,11 +108,13 @@ canvas.pack()
 splroot.update()
 
 ## imports ##
-print("..: Loading modules...")    
+print("Loading modules...")
 import sys
 import shutil
 import logging
+from subprocess import call as sub_call
 from logging.handlers import RotatingFileHandler
+import pickle as pk
 import operator
 import traceback 
 import time
@@ -126,35 +148,42 @@ from lib import rotationcorrelation as RC
 from lib import db_handler as DB
 from lib import tools
 from lib import parsers
+from lib import exceptions
+# from lib import cli
 
 #-- make required directories
 try:
-    os.makedirs(os.path.join(WORKDIR, 'logs'))
+    os.makedirs(os.path.join(_DIR_CWD, 'logs'))
 except: # if folder already exists
     pass
 try:
-    os.makedirs(os.path.join(WORKDIR, 'etc', 'options'))
+    os.makedirs(os.path.join(_DIR_CWD, 'etc', 'options'))
 except: # if folder already exists
     pass
 try:
-    os.makedirs(os.path.join(WORKDIR, 'etc', 'evcor'))
+    os.makedirs(os.path.join(_DIR_CWD, 'etc', 'evcor'))
 except: # if folder already exists
     pass
 try:
-    os.makedirs(os.path.join(WORKDIR, 'etc', 'index'))
+    os.makedirs(os.path.join(_DIR_CWD, 'etc', 'index'))
 except: # if folder already exists
     pass  
 
+#--- setup logger
+logging.getLogger('matplotlib.font_manager').disabled = True
+
 # init the log file
-logfile=WORKDIR+os.sep+"logs%s%s_Pytheas.log" % (os.sep,UTCDateTime().strftime("%Y%m%d%H%M%S"))
+logfile = os.path.join(_DIR_CWD, 'logs', '%s_Pytheas.log' % UTCDateTime().strftime("%Y%m%d%H%M%S"))
+
 # read the last used maxBytes value
 try:
-    with open(WORKDIR + os.sep + "etc%soptions%slog_max_bytes" % (os.sep,os.sep), 'r') as fid:
+    with open(_DIR_CWD + os.sep + "etc%soptions%slog_max_bytes" % (os.sep,os.sep), 'r') as fid:
         MAX_BYTES = float(fid.read())
 except FileNotFoundError:
     MAX_BYTES = 50.
-    with open(WORKDIR + os.sep + "etc%soptions%slog_max_bytes" % (os.sep,os.sep), 'w') as fid:
+    with open(_DIR_CWD + os.sep + "etc%soptions%slog_max_bytes" % (os.sep,os.sep), 'w') as fid:
         fid.write(str(MAX_BYTES))
+
 # setup rotating files
 ROOT_LOGGER = logging.getLogger()
 ROOT_LOGGER.setLevel(logging.DEBUG)
@@ -183,26 +212,48 @@ class Pytheas(QtWidgets.QMainWindow):
     def __init__(self):
         """Initiliaze main app window and setups labels, flags etc."""
         logging.info("Start Application...")
+        logging.debug('OS: %s %s (%s)' % (
+            _CURRENT_SYSTEM_OS.system, 
+            _CURRENT_SYSTEM_OS.release, 
+            _CURRENT_SYSTEM_OS.version
+            )
+        )
+        logging.debug('Python: %s (%s)' % (
+            _CURRENT_PYTHON_VER, 
+            _CURRENT_PYTHON_BLD
+            )
+        )
         # init the main window
         QtWidgets.QMainWindow.__init__(self)
         # variables
         self.evWin = None
         self.stWin = None
         # check for default dirs. create them if needed
+        self.cli_settings_dir = os.path.join(_DIR_CWD, 'etc', 'data_cli')
         self.checkDefaultDirs()
         # read configuration files
-        self.generalCNF = parsers.parseGeneralCnf(os.path.join(WORKDIR, 'etc', 'options', 'general.cnf'))
-        self.pkCNF = parsers.parsePickerCnf(os.path.join(WORKDIR, 'etc', 'options', 'picker.cnf'))
-        self.caCNF = parsers.parseClusteringCnf(os.path.join(WORKDIR, 'etc', 'options', 'clustering.cnf'))
-        self.tpCNF = parsers.parseTaupCnf(os.path.join(WORKDIR, 'etc', 'options', 'taup.cnf'))
-        self.gradeCNF = parsers.parseGradeCnf(os.path.join(WORKDIR, 'etc', 'options', 'grading.cnf'))
-        self.filterCNF = parsers.ParseFilterCnf(os.path.join(WORKDIR, 'etc', 'options', 'filters.cnf'))
+        self.exPathFile = os.path.join(_DIR_CWD, 'etc', 'options', 'paths.exp')
+        self.generalCNF = parsers.parseGeneralCnf(os.path.join(_DIR_CWD, 'etc', 'options', 'general.cnf'))
+        self.pkCNF = parsers.parsePickerCnf(os.path.join(_DIR_CWD, 'etc', 'options', 'picker.cnf'))
+        self.caCNF = parsers.parseClusteringCnf(os.path.join(_DIR_CWD, 'etc', 'options', 'clustering.cnf'))
+        self.tpCNF = parsers.parseTaupCnf(os.path.join(_DIR_CWD, 'etc', 'options', 'taup.cnf'))
+        self.gradeCNF = parsers.parseGradeCnf(os.path.join(_DIR_CWD, 'etc', 'options', 'grading.cnf'))
+        self.filterCNF = parsers.ParseFilterCnf(os.path.join(_DIR_CWD, 'etc', 'options', 'filters.cnf'))
+        self.cli_settings_path = os.path.join(self.cli_settings_dir, 'cca_settings_c%i.bin')
+        logging.info(f'Attempting to get previous settings from {self.cli_settings_path}')
+        try:
+            self.cca_settings = pk.load(open(self.cli_settings_path, 'rb'))
+            logging.info('Successfully read CCA parameters from file.')
+        except FileNotFoundError:
+            self.cca_settings = tools.Dummy()
+            logging.warning('Could not read CCA parameters! Initiated empty settings object.')
+        
         # set icon and initial GUI params
-        self.appIcon = os.path.join(WORKDIR, 'etc', 'images', 'Pytheas_ICO.ico')
+        self.appIcon = os.path.join(_DIR_CWD, 'etc', 'images', 'Pytheas_ICO.ico')
         self.globalName = "Pytheas"
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
-        self.setWindowTitle(self.globalName + ' v' + str(VERSION))
+        self.setWindowTitle(self.globalName + ' v' + str(_PYTHEAS_VERSION))
         self.setWindowIcon(QtGui.QIcon(self.appIcon))
         # set validators
         self.validateInt = QtGui.QIntValidator()
@@ -273,15 +324,15 @@ class Pytheas(QtWidgets.QMainWindow):
         self.splitMenu.addAction("&Eigenvalue",lambda: self.applyEV('EV'),QtCore.Qt.CTRL+QtCore.Qt.Key_L)
         self.splitMenu.addAction("&Minimum Energy",lambda: self.applyEV('ME'),QtCore.Qt.CTRL+QtCore.Qt.Key_E)
         self.splitMenu.addSeparator()        
-        self.splitMenu.addAction("&Cluster Analysis (EV)",lambda: self.applyCA('EV',self.stream,self.filtered,self.freqmin,self.freqmax,
-                                                                      self.sPick,self.baz,self.ain,True,False
-                                                                    ),QtCore.Qt.CTRL+QtCore.Qt.Key_T)
-        self.splitMenu.addAction("&Cluster Analysis (ME)",lambda: self.applyCA('ME',self.stream,self.filtered,self.freqmin,self.freqmax,
-                                                                      self.sPick,self.baz,self.ain,True,False
-                                                                    ),QtCore.Qt.CTRL+QtCore.Qt.Key_U)
-        self.splitMenu.addAction("&Cluster Analysis (RC)",lambda: self.applyCA('RC',self.stream,self.filtered,self.freqmin,self.freqmax,
-                                                                      self.sPick,self.baz,self.ain,True,False
-                                                                    ),QtCore.Qt.CTRL+QtCore.Qt.Key_Y)
+		# self.splitMenu.addAction("&Cluster Analysis (EV)",lambda: self.applyCA('EV',self.stream,self.filtered,self.freqmin,self.freqmax,
+  		#                                                               self.sPick,self.baz,self.ain,self.SNR,True,False
+  		#                                                             ),QtCore.Qt.CTRL+QtCore.Qt.Key_T)
+  		# self.splitMenu.addAction("&Cluster Analysis (ME)",lambda: self.applyCA('ME',self.stream,self.filtered,self.freqmin,self.freqmax,
+  		#                                                               self.sPick,self.baz,self.ain,self.SNR,True,False
+  		#                                                             ),QtCore.Qt.CTRL+QtCore.Qt.Key_U)
+  		# self.splitMenu.addAction("&Cluster Analysis (RC)",lambda: self.applyCA('RC',self.stream,self.filtered,self.freqmin,self.freqmax,
+  		#                                                               self.sPick,self.baz,self.ain,self.SNR,True,False
+  		#                                                             ),QtCore.Qt.CTRL+QtCore.Qt.Key_Y)
         self.splitMenu.addSeparator()        
         self.splitMenu.addAction("&Catalogue Cluster Analysis",self.caMultWindow,QtCore.Qt.SHIFT+QtCore.Qt.Key_A)
         self.menuBar().addMenu(self.splitMenu) # Add Splitting menu to bar
@@ -317,6 +368,7 @@ class Pytheas(QtWidgets.QMainWindow):
         self.toolsMenu.addAction("&Auto-select Filter", self.automatic_filter_selection, QtCore.Qt.CTRL+QtCore.Qt.Key_A)
         self.toolsMenu.addAction("&Remove filter",self.removeFilter,QtCore.Qt.CTRL+QtCore.Qt.Key_R)
         self.toolsMenu.addAction("&Show Horizontal Spectra",self.plotSpectrum)
+        self.toolsMenu.addAction("&Show Full Spectrogram", self.plotQDSpectrogram)
         self.menuBar().addMenu(self.toolsMenu)
         self.toolsMenu.setEnabled(False)
         self.activateMenus.append(self.toolsMenu)     
@@ -339,9 +391,9 @@ class Pytheas(QtWidgets.QMainWindow):
         self.lblFont=QtGui.QFont("Calibri",11,QtGui.QFont.Bold)
         self.inpFont=QtGui.QFont("Calibri",11,QtGui.QFont.Normal)
         # add the labels where information will be shown 
-        self.lblOrigin=QtWidgets.QLabel("Pytheas v.%s" % VERSION,font=QtGui.QFont("Calibri",14,QtGui.QFont.Bold))
+        self.lblOrigin=QtWidgets.QLabel("Pytheas v.%s" % _PYTHEAS_VERSION,font=QtGui.QFont("Calibri",14,QtGui.QFont.Bold))
         self.lblOrigin.setAlignment(QtCore.Qt.AlignCenter)
-        self.lblStation=QtWidgets.QLabel("V. Date: %s" % VERDATE,font=QtGui.QFont("Calibri",14,QtGui.QFont.Bold))
+        self.lblStation=QtWidgets.QLabel("V. Date: %s" % _PYTHEAS_VERDATE,font=QtGui.QFont("Calibri",14,QtGui.QFont.Bold))
         self.lblStation.setAlignment(QtCore.Qt.AlignCenter)
         self.lblAIN=QtWidgets.QLabel("incidence ("+u"\u00b0"+"):",font=self.lblFont)
         self.inpAIN=QtWidgets.QLabel("45",font=self.inpFont)
@@ -433,9 +485,11 @@ class Pytheas(QtWidgets.QMainWindow):
         self.caCNF.maxTd = self.generalCNF.maxTd
         # clean logs
         self.cleanLogs()
+        #-- setup default class vars
+        self.staList = []
         # read inventory
         try:
-            self.inventory,self.xmlInventory=self.readStations(self.tpCNF.stations)
+            self.inventory, self.xmlInventory = parsers.read_stations(self.tpCNF.stations)
         except: # no station file! show a warning to the user...
             logging.exception("Could not find station file %s" % self.tpCNF.stations)
             winTitle="StationXML Warning"
@@ -468,25 +522,31 @@ class Pytheas(QtWidgets.QMainWindow):
         :returns: True if V<H and False if V>H
 
         """
+        ## return?
+        if np.isnan(pick):
+            return False
         ## adjust windows to S pick
-        sps=self.stream[0].stats.sampling_rate
-        winstart=pick+start
-        idxstart=int(np.floor(sps*winstart))
-        winend=pick+end
-        idxend=int(np.ceil(sps*winend))
+        sps = self.stream[0].stats.sampling_rate
+        winstart = pick + start
+        idxstart = int(np.floor(sps * winstart))
+        winend = pick + end
+        idxend = int(np.ceil(sps * winend))
         if (idxstart < 0) or (idxend > self.stream[0].stats.npts):
             logging.warning("Not enough samples for V2H based on pick")
             return False
         ## get arrays
-        H1="N"; H2="E"
-        if self.stageRotated: H1="R"; H2="T"
-        Z=self.stream.select(component="Z")[0].data[idxstart:idxend]
-        N=self.stream.select(component=H1)[0].data[idxstart:idxend]
-        E=self.stream.select(component=H2)[0].data[idxstart:idxend]
+        H1 = "N"
+        H2 = "E"
+        if self.stageRotated: 
+            H1="R"
+            H2="T"
+        Z = self.stream.select(component="Z")[0].data[idxstart:idxend]
+        N = self.stream.select(component=H1)[0].data[idxstart:idxend]
+        E = self.stream.select(component=H2)[0].data[idxstart:idxend]
         ## return the ratios
         return any((np.abs(Z).max()<np.abs(N).max(),np.abs(Z).max()<np.abs(E).max()))
 
-    def calcSNR(self,pick,winNoise=None,winSignal=None):
+    def calcSNR(self, pick, win_noise=None, win_signal=None):
         """
         Calculates the Signal-to-Noise Ratio (SNR) around the S-arrival (if picked)
         or the middle of the selected signal window. The equation used is:
@@ -498,52 +558,22 @@ class Pytheas(QtWidgets.QMainWindow):
         
         :type pick: float
         :param pick: the arrival of the S-wave relative to the trace's start time (in s)
-        :type winNoise: float or None, optional
-        :param winNoise: start of the noise window (its end is the S-arrival/middle of window).
+        :type win_noise: float or None, optional
+        :param win_noise: start of the noise window (its end is the S-arrival/middle of window).
             If None, its value is acquired from the Preferences. Defaults to None.
-        :type winSignal: float or None, optional
-        :param winSignal: end of the signal window (its start is the S-arrival/middle of window).
+        :type win_signal: float or None, optional
+        :param win_signal: end of the signal window (its start is the S-arrival/middle of window).
             If None, its value is acquired from the Preferences. Defaults to None.
-        :returns: the average SNR of the horizontal waveforms
     
         """
         # get windows bounds from Preferences?
-        if winNoise is None:
-            winNoise=self.generalCNF.snrStart
-        if winSignal is None:
-            winSignal=self.generalCNF.snrEnd
-        # grab the two horizontal waveforms
-        if self.stageRotated:
-            M1=self.stream.select(component="R")[0].data
-            M2=self.stream.select(component="T")[0].data
-        else:
-            M1=self.stream.select(component="N")[0].data
-            M2=self.stream.select(component="E")[0].data
-        # get indices of the signal and noise windows
-        idxNoise=int(np.floor((pick+winNoise)*self.stream[0].stats.sampling_rate))
-        idxSignl=int(np.ceil((pick+winSignal)*self.stream[0].stats.sampling_rate))
-        # however, if the bounds are beyond the length of the waveform...
-        if (idxNoise < 0) or (idxSignl > self.stream[0].stats.npts):
-            logging.warning("Not enough samples for SNR based on pick")
-            return 0
-        idxPick=int(pick*self.stream[0].stats.sampling_rate)
-        # calculate SNR for N/F channels
-        noise=M1[idxNoise:idxSignl]
-        signl=M1[idxPick:idxSignl]        
-        RMSnoise=np.sqrt(np.mean(noise**2))
-        RMSsignl=np.sqrt(np.mean(signl**2))
-        SNR1=(RMSsignl/RMSnoise)**2
-        # calculate SNR for E/S channels
-        noise=M2[idxNoise:idxSignl]
-        signl=M2[idxPick:idxSignl]
-        RMSnoise=np.sqrt(np.mean(noise**2))
-        RMSsignl=np.sqrt(np.mean(signl**2))
-        SNR2=(RMSsignl/RMSnoise)**2
-        # get average SNR
-        SNR=(SNR1+SNR2)/2.0
-        if tools.isnone(SNR): # final check, just to be sure
-            SNR=0.0
-        return SNR
+        if tools.isnone(win_noise):
+            win_noise = self.generalCNF.snrStart
+        if tools.isnone(win_signal):
+            win_signal = self.generalCNF.snrEnd
+
+        # calculate the snr
+        return tools.calculate_snr(self.stream, pick, win_noise, win_signal)
   
     def tdCheck(self,td):
         """
@@ -654,36 +684,21 @@ class Pytheas(QtWidgets.QMainWindow):
     ## ARCHIVING FUNCTIONS ##
     def checkDefaultDirs(self):
         """Make the default directories."""
-        index_dir = os.path.join(WORKDIR, 'etc', 'index')
-        options_dir = os.path.join(WORKDIR, 'etc', 'options')
-        evcor_dir = os.path.join(WORKDIR, 'etc', 'evcor')
+        index_dir = os.path.join(_DIR_CWD, 'etc', 'index')
+        options_dir = os.path.join(_DIR_CWD, 'etc', 'options')
+        evcor_dir = os.path.join(_DIR_CWD, 'etc', 'evcor')
         if not os.path.isdir(index_dir):
             os.makedirs(index_dir)
-            logging.debug("Created %s" % index_dir)
+            logging.debug(f"Created {index_dir}")
         if not os.path.isdir(options_dir):
             os.makedirs(options_dir)
-            logging.debug("Created %s" % options_dir)
+            logging.debug(f"Created {options_dir}")
         if not os.path.isdir(evcor_dir):
             os.makedirs(evcor_dir)
-            logging.debug("Created %s" % evcor_dir)
-
-    def getTree(self,path):
-        """
-        Get tree of directories that contain waveforms. It is mandatory for the
-        final branch to be named after the event code, e.g. %Y-%m-%d-%H-%M-%S
-
-        :type path: str
-        :param path: master directory that contains separate event folders.
-        :returns: a list of the event directories found
-
-        """
-        fullEvents={}; n=0
-        for root,dirs,files in os.walk(path):
-            if files and not dirs:
-                n+=1
-                logging.debug("Adding path to event %i"%n)
-                fullEvents[os.path.split(root)[-1]]=root
-        return fullEvents
+            logging.debug(f"Created {evcor_dir}")
+        if not os.path.isdir(self.cli_settings_dir):
+        	os.makedirs(self.cli_settings_dir)
+        	logging.debug(f'Created {self.cli_settings_dir}')
 
     def getActiveStations(self):
         """
@@ -726,47 +741,6 @@ class Pytheas(QtWidgets.QMainWindow):
             except:
                 continue
         return activeEvents
-
-    def readStations(self,staFile):
-        """
-        Read the stations information file. Must be either a
-        StationXML or an ASCII file in the format:
-        station network latitude longitude elevation
-
-        :type staFile: str
-        :param staFile: path to the station information file
-        :returns: if the file is StationXML returns a tuple with 
-            (a dict containing the station information, 
-             the :class:`~obspy.core.stream.Inventory` object),
-            otherwise returns (a dict containing the station information, None)
-
-        """
-        try:
-            # simple check to validate file is of xml type, as obspy's
-            # read_inventory sometimes parses non-xml files as xml
-            with open(staFile, 'r') as fid:
-                check_line = fid.readline()
-            if not '?xml version' in check_line:
-                raise TypeError('Input file is not StationXML')
-            # read the xml
-            xml=read_inventory(staFile)
-            inventory={}
-            for net in xml:
-                for sta in net:
-                    inventory.update({sta.code:{"network":net.code,"latitude":sta.latitude,
-                                      "longitude":sta.longitude,"elevation":sta.elevation}})
-            return inventory, xml
-        except TypeError:
-            xml=None
-            with open(staFile,"r") as fid: staLines=fid.readlines()
-            return {x.split()[0]:
-                     {
-                       "network":x.split()[1],"latitude":float(x.split()[2]),
-                        "longitude":float(x.split()[3]),"elevation":float(x.split()[4])
-                     } for x in staLines
-                   }, xml
-        except:
-            raise IOError("Could not read station file %s" % staFile)
 
 
     def readEventCat(self,catFile):
@@ -912,7 +886,7 @@ class Pytheas(QtWidgets.QMainWindow):
                         ain=arr.incidence_angle
                     except AttributeError: # maybe the takeoff is
                         try:
-                            # calcualte the incidence angle from the takeoff
+                            # calculate the incidence angle from the takeoff
                             # as seen in Kapetanidis (2017).
                             ih=arr.takeoff_angle # takeoff angle
                             vTop=np.float(self.vmodel.evaluate_below(0,'s')) # velocity at station
@@ -1028,7 +1002,7 @@ class Pytheas(QtWidgets.QMainWindow):
        keyTrash = []
        logging.debug("Performing keys correction...")
        # get previous corrections
-       evcor_file = os.path.join(WORKDIR, 'etc', 'evcor', 'evcor.dat')
+       evcor_file = os.path.join(_DIR_CWD, 'etc', 'evcor', 'evcor.dat')
        try: # if it exists
            with open(evcor_file, 'r') as fid:
                corList = fid.readlines()
@@ -1038,9 +1012,11 @@ class Pytheas(QtWidgets.QMainWindow):
                fid.write("# INITIAL CORRECTED\n")
            corDict={}
        # get keys. catalogue keys are rounded to 0 microseconds
-       catalogueKeys=np.asarray([round(UTCDateTime(x).timestamp) for x in sorted(evsDict)])
-       directoryKeys=np.asarray([UTCDateTime(y).timestamp for y in sorted(evPath)])
-       keyFrmt="%Y-%m-%d-%H-%M-%S"
+       catalogueKeys = np.asarray([round(UTCDateTime(x).timestamp) for x in sorted(evsDict)])
+       directoryKeys = np.asarray([UTCDateTime(y).timestamp for y in sorted(evPath)])
+       logging.debug(f'Set {len(catalogueKeys)} catalogue keys')
+       logging.debug(f'Set {len(catalogueKeys)} event directory keys')
+       keyFrmt = "%Y-%m-%d-%H-%M-%S"
        # we want to match the CATALOGUE keys to the DIRECTORY keys
        for eTms in catalogueKeys:
            diff = directoryKeys - eTms
@@ -1060,7 +1036,7 @@ class Pytheas(QtWidgets.QMainWindow):
            evsDict[pKey]=evsDict[eKey]
            statsDict[pKey]=statsDict[eKey]
            keyTrash.append(eKey)            
-           with open(WORKDIR+os.sep+"etc%sevcor%sevcor.dat"%(os.sep,os.sep),"a") as fid:
+           with open(_DIR_CWD+os.sep+"etc%sevcor%sevcor.dat"%(os.sep,os.sep),"a") as fid:
                fid.write(str(eKey)+" "+str(pKey)+"\n")
            logging.debug("Corrected key: "+eKey+" -> "+pKey)
        # Clear dictionaries of unused keys
@@ -1071,61 +1047,7 @@ class Pytheas(QtWidgets.QMainWindow):
                _=statsDict.pop(tKey)
        return evsDict,statsDict
 
-    def pathParser(self,mode="read",catFile=None,dataPath=None,dbPath=None):
-        """
-        Check whether a file containing the previously used data directory, catalogue file and
-        database file paths exists and then either read or write.
-
-        :type mode: str, optional
-        :param mode: One of 'read' or 'write', selects the mode with which the function will
-            operate. 'read' means reading previous paths and 'write' means (over)writing the 
-            new ones to the file. Defaults to 'read'.
-        :type catFile: str or None, optional
-        :param catFile: path to the catalogue file. If None, this path will be skipped. Defaults to 
-            None.
-        :type dataPath: str or None, optional
-        :param dataPath: path to data directory. If None, this path will be skipped. Defaults to
-            None.
-        :type dbPath: str or None, optional
-        :param dbPath: path to database file. If None, this path will be skipped. Defaults to
-            None.
-
-        """
-        # set name for paths file
-        exPathFile=WORKDIR+os.sep+"etc%soptions%spaths.exp"%(os.sep,os.sep)
-        if mode == "read": # read from existing file
-            try:
-                with open(exPathFile,"r") as fid:
-                    temp=fid.readlines()
-                paths=[x.split(",") for x in temp]
-                for path in paths:
-                    if path[0] == "ERRPATH": # catalogue. 'ERR' is a remnant from old times...
-                        catFile=path[1].strip()
-                    elif path[0] == "DATAPATH": # data directory
-                        dataPath=path[1].strip()
-                    elif path[0] == "DBPATH": # database directory
-                        dbPath=path[1].strip()
-                # if the file doesn't exist, set current directory
-                if not catFile or not os.path.exists(catFile):
-                    catFile=os.getcwd()
-                if not dataPath or not os.path.exists(dataPath):
-                    dataPath=os.getcwd()
-                if not dbPath or not os.path.exists(dbPath):
-                    dbPath=os.getcwd()
-                return dataPath,catFile,dbPath
-            except IOError:
-                catFile=os.getcwd()
-                dataPath=os.getcwd()
-                dbPath=os.getcwd()
-                return dataPath,catFile,dbPath
-        elif mode == "write": # write to the file
-            if catFile and dataPath and dbPath:
-                with open(exPathFile,"w") as fid:
-                    fid.write("ERRPATH"+","+catFile+"\n")
-                    fid.write("DATAPATH"+","+dataPath+"\n")
-                    fid.write("DBPATH"+","+dbPath+"\n")
-
-    def updateSplittingDict(self,splitting=True):
+    def updateSplittingDict(self, splitting=True):
         """
         Update the splitting dictionary. Values are held in ``self``.
 
@@ -1160,17 +1082,34 @@ class Pytheas(QtWidgets.QMainWindow):
         # update arrivals and picks
         if not self.sPick:
             try:
-                self.sArr=self.spickDict[self.activeEvent][self.station]
+                self.sArr = self.dict_s_arr[self.activeEvent][self.station]
             except:
                 pass
         else:
-            self.sArr=self.stream[0].stats.starttime+self.sPick  
-        if self.sArr not in [self.stream[0].stats.starttime,0,np.nan]:      
-            self.splittingDict[self.activeEvent][self.station]["s_obs"]=self.sArr.datetime
-        if self.sArrTheor not in [self.stream[0].stats.starttime,0,np.nan]:      
-            self.splittingDict[self.activeEvent][self.station]["s_theo"]=self.sArrTheor.datetime
-        if self.sArrAuto not in [self.stream[0].stats.starttime,0,np.nan]:      
-            self.splittingDict[self.activeEvent][self.station]["s_auto"]=self.sArrAuto.datetime
+            try:
+                self.sArr = self.stream[0].stats.starttime + self.sPick
+            except ValueError:  # trying to add `None` to UTCDateTime object
+                pass
+
+        #-- compatibility fix with older versions
+        try:
+            self.splittingDict[self.activeEvent][self.station]["s_obs"] = self.sArr.datetime
+        except:
+            self.sArr = None
+            self.sPick = np.nan
+            self.splittingDict[self.activeEvent][self.station]["s_obs"] = self.sArr
+        try:
+            self.splittingDict[self.activeEvent][self.station]["s_theo"] = self.sArrTheor.datetime
+        except:
+            self.sArrTheor = None
+            self.sPickTheor = np.nan
+            self.splittingDict[self.activeEvent][self.station]["s_theo"] = self.sArrTheor
+        try:
+            self.splittingDict[self.activeEvent][self.station]["s_auto"] = self.sArrAuto.datetime
+        except:
+            self.sArrAuto = None
+            self.sArrAuto = np.nan
+            self.splittingDict[self.activeEvent][self.station]["s_auto"] = self.sArrAuto
         # update the method layer
         if splitting:
             self.splittingDict[self.activeEvent][self.station][self.method]["station"]=self.station
@@ -1229,36 +1168,48 @@ class Pytheas(QtWidgets.QMainWindow):
                 if self.method not in self.splittingDict[self.activeEvent][self.station]:
                     return
         # station layer
-        self.tpts=self.splittingDict[self.activeEvent][self.station]["s_p"]
+        self.tpts = self.splittingDict[self.activeEvent][self.station]["s_p"]
         # method layer
-        metDict=self.splittingDict[self.activeEvent][self.station][method]
+        metDict = self.splittingDict[self.activeEvent][self.station][method]
         # get observed arrival
-        try:
-            sArr=UTCDateTime(self.splittingDict[self.activeEvent][self.station]["s_obs"])
-        except:
-            sArr=0.
-        if sArr not in [self.stream[0].stats.starttime,0,np.nan]:
-            self.sArr=UTCDateTime(sArr)
-            self.spickDict[self.activeEvent][self.station]=self.sArr
-            self.sPick=self.sArr-self.stream[0].stats.starttime
+        if not self.sArr:
+            try:
+                sArr = UTCDateTime(self.splittingDict[self.activeEvent][self.station]["s_obs"])
+                self.sArr = sArr
+                self.dict_s_arr[self.activeEvent][self.station] = self.sArr
+                self.sPick = self.sArr - self.stream[0].stats.starttime
+            except TypeError:
+                self.sArr = None
+                self.sPick = np.nan
         else:
             try:
-                self.sArr=self.spickDict[self.activeEvent][self.station]
-                self.sPick=self.sArr-self.stream[0].stats.starttime
-            except:
-                pass
+                self.sArr = self.dict_s_arr[self.activeEvent][self.station]
+                self.sPick = self.sArr - self.stream[0].stats.starttime
+            except TypeError:
+                self.sArr = None
+                self.sPick = np.nan
         # get theoretical arrival
-        if self.sArrTheor in [self.stream[0].stats.starttime,0,np.nan]:
-            sArrTheor=self.splittingDict[self.activeEvent][self.station]["s_theo"]
-            if sArrTheor not in [self.stream[0].stats.starttime,0,np.nan]:
-                self.sArrTheor=UTCDateTime(sArrTheor)
-                self.sPickTheor=self.sArrTheor-self.stream[0].stats.starttime
+        if not self.sArrTheor:
+            sArrTheor = self.splittingDict[self.activeEvent][self.station]["s_theo"]
+            if sArrTheor:
+                try:
+                    self.sArrTheor = UTCDateTime(sArrTheor)
+                    self.sPickTheor = self.sArrTheor-self.stream[0].stats.starttime
+                except TypeError:
+                    self.splittingDict[self.activeEvent][self.station]["s_theo"] = None
+                    self.sArrTheor = None
+                    self.sPickTheor = np.nan
         # get automatic arrrival
-        if self.sArrAuto in [self.stream[0].stats.starttime,0,np.nan]:
-            sArrAuto=self.splittingDict[self.activeEvent][self.station]["s_auto"]
-            if sArrAuto not in [self.stream[0].stats.starttime,0,np.nan]:
-                self.sArrAuto=UTCDateTime(sArrAuto)
-                self.sPickAuto=self.sArrAuto-self.stream[0].stats.starttime
+        if not self.sArrAuto:
+            sArrAuto = self.splittingDict[self.activeEvent][self.station]["s_auto"]
+            if sArrAuto:
+                try:
+                    self.sArrAuto = UTCDateTime(sArrAuto)
+                    self.sPickAuto = self.sArrAuto - self.stream[0].stats.starttime
+                except TypeError:  # when passing `np.nan` to `UTCDateTime`
+                    self.splittingDict[self.activeEvent][self.station]["s_auto"] = None
+                    self.sArrAuto = None
+                    self.sPickAuto = np.nan
         # get rest
         self.SNR=metDict["SNR"]
         self.dPer=metDict["s_freq"]
@@ -1356,9 +1307,13 @@ class Pytheas(QtWidgets.QMainWindow):
                 orientation="{:.1f}".format(stLayer["orientation"])
                 for method in sorted(stLayer):
                     meLayer=stLayer[method]
-                    if not isinstance(meLayer,dict): continue # same as above
-                    grade=meLayer["grade"]
-                    if grade in ("F","X"): continue # skip failed attempts
+                    if not isinstance(meLayer,dict):
+                        continue # same as above
+                    grade = meLayer["grade"]
+                    if str(grade) == 'nan':
+                        grade = 'F'
+                    if grade in ("F", "X"): 
+                        continue # skip failed attempts
                     entry_n += 1
                     logging.debug("Writing entry #%i: %s / %s / %s" % (entry_n, activeEvent, station, method))
                     phi="{:.1f}".format(meLayer["phi"])
@@ -1533,7 +1488,7 @@ class Pytheas(QtWidgets.QMainWindow):
                 self.applyTimedelay(arrowInput=True)
             # if there's a pick and the method is MAN, calculate the correlation
             # coefficient for the corrected F/S
-            if self.sPick not in [0,np.nan] and self.method == "MAN":
+            if (not np.isnan(self.sPick)) and self.method == "MAN":
                 ccIdx1=int(np.floor((self.sPick-0.2)*self.stream[0].stats.sampling_rate))
                 ccIdx2=int(np.ceil((self.sPick+0.2)*self.stream[0].stats.sampling_rate))
                 self.CC_FS=tools.xcStatic(self.stream.select(component="R")[0][ccIdx1:ccIdx2],\
@@ -1546,7 +1501,7 @@ class Pytheas(QtWidgets.QMainWindow):
                 self.applyTimedelay(arrowInput=True)
             # if there's a pick and the method is MAN, calculate the correlation
             # coefficient for the corrected F/S and then N/E.
-            if self.sPick not in [0,np.nan] and self.method == "MAN":
+            if (not np.isnan(self.sPick)) and self.method == "MAN":
                 ccIdx1=int(np.floor((self.sPick-0.2)*self.stream[0].stats.sampling_rate))
                 ccIdx2=int(np.ceil((self.sPick+0.2)*self.stream[0].stats.sampling_rate))
                 self.CC_FS=tools.xcStatic(self.stream.select(component="R")[0][ccIdx1:ccIdx2],\
@@ -1555,7 +1510,7 @@ class Pytheas(QtWidgets.QMainWindow):
             # rotate to N/E
             self.stream=self.rotation(self.phi,self.stream,"RT->NE")
             # calculate the CC @ N/E
-            if self.sPick and self.method == "MAN":
+            if (not np.isnan(self.sPick)) and self.method == "MAN":
                 ccIdx1=int(np.floor((self.sPick-0.2)*self.stream[0].stats.sampling_rate))
                 ccIdx2=int(np.ceil((self.sPick+0.2)*self.stream[0].stats.sampling_rate))
                 self.CC_NE=tools.xcStatic(self.stream.select(component="N")[0][ccIdx1:ccIdx2],\
@@ -1565,7 +1520,16 @@ class Pytheas(QtWidgets.QMainWindow):
         # change axis limits?
         if keepAxisLimits:
             bottom,top=self.axN.get_ybound()
-            left,right=self.axN.get_xbound()
+            left,right=self.axN.get_xbound()           
+        # Filter?
+        if self.filtered:
+            self.stream.filter(
+                type="bandpass",
+                freqmin=self.freqmin,
+                freqmax=self.freqmax,
+                zerophase=True,
+                corners=4
+                                )
         # store trace for each channel
         if self.stageRotated:
             vert=self.stream.select(component="Z")[0]
@@ -1574,13 +1538,7 @@ class Pytheas(QtWidgets.QMainWindow):
         else:
             vert=self.stream.select(component="Z")[0]
             nort=self.stream.select(component="N")[0]
-            east=self.stream.select(component="E")[0]           
-        # Filter?
-        if self.filtered:
-            vert.filter(type="bandpass",freqmin=self.freqmin,freqmax=self.freqmax,zerophase=True,corners=4)
-            nort.filter(type="bandpass",freqmin=self.freqmin,freqmax=self.freqmax,zerophase=True,corners=4)
-            east.filter(type="bandpass",freqmin=self.freqmin,freqmax=self.freqmax,zerophase=True,corners=4)
-            self.V2H = self.calcV2H(self.sPick)
+            east=self.stream.select(component="E")[0]
         # get relative times
         tV=vert.times(type="relative")
         tN=nort.times(type="relative")
@@ -1635,21 +1593,22 @@ class Pytheas(QtWidgets.QMainWindow):
         for i,arr in enumerate((self.sPick,self.sPickAuto,self.sPickTheor)):
             self.axPolar.lines[i].set_xdata(arr)
         self.vspanList.append(self.axPolar.axvspan(self.minPick,self.maxPick,color='green',alpha=0.3))
-        # calculate SNR
-        if self.method == "MAN":
-            self.SNR=self.calcSNR(self.sPick)
-        else:
-            try:
-                if self.sPick:
-                    self.SNR = self.calcSNR(self.sPick)
-                else:
-                    raise ValueError('No S pick set.')
-            except ValueError:
-                logging.exception('No S pick set.')
-                self.SNR = self.calcSNR(int(round((self.minPick+self.maxPick)/2)))
-            finally:
-                logging.exception('Could not calculate SNR')
-                self.SNR = np.nan
+        #-- calc metrics
+        # V2H
+        self.V2H = self.calcV2H(self.sPick)
+        # SNR
+        try:
+            if np.isnan(self.sPick):
+                self.SNR = self.calcSNR(int(round((self.minPick + self.maxPick) / 2)))
+            else:
+                self.SNR = self.calcSNR(self.sPick)
+        except:
+            self.SNR = np.nan
+            logging.warning('Could not calculate SNR')
+
+
+        # update splitting dictionary with the new SNR val
+        self.updateSplittingDict()
         # update the title
         self.updateTitle()              
         # fix the limits, if need
@@ -1758,19 +1717,21 @@ class Pytheas(QtWidgets.QMainWindow):
         ## get either aux or pol
         T=polarDict["TIME"] # time dimension of vectors
         D=polarDict["ANGLE"] # angle of each vector
-        # get the angle at the pick
-        # get the vector CLOSEST to the pick
-        pAngle=D[np.abs(T-self.sPick).argmin()] % 180
-        # convert to N/E-system (or F/S) angle
-        pAngle=self.mpl2ns(pAngle)        
-        # get polarization angle?
-        if self.stageRotated and self.method is "MAN":
-            self.aux=pAngle
-            self.pol=(self.aux+self.phi) % 180
-            self.updateSplittingDict()
-        if self.stageCorrected and self.method is "MAN":
-            self.pol=pAngle
-            self.updateSplittingDict()
+
+        if not np.isnan(self.sPick):
+            # get the angle at the pick
+            # get the vector CLOSEST to the pick
+            pAngle = D[np.abs(T - self.sPick).argmin()] % 180
+            # convert to N/E-system (or F/S) angle
+            pAngle = self.mpl2ns(pAngle)        
+            # get polarization angle?
+            if self.stageRotated and self.method is "MAN":
+                self.aux=pAngle
+                self.pol=(self.aux+self.phi) % 180
+                self.updateSplittingDict()
+            if self.stageCorrected and self.method is "MAN":
+                self.pol=pAngle
+                self.updateSplittingDict()
         if draw:
             self.canvas.draw()
 
@@ -1816,7 +1777,7 @@ class Pytheas(QtWidgets.QMainWindow):
                 hodoList.append(partPairs)
                 maxvals.append(abs(partPairs[:,:,1]).max())
             except ValueError: # if cannot get a non 0-element array
-                logging.exception("0-element array for "+str(ax))
+                logging.error("0-element array for "+str(ax))
                 partPairs=np.asarray([0,0])
                 continue
         normval=max(maxvals)
@@ -1963,7 +1924,7 @@ class Pytheas(QtWidgets.QMainWindow):
                         return
                     else:
                         self.method="RESET"
-                # reset values first if method wasn't MNA
+                # reset values first if method wasn't MAN
                 if self.method != "MAN":
                     self.flagReset(general=False,splitting=True,indexing=False,titling=False,splitDict=False)
                     self.grade="X"
@@ -1973,21 +1934,22 @@ class Pytheas(QtWidgets.QMainWindow):
                 D=self.polarDict["ANGLE"]
                 # Get t closest to pick
                 idx=np.abs(self.stream[0].times()-event.xdata).argmin()
-                self.sPick=self.stream[0].times()[idx]
-                self.sArr=self.stream[0].stats.starttime+self.sPick
-                self.spickDict[self.activeEvent][self.station]=self.sArr
-                logging.info("S picked @ %s" % self.spickDict[self.activeEvent][self.station])
+                self.sPick = self.stream[0].times()[idx]
+                self.sArr = self.stream[0].stats.starttime + self.sPick
+                self.dict_s_arr[self.activeEvent][self.station] = self.sArr
+                logging.info("S picked @ %s" % self.dict_s_arr[self.activeEvent][self.station])
                 # get SNR
                 try:
-                    self.SNR=self.calcSNR(self.sPick)
+                    self.SNR = self.calcSNR(self.sPick)
                 except:
-                    self.SNR=np.nan
-                self.V2H=self.calcV2H(self.sPick)
-                self.errors=(1.,self.stream[0].stats.delta/2.)             
+                    self.SNR = np.nan
+                    logging.warning('Could not calculate SNR')
+                self.V2H = self.calcV2H(self.sPick)
+                self.errors = (1.,self.stream[0].stats.delta / 2.)             
                 # get angles
-                pAngle=D[np.abs(T-event.xdata).argmin()] % 180
+                pAngle = D[np.abs(T-event.xdata).argmin()] % 180
                 # Convert to Fast-Slow according to quadrant.
-                pAngle=self.mpl2ns(pAngle)
+                pAngle = self.mpl2ns(pAngle)
                 # Draw pick lines
                 for ax in (self.axZ,self.axE,self.axN):
                     ax.lines[1].set_xdata(self.sPick)
@@ -2081,13 +2043,17 @@ class Pytheas(QtWidgets.QMainWindow):
                 else:
                     self.sPick=self.stream[0].times()[idx]
                     self.sArr=self.stream[0].stats.starttime+self.sPick
-                    self.spickDict[self.activeEvent][self.station]=self.sArr
-                    logging.info("S picked @ %s" % self.spickDict[self.activeEvent][self.station])
+                    self.dict_s_arr[self.activeEvent][self.station]=self.sArr
+                    logging.info("S picked @ %s" % self.dict_s_arr[self.activeEvent][self.station])
                     # get SNR
                     try:
-                        self.SNR=self.calcSNR(self.sPick)
+                        if np.isnan(self.sPick):
+                            self.SNR = self.calcSNR(int(round((self.minPick + self.maxPick) / 2)))
+                        else:
+                            self.SNR = self.calcSNR(self.sPick)
                     except:
-                        self.SNR=np.nan
+                        self.SNR = np.nan
+                        logging.warning('Could not calculate SNR')
                     self.V2H=self.calcV2H(self.sPick)
                     # Draw pick lines
                     for ax in (self.axZ,self.axE,self.axN):
@@ -2164,7 +2130,7 @@ class Pytheas(QtWidgets.QMainWindow):
         self.axPolar.set_aspect(1,adjustable="datalim")
         self.canvas.draw()
 
-    def nextStation(self,autoAinSkip=True):
+    def nextStation(self,autoAinSkip=True, show_info_msgbox=False):
         """
         Go to next station
         
@@ -2177,10 +2143,19 @@ class Pytheas(QtWidgets.QMainWindow):
         foundNextStation=False
         # store the initial station index, in case of a reset
         iniStIdx=self.stIdx
+        logging.debug('Going to next station. Current event/station IDs: %s/%s' % (self.evIdx, iniStIdx))   
         # start iterating for station indexing, from the current one onwards
-        for stIdx,_ in enumerate(self.staList[self.stIdx:]):
-            self.stIdx+=stIdx+1
-            if self.stIdx >= len(self.staList): break       
+        for stIdx, _ in enumerate(self.staList[self.stIdx:]):
+            self.stIdx += stIdx + 1
+            if self.stIdx >= len(self.staList): 
+                logging.info("This is the last station!")
+                if show_info_msgbox:
+                    winTitle = "Last Station"
+                    genText = "Last Station"
+                    infText = "This is the last station of the event! congratulations!"
+                    self.infoMsgBox(genText,infText,winTitle)
+                self.stIdx = iniStIdx
+                return
             event=sorted(self.evsDict.keys())[self.evIdx]
             station1=self.staList[self.stIdx] 
             # shear-wave window?
@@ -2207,13 +2182,14 @@ class Pytheas(QtWidgets.QMainWindow):
                         continue
         if not foundNextStation:
             logging.info("Reached last station!")
-            genTxt=""
-            infTxt="You reached the last available station for this event."
+            genTxt="Last Station"
+            infTxt="You reached the last available station for this event! Good job!"
             winTit="Last Station"
-            self.warnMsgBox(genTxt,infTxt,winTit)
+            self.infoMsgBox(genTxt,infTxt,winTit)
             self.stIdx=iniStIdx
             self.updateFromSplittingDict()
             return
+        logging.debug('Opening event/station with IDs %s/%s' % (self.evIdx, self.stIdx))               
         self.undoStream=self.stream.copy()
         self.streamIni=self.stream.copy()
         splitRes=False
@@ -2222,14 +2198,14 @@ class Pytheas(QtWidgets.QMainWindow):
             self.flagReset(general=False,indexing=False,titling=False,splitDict=False,splitting=splitRes)
         except KeyError: # means that one of event/station/method is not in the DB
             try:
-                self.sArr=self.spickDict[self.activeEvent][self.station]
+                self.sArr=self.dict_s_arr[self.activeEvent][self.station]
                 self.sPick=self.sArr-self.stream[0].stats.starttime
                 self.flagReset(general=False,indexing=False,titling=False,splitDict=False,splitting=splitRes)
             except:
                 pass 
         self.updateFig()
 
-    def prevStation(self,autoAinSkip=True):
+    def prevStation(self, autoAinSkip=True, show_info_msgbox=False):
         """
         Go to previous station
         
@@ -2238,15 +2214,24 @@ class Pytheas(QtWidgets.QMainWindow):
             the shear-wave window. Defaults to True.
 
         """
-        foundPrevStation=False
-        iniStIdx=self.stIdx
+        foundPrevStation = False
+        iniStIdx = self.stIdx
+        logging.debug('Going to previous station. Current event/station IDs: %s/%s' % (self.evIdx, iniStIdx))        
         for stIdx in range(iniStIdx-1,-1,-1):
-            self.stIdx=stIdx
-            if self.stIdx < 0: break       
-            event=sorted(self.evsDict.keys())[self.evIdx]
-            station1=self.staList[self.stIdx] 
+            self.stIdx = stIdx
+            if self.stIdx < 0:
+                logging.info("This is the first station!")
+                if show_info_msgbox:
+                    winTitle = "First Station"
+                    genText = "First Station"
+                    infText = "This is the first station of the event!"
+                    self.infoMsgBox(genText,infText,winTitle)
+                self.stIdx = 0
+                return       
+            event = sorted(self.evsDict.keys())[self.evIdx]
+            station1 = self.staList[self.stIdx] 
             if (self.statsDict[event][station1]["AN"] > self.maxAin) and autoAinSkip:
-                logging.warning("Skippnig %s - %s cause of AIN criterion..." % (event,station1))
+                logging.warning("Skipping %s - %s cause of AIN criterion..." % (event,station1))
                 continue
             try:
                 self.fetchEvent(self.evIdx,self.stIdx,eventMode=False)
@@ -2267,12 +2252,13 @@ class Pytheas(QtWidgets.QMainWindow):
                         continue
         if not foundPrevStation:
             logging.info("Reached first station!")
-            genTxt=""
+            winTit="First Station"
+            genTxt="First station"
             infTxt="You reached the first available station for this event."
-            winTit="Last Station"
-            self.warnMsgBox(genTxt,infTxt,winTit)
+            self.infoMsgBox(genTxt,infTxt,winTit)
             self.stIdx=iniStIdx
             return
+        logging.debug('Opening event/station with IDs %s/%s' % (self.evIdx, self.stIdx))            
         self.undoStream=self.stream.copy()
         self.streamIni=self.stream.copy()
         splitRes=False
@@ -2281,7 +2267,7 @@ class Pytheas(QtWidgets.QMainWindow):
             self.flagReset(general=False,indexing=False,titling=False,splitDict=False,splitting=splitRes)
         except KeyError: # means that one of event/station/method is not in the DB
             try:
-                self.sArr=self.spickDict[self.activeEvent][self.station]
+                self.sArr=self.dict_s_arr[self.activeEvent][self.station]
                 if self.sArr not in [self.stream[0].stats.starttime,0,np.nan]: 
                     self.sPick=self.sArr-self.stream[0].stats.starttime
                 #splitRes=True
@@ -2295,29 +2281,34 @@ class Pytheas(QtWidgets.QMainWindow):
         inEvIdx=self.evIdx
         inStIdx=self.stIdx
         foundNextEvent=False
+        logging.debug('Going to next event. Current event/station IDs: %s/%s' % (inEvIdx, inStIdx))
         while not foundNextEvent:
             self.evIdx+=1
             if self.evIdx >= len(self.evsDict):
                 logging.info("This is the last event!")
+                winTitle = "Last Event"
+                genText = "Last Event"
+                infText = "This is the last event of the catalogue! congratulations!"
+                self.infoMsgBox(genText,infText,winTitle)
                 self.evIdx-=1
                 return            
-            event1=sorted(self.evsDict.keys())[self.evIdx]
+            event1 = sorted(self.evsDict.keys())[self.evIdx]
             ## skip cause of ain?
             self.staList=sorted(self.statsDict[event1],key=lambda x:self.statsDict[event1][x]["AN"])
             station=self.staList[0]
             if self.statsDict[event1][station]["AN"] > self.maxAin:
                 logging.warning("Skipping %s - %s cause of AIN criterion..." % (event1,station))
                 continue
-            if self.evIdx == len(self.evsDict)-1:
-                event2=event1
+            if self.evIdx == len(self.evsDict) - 1:
+                event2 = event1
             else:
-                event2=sorted(self.evsDict.keys())[self.evIdx+1]
+                event2 = sorted(self.evsDict.keys())[self.evIdx+1]
             try:
                 self.stIdx=0
                 self.fetchEvent(self.evIdx,self.stIdx)
                 logging.info("Found stream: "+str(self.stream))
                 foundNextEvent=True
-            except StationException:
+            except exceptions.StationException:
                 self.nextStation()
                 foundNextEvent=True
                 return
@@ -2334,6 +2325,7 @@ class Pytheas(QtWidgets.QMainWindow):
                 else:
                     logging.exception("Error while opening waveforms for "+event1)
                     logging.debug("this was the last event!")
+        logging.debug('Opening event/station with IDs %s/%s' % (self.evIdx, self.stIdx))
         self.undoStream=self.stream.copy()
         self.streamIni=self.stream.copy()
         self.station=self.stream[0].stats.station
@@ -2344,7 +2336,7 @@ class Pytheas(QtWidgets.QMainWindow):
         except KeyError: # means that one of event/station/method is not in the DB
             try:
                 #splitRes=True
-                self.sArr=self.spickDict[self.activeEvent][self.station]
+                self.sArr=self.dict_s_arr[self.activeEvent][self.station]
                 if self.sArr not in [self.stream[0].stats.starttime,0,np.nan]: 
                     self.sPick=self.sArr-self.stream[0].stats.starttime
                 self.flagReset(general=False,indexing=False,titling=False,splitDict=False,splitting=splitRes)
@@ -2354,32 +2346,38 @@ class Pytheas(QtWidgets.QMainWindow):
 
     def prevEvent(self):
         """Go to previous event"""
-        inEvIdx=self.evIdx
-        inStIdx=self.stIdx
-        foundPrevEvent=False
+        inEvIdx = self.evIdx
+        inStIdx = self.stIdx
+        logging.debug('Going to previous event. Current event/station IDs: %s/%s' % (inEvIdx, inStIdx))
+        foundPrevEvent = False
         while not foundPrevEvent:
-            self.evIdx-=1
+            self.evIdx -= 1
             if self.evIdx < 0:
                 logging.info("This is the first event!")
-                self.evIdx+=1
+                winTitle = "First Event"
+                genText = "First Event"
+                infText = "This is the first event of the catalogue"
+                self.infoMsgBox(genText,infText,winTitle)
+                self.evIdx = 0
                 return            
-            event1=sorted(self.evsDict.keys())[self.evIdx]
+            event1 = sorted(self.evsDict.keys())[self.evIdx]
+            event2 = sorted(self.evsDict.keys())[self.evIdx + 1]
             ## skip cause of ain?
-            self.staList=sorted(self.statsDict[event1],key=lambda x:self.statsDict[event1][x]["AN"])
-            station=self.staList[0]
+            self.staList = sorted(self.statsDict[event1], key=lambda x:self.statsDict[event1][x]["AN"])
+            station = self.staList[0]
             if self.statsDict[event1][station]["AN"] > self.maxAin:
-                logging.warning("Skipping %s - %s cause of AIN criterion..." % (event1,station))
+                logging.warning("Skipping %s - %s cause of AIN criterion..." % (event1, station))
                 continue            
             if self.evIdx == 0:
-                event1=event2
+                event1 = event2
             else:
-                event2=sorted(self.evsDict.keys())[self.evIdx-1]
+                event2 = sorted(self.evsDict.keys())[self.evIdx - 1]
             try:
                 self.stIdx=0
                 self.fetchEvent(self.evIdx,self.stIdx)
                 logging.info("Found stream: "+str(self.stream))
                 foundPrevEvent=True
-            except StationException:
+            except exceptions.StationException:
                 self.prevStation()
                 foundPrevEvent=True
                 return
@@ -2394,19 +2392,20 @@ class Pytheas(QtWidgets.QMainWindow):
                         self.evIdx=inEvIdx
                         return
                 else:
-                    logging.exception("Error while opening waveforms for "+event1)
+                    logging.exception("Error while opening waveforms for " + event1)
                     logging.debug("this was the first event!")
-        self.undoStream=self.stream.copy()
-        self.streamIni=self.stream.copy()
-        self.station=self.stream[0].stats.station
-        splitRes=False
+        logging.debug('Opening event/station with IDs %s/%s' % (self.evIdx, self.stIdx))
+        self.undoStream = self.stream.copy()
+        self.streamIni = self.stream.copy()
+        self.station = self.stream[0].stats.station
+        splitRes = False
         try:
             self.updateFromSplittingDict()
             self.flagReset(general=False,indexing=False,titling=False,splitDict=False,splitting=splitRes)
         except KeyError: # means that one of event/station/method is not in the DB
             try:
                 #splitRes=True
-                self.sArr=self.spickDict[self.activeEvent][self.station]
+                self.sArr=self.dict_s_arr[self.activeEvent][self.station]
                 if self.sArr not in [self.stream[0].stats.starttime,0,np.nan]: 
                     self.sPick=self.sArr-self.stream[0].stats.starttime
                 self.flagReset(general=False,indexing=False,titling=False,splitDict=False,splitting=splitRes)
@@ -2414,117 +2413,7 @@ class Pytheas(QtWidgets.QMainWindow):
                 pass  
         self.updateFig()
 
-    ## GUI FUNCTIONS ##
-    def getWave(self,fileName,inventory=None,prefChannel="HH,EH,BH,HN",orientCorr=True,showWarn=True):
-        """
-        Ask for required waveforms. Order is Vertical -> North -> East
-        
-        :type fileName: str
-        :param fileName: query string for waveforms
-        :type inventory: :class: `~obspy.core.inventory` or None, optional
-        :param inventory: inventory with stored station information or None.
-            Defaults to None.
-        :type prefChannel: str, optional
-        :param prefChannel: string with the order of the channel codes (per SEED) that the
-            program will preferentialy look for, comma-separated. Defaults to 'HH,EH,BH,HN'.
-        :type orientCorr: bool, optional
-        :param orientCorr: perform orientation correction if required. Defaults to True.
-        :type showWarn: bool, optional
-        :param showWarn: display a warning dialog if something goes wrong. Defaults to True.
-        :returns: (obspy Stream object, instrument orientation correction)
-
-        """
-        # convert preferred channels object to list
-        prefChannel=prefChannel.split(",")
-        # clean up file name just in case
-        fileName=str(fileName).replace("/",os.sep)
-        logging.debug("Trying to open "+str(fileName)+"...")
-        # start looking for the station/event
-        try:
-            if not glob(fileName):
-                fileNamePath=os.path.dirname(fileName)
-                if os.path.exists(fileNamePath):
-                    raise StationException("Could not find station "+fileName)
-                else:
-                    raise EventException("Could not find event "+fileNamePath)
-            stream=read(str(fileName))
-            logging.info("Read "+str(stream))
-            # look for the channels as provided by the user. if '??' is reached,
-            # the first ones will be used
-            for prefCode in prefChannel+["??"]:
-                if prefCode == "??":
-                    prefCode=stream[0].stats.channel[:2]
-                numChan=[x.stats.channel for x in stream.select(channel=prefCode+"?")]
-                # did we find 3 channels?
-                if len(numChan) == 3:
-                    stream=stream.select(channel=prefCode+"?")
-                    logging.debug("Found channels %s?" % stream[0].stats.channel[:2])
-                    break
-            # if no 3 channels could be found, raise an exception
-            if len(numChan) != 3:
-                raise StationException("Station does not have 3 channels!")
-            # correct calibration factor if null
-            for tr in stream:
-                if float(tr.stats.calib) == 0.0:
-                    tr.stats.calib=1.0
-            # get waveforms and correct orientation from inventory
-            comps=sorted(list(set([tr.stats.channel[-1] for tr in stream])))
-            if "3" in comps:
-                inpComponents="Z23"
-                if "1" in comps:
-                    inpComponents="123"
-            elif "2" in comps:
-                inpComponents="Z12"
-            elif "N" in comps:
-                inpComponents="ZNE"
-            streamBk=stream.copy() # save a stream backup, apparently Obspy (1.1.1) deletes the
-                                   # data if an exception is raised during rotation. see 
-                                   # obspy/obspy #2372
-            try:
-                if orientCorr:
-                    if inventory: # is the station in the inventory?
-                        stream.rotate("->ZNE",inventory=inventory,components=(inpComponents))     
-                        # the azimuth of the 'north' (second as defined above) is the
-                        # orientation correction
-                        orCorrection=inventory.select(
-                            network=stream[0].stats.network,
-                            station=stream[0].stats.station,
-                            location=stream[0].stats.location,
-                            channel=stream[0].stats.channel[:2]+inpComponents[1],
-                            time=stream[0].stats.starttime
-                                                      )[0][0][0].azimuth
-                    else:
-                        raise IOError("No available inventory")
-                else:
-                    raise ValueError("Instrument orientation correction disabled.")
-            except:
-                stream=streamBk.copy()
-                logging.exception("Could not perform orientation correction. Renaming channels...")
-                stream.select(component=inpComponents[0])[0].stats.channel=\
-                                stream.select(component=inpComponents[0])[0].stats.channel[:2]+"Z"
-                stream.select(component=inpComponents[1])[0].stats.channel=\
-                                stream.select(component=inpComponents[1])[0].stats.channel[:2]+"N"
-                stream.select(component=inpComponents[2])[0].stats.channel=\
-                                stream.select(component=inpComponents[2])[0].stats.channel[:2]+"E"
-                orCorrection=0.
-            # get final combo of channels
-            comps=sorted(list(set([tr.stats.channel[-1] for tr in stream])))
-            # preprocess. we need to remove mean/trend to be able to merge.
-            logging.info("Applying detrend/demean...")
-            stream.detrend("linear")
-            stream.detrend("demean")
-            stream.merge(method=1,fill_value=0,interpolation_samples=0)
-        except Exception as exc:
-            logging.exception("Could not read stream")
-            if showWarn:
-                genTxt="Could not read "+str(fileName)
-                infTxt=str(exc)
-                winTit="Stream Error"
-                self.warnMsgBox(genTxt,infTxt,winTit)
-            return
-        return stream, orCorrection
-
-             
+    ## GUI FUNCTIONS ##             
     def getCat(self,dataPath,catFile,dbPath):
         """
         Ask for data path and catalogue file
@@ -2538,9 +2427,10 @@ class Pytheas(QtWidgets.QMainWindow):
 
         """
         # initial params
-        indexed=False
-        idxPath=WORKDIR+os.sep+"etc%sindex%s"%(os.sep,os.sep)
-        idxFile=WORKDIR+os.sep+"etc%sindex%sindex.cat"%(os.sep,os.sep)
+        indexed = False
+        idxPath = os.path.join(_DIR_CWD, 'etc', 'index')
+        idxFile = os.path.join(idxPath, 'index.cat')
+
         # search for an existing index to the folder
         try:
             self.pDial.setLabelText("Getting event directories...")
@@ -2552,34 +2442,43 @@ class Pytheas(QtWidgets.QMainWindow):
         # to an index file for faster access the next time.
         logging.debug("Initiating folder searching...")
         try:
-            with open(idxFile,"r") as fid:
-                indexCat=fid.readlines()
-                indexCat=[x.strip() for x in indexCat]
+            with open(idxFile, "r") as fid:
+                indexCat = fid.readlines()
+                indexCat = [x.strip() for x in indexCat]
+
             for idx in indexCat[1:]: # First line is comment
-                mFile,mPath=idx.split(",")
+                try:
+                    mFile ,mPath, mNum = idx.split(",")
+                except ValueError:  # compatibility with version(s) <= 0.3.0
+                    mFile, mPath = idx.split(",")
+                    mNum = 0
                 if mPath == dataPath:
-                    with open(idxPath+mFile,"r") as fid:
-                        temp=fid.readlines()
-                        temp=[x.strip() for x in temp]
-                    self.fullEvents={
+                    with open(os.path.join(idxPath, mFile),"r") as fid:
+                        temp = fid.readlines()
+                        temp = [x.strip() for x in temp]
+                    self.fullEvents = {
                                         x.strip().split(os.sep)[-1]:x.strip() for x in temp
 
                                     }
-                    logging.debug("Read path information from existing index file "+mFile)
-                    indexed=True      
+                    self.waveforms_number = int(mNum)
+                    logging.info('Read path information from existing index file %s' % mFile)
+                    logging.info('Found potentially %s waveforms in given path.' % '{:,}'.format(self.waveforms_number))
+                    indexed = True      
         except IOError:
-            with open(WORKDIR+os.sep+"etc/index/index.cat","w") as fid:
+            with open(idxFile, "w") as fid:
                 fid.write("# Index file, main path\n")
             logging.debug("Created index catalogue file.")
         if not indexed:
-            self.fullEvents=self.getTree(dataPath)
-            logging.info("Found "+str(len(self.fullEvents))+" events in given path.")
-            idxNew=UTCDateTime.now().strftime("%Y%m%d%H%M%S")+".idx"
-            with open(idxPath+idxNew,"w") as fid:
-                fid.writelines([self.fullEvents[x]+"\n" for x in self.fullEvents])
-            logging.debug("Created new index file: "+idxPath+idxNew)
+            self.fullEvents, self.waveforms_number = tools.get_tree(dataPath)
+            logging.info('Found %s events in given path.' % '{:,}'.format(len(self.fullEvents)))
+            logging.info('Found potentially %s waveforms in given path.' % '{:,}'.format(self.waveforms_number))
+            idxNew = UTCDateTime.now().strftime("%Y%m%d%H%M%S") + ".idx"
+            path_new_index_file = os.path.join(idxPath, idxNew)
+            with open(path_new_index_file, "w") as fid:
+                fid.writelines([self.fullEvents[x] + "\n" for x in self.fullEvents])
+            logging.debug("Created new index file: %s" % path_new_index_file)
             with open(idxFile,"a") as fid:
-                fid.write(idxNew+","+dataPath+"\n")
+                fid.write('%s,%s,%i\n' % (idxNew, dataPath, self.waveforms_number))
         logging.info("Found "+str(len(self.fullEvents))+" events in given path.")
         ## read the catalogue file
         try:
@@ -2593,9 +2492,11 @@ class Pytheas(QtWidgets.QMainWindow):
             ##       format
             
             # read the first line and check if it contains the xml tag 
-            with open(catFile,'r') as fid: xCheck=fid.readline()
-            if not '<?xml' in xCheck: raise TypeError('Given catalogue is not in XML format...')
-            self.evsDict,self.statsDict=self.readQML(catFile)
+            with open(catFile,'r') as fid:
+                xCheck=fid.readline()
+            if not '<?xml' in xCheck:
+                raise TypeError('Given catalogue is not in XML format...')
+            self.evsDict, self.statsDict = self.readQML(catFile)
         except TypeError: # then it's not a QuakeML!
             try:
                 self.pDial.setLabelText("Calculating angles of incidence...")
@@ -2628,10 +2529,16 @@ class Pytheas(QtWidgets.QMainWindow):
                 # get vel model name
                 vmod=os.path.split(os.path.splitext(self.tpCNF.model)[0])[1]
                 vmod=os.path.splitext(self.tpCNF.model)[0]+'.npz'
+            else:
+                vmod = self.tpCNF.model.upper()
             # set taup model
             self.tmodel=TauPyModel(model=vmod)
         except:
             logging.exception("Could not use custom model! Using IASP91 instead...")
+            winTitle="Velocity Model Warning"
+            genText="Could not read the velocity model!!"
+            infText="Could not read %s ! Will use 'iasp91' instead" % self.tpCNF.model
+            self.warnMsgBox(genText, infText, winTitle)
             vmod="IASP91"
             # set taup model
             self.tmodel=TauPyModel(model=vmod)            
@@ -2654,7 +2561,7 @@ class Pytheas(QtWidgets.QMainWindow):
         try: # create
             self.dbConn,self.dbCur=DB.init(self.dbPath)
             self.splittingDict={}
-            self.spickDict={}
+            self.dict_s_arr={}
         except IOError: # read
             self.dbConn,self.dbCur=DB.open(self.dbPath)
         # correct keys
@@ -2780,6 +2687,7 @@ class Pytheas(QtWidgets.QMainWindow):
                            self.streamIni.copy(),metDict["phi"],metDict["td"]/(10**3),metDict["pol"],
                            (metDict["err_phi"],metDict["err_td"]/(10**3)),
                            self.baz,
+                           self.actQT.isChecked(),
                            (
                             UTCDateTime(metDict["window_min"])-self.stream[0].stats.starttime,
                             UTCDateTime(metDict["window_max"])-self.stream[0].stats.starttime
@@ -2795,6 +2703,7 @@ class Pytheas(QtWidgets.QMainWindow):
                            self.streamIni.copy(),metDict["phi"],metDict["td"]/(10**3),metDict["pol"],
                            (metDict["err_phi"],metDict["err_td"]/(10**3)),
                            self.baz,
+                           self.actQT.isChecked(),
                            (
                             UTCDateTime(metDict["window_min"])-self.stream[0].stats.starttime,
                             UTCDateTime(metDict["window_max"])-self.stream[0].stats.starttime
@@ -2815,7 +2724,7 @@ class Pytheas(QtWidgets.QMainWindow):
                  Scalable Vector Graphics (*.svg);; Portable Document Format (*.pdf);;All files (*)")
             if len(figFile) == 0:
                 return
-            tools.qcClusterDiagram(
+            tools.qcClusterDiagram2(
              metDict["initial_clusters"],
              metDict["initial_clusters_errors"],
              metDict["calinski_score"],
@@ -2899,31 +2808,36 @@ class Pytheas(QtWidgets.QMainWindow):
         logging.info("~"*25)
         logging.info("fetchEvent: "+str(self.activeEvent))
         self.staDict=self.statsDict[self.activeEvent]
-        self.staList=sorted(self.staDict,key=lambda x: self.staDict[x]["AN"])
+        if not self.staList:
+            self.staList=sorted(self.staDict,key=lambda x: self.staDict[x]["AN"])
         self.evDict=self.evsDict[self.activeEvent]
         # get required waveforms
         station=self.staList[stIdx]
         evFolder=self.fullEvents[self.activeEvent]
         # iterate through ZNE
         while True:
-            self.stream=Stream()
-            tempStream=Stream()
-            stationFile=evFolder+os.sep+"*."+station+".*"
+            self.stream = Stream()
+            tempStream = Stream()
+            path_waveforms_pair = os.path.join(evFolder, '*.%s.*' % station)
             try:
-                tempStream,orCorrection=self.getWave(stationFile,
+                tempStream, orCorrection = tools.get_wave_record(
+                                                     path_waveforms_pair,
                                                      inventory=self.xmlInventory,
-                                                     prefChannel=self.generalCNF.chanPref,
-                                                     orientCorr=self.generalCNF.orientFlag,
-                                                     showWarn=False)
+                                                     pref_channels=self.generalCNF.chanPref,
+                                                     orient_corr=self.generalCNF.orientFlag)
             except:
-                logging.exception('Exception while trying to read %s' % stationFile)
+                logging.exception('Exception while trying to read %s' % path_waveforms_pair)
+                genTxt="Could not read "+str(path_wave_record)
+                infTxt=str(exc)
+                winTit="Stream Error"
+                self.warnMsgBox(genTxt,infTxt,winTit)
                 pass # pass cause stream will be empty and handled below
             if not tempStream:
                 if not eventMode:
-                    raise StationException("Could not find %s" %station)
-                stIdx+=1
+                    raise exceptions.StationException("Could not find %s" %station)
+                stIdx += 1
                 if stIdx >= len(self.staList):
-                    raise StationException("Could not find any stations for %s" % self.activeEvent)
+                    raise exceptions.StationException("Could not find any stations for %s" % self.activeEvent)
                 station=self.staList[stIdx]
             else:
                 break
@@ -2938,41 +2852,53 @@ class Pytheas(QtWidgets.QMainWindow):
             logging.debug("Found splitting entries for %s in the DB!" % self.station)
         else:
             logging.warning("No splitting entries for %s in the DB!" % self.station)
-        # check if all timeseries have the same length
-        Wz=self.stream.select(component="Z")[0]
-        Wy=self.stream.select(component="N")[0]
-        Wx=self.stream.select(component="E")[0]
-        # First horizontals
-        Ax,Ay=tools.lengthcheck(Wx,Wy)
-        self.stream.select(component="E")[0].data=Ax 
-        self.stream.select(component="N")[0].data=Ay
-        # Now the vertical
-        Az,Ay=tools.lengthcheck(Wz,Wy)
-        self.stream.select(component="Z")[0].data=Az
-        self.stream.select(component="N")[0].data=Ay
-        logging.debug("Corrected stream before trim %s" % str(self.stream))
-        # Horizontals second time 
-        Ax,Ay=tools.lengthcheck(Wx,Wy)
-        self.stream.select(component="E")[0].data=Ax 
-        self.stream.select(component="N")[0].data=Ay 
-        ## sync starttimes if less than a sample difference
-        delta=self.stream[0].stats.delta
-        if 0 < abs(Wx.stats.starttime-Wy.stats.starttime) <= delta:
-            Wx.stats.starttime=max((Wy.stats.starttime,Wx.stats.starttime))
-            Wy.stats.starttime=max((Wy.stats.starttime,Wx.stats.starttime))
-        if 0 < abs(Wz.stats.starttime-Wy.stats.starttime) <= delta:
-            Wz.stats.starttime=max((Wy.stats.starttime,Wz.stats.starttime))
-            Wy.stats.starttime=max((Wy.stats.starttime,Wz.stats.starttime))            
-        if 0 < abs(Wx.stats.starttime-Wy.stats.starttime) <= delta:
-            Wx.stats.starttime=max((Wy.stats.starttime,Wx.stats.starttime))
-            Wy.stats.starttime=max((Wy.stats.starttime,Wx.stats.starttime))            
-        # initiliaze picks
-        self.sPick=0; self.sArr=0
-        self.sPickTheor=0; self.sArrTheor=0
-        self.sPickAuto=0; self.sArrAuto=0
+
+        #- fetch observed S (if it exists)
+        #-- init picks
+        self.sArr = None
+        self.sPick = np.nan
+        self.sArrTheor = None
+        self.sPickTheor = np.nan
+        self.sArrAuto = None
+        self.sPickAuto = np.nan
+        # load observed arrival
+        self.updateFromSplittingDict()
+        try:
+            self.sArr = self.dict_s_arr[self.activeEvent][station]
+        except KeyError:
+            logging.exception('Could not find observed S arrival in dict')
+        # update other values
+        self.baz = self.statsDict[self.activeEvent][station]["BAZ"]
+        self.dist = self.statsDict[self.activeEvent][station]["DIST"]
+        self.mag = self.evsDict[self.activeEvent]["MAG"]
+        self.origtime = self.evsDict[self.activeEvent]["ORIGIN"]        
+        # trim waveforms for faster processing
+        if self.generalCNF.trimFlag and self.sArr:
+            logging.info('Performing waveform trim')
+            self.stream.trim(
+                             starttime=self.sArr + self.generalCNF.trimStart,
+                             endtime=self.sArr + self.generalCNF.trimEnd,
+                             pad=True,
+                             nearest_sample=False,
+                             fill_value=0
+                             )
+        # sync 
+        self.stream = tools.sync_waveforms(self.stream.copy())
+
+        # setup pick
+        if self.sArr:
+            try:
+                self.sPick = self.sArr - self.stream[0].stats.starttime
+            except:
+                self.sPick = np.nan
+        else:
+            self.sPick = np.nan
+        logging.info("Observed arrival @ %s" % self.sArr)
+        logging.info("Observed pick @ %.3f " % self.sPick)       
+
         # get theoretical information from TauP
         try:
-          taupdat=tools.getTheorArrivals( # TODO: display secondary phases too
+          taupdat = tools.getTheorArrivals( # TODO: display secondary phases too
                                    (self.evsDict[self.activeEvent]["ORIGIN"],self.evDict["LAT"],
                                                                   self.evDict["LON"],
                                                                   self.evDict["DEPTH"]),
@@ -2980,18 +2906,19 @@ class Pytheas(QtWidgets.QMainWindow):
                                     self.inventory[station]["longitude"]),
                                    self.tmodel
                                         )
+
           # grab measurements for the s arrival (not S)
-          foundS=False
+          foundS = False
           for reg in taupdat.values():
             if reg["phase"] == "s": 
                 foundS=True
-                self.sArrTheor=reg["time"]
-                self.sPickTheor=self.sArrTheor-self.stream[0].stats.starttime
+                self.sArrTheor = reg["time"]
+                self.sPickTheor = self.sArrTheor-self.stream[0].stats.starttime
                 if self.tpCNF.ainFlag:
                     if tools.isnone(reg['ain']):
                         raise ValueError("TauP couldn't estimate a valid incidence angle.")
                     logging.debug('Estimated TauP incidence angle at %.1f' % reg['ain'])
-                    self.ain=reg["ain"]
+                    self.ain = reg["ain"]
                     self.statsDict[self.activeEvent][station]["AN"]=self.ain
                 else:
                     self.ain=self.statsDict[self.activeEvent][station]["AN"]
@@ -2999,86 +2926,33 @@ class Pytheas(QtWidgets.QMainWindow):
           if not foundS:
             raise ValueError('Could not find a valid s arrival with TauP!')
         except:
-          logging.exception("Could not calculate theoretical arrivals for %s in %s pair!" % (station,self.activeEvent))
-          self.sArrTheor=0; self.sPickTheor=0
-          self.ain=self.statsDict[self.activeEvent][station]["AN"]
+          logging.exception("Could not calculate theoretical arrivals for %s in %s pair!" % (station, self.activeEvent))
+          self.ain = self.statsDict[self.activeEvent][station]["AN"]
+
         logging.info("Theoretical arrival @ %s" % self.sArrTheor)
-        logging.info("Theoretical pick @ %.3f (before trim)" % self.sPickTheor)
-        # update other values
-        self.baz=self.statsDict[self.activeEvent][station]["BAZ"]
-        self.dist=self.statsDict[self.activeEvent][station]["DIST"]
-        self.mag=self.evsDict[self.activeEvent]["MAG"]
-        self.origtime=self.evsDict[self.activeEvent]["ORIGIN"]        
-        # load values from DB
-        try:
-            self.updateFromSplittingDict()
-            if self.sArr in [self.stream[0].stats.starttime,0,np.nan]:
-                raise KeyError("Could not find arrival in splitting dictionary")
-        except KeyError: # means that one of event/station/method is not in the DB
-            try:
-                self.sArr=self.spickDict[self.activeEvent][self.station]
-                if self.sArr not in [self.stream[0].stats.starttime,0,np.nan]: 
-                    self.sPick=self.sArr-self.stream[0].stats.starttime
-            except KeyError:
-                pass  
-        logging.info("Observed arrival @ %s" % self.sArr)
-        logging.info("Observed pick @ %.3f (before trim)" % self.sPick)            
+        logging.info("Theoretical pick @ %.3f " % self.sPickTheor)
+
         ## use AR-AIC?
         if self.toggleAR.isChecked():
             try:
                 logging.debug("Applying the AR-AIC autopicker...")
-                _,self.sPickAuto=tools.arPicker(self.stream,self.pkCNF)
-                self.sArrAuto=self.stream[0].stats.starttime+self.sPickAuto
+                _, self.sPickAuto = tools.arPicker(self.stream,self.pkCNF)
+                self.sArrAuto = self.stream[0].stats.starttime + self.sPickAuto
             except:
                 logging.exception("Error while getting automatic pick.")
-                self.sPickAuto=0; self.sArrAuto=0
         else:
             logging.debug("automatic picker is deactivated")
-            self.sPickAuto=0; self.sArrAuto=0
-        logging.info("Automatic arrival @ %s" % self.sArrAuto)
-        logging.info("Automatic pick @ %.3f (before trim)" % self.sPickAuto)   
-        # trim waveforms for faster processing
-        if self.generalCNF.trimFlag and (self.sArr not in [self.stream[0].stats.starttime,0,np.nan]):
-            self.stream.trim(
-                             starttime=self.sArr+self.generalCNF.trimStart,
-                             endtime=self.sArr+self.generalCNF.trimEnd,
-                             pad=True,nearest_sample=False,fill_value=0
-                             )  
-            # check if all timeseries have the same length
-            Wz=self.stream.select(component="Z")[0]
-            Wy=self.stream.select(component="N")[0]
-            Wx=self.stream.select(component="E")[0]
-            # First horizontals
-            Ax,Ay=tools.lengthcheck(Wx,Wy)
-            self.stream.select(component="E")[0].data=Ax 
-            self.stream.select(component="N")[0].data=Ay
-            # Now the vertical
-            Az,Ay=tools.lengthcheck(Wz,Wy)
-            self.stream.select(component="Z")[0].data=Az
-            self.stream.select(component="N")[0].data=Ay
-            # Horizontals second time 
-            Ax,Ay=tools.lengthcheck(Wx,Wy)
-            self.stream.select(component="E")[0].data=Ax 
-            self.stream.select(component="N")[0].data=Ay       
-            logging.debug("Corrected stream after trim %s" % str(self.stream))
-            # recalc picks
-            if self.sArr not in [self.stream[0].stats.starttime,0,np.nan]: 
-                self.sPick=self.sArr-self.stream[0].stats.starttime
-            if self.sArrTheor not in [self.stream[0].stats.starttime,0,np.nan]:
-                self.sPickTheor=self.sArrTheor-self.stream[0].stats.starttime
-            if self.sArrAuto not in [self.stream[0].stats.starttime,0,np.nan]:
-                self.sPickAuto=self.sArrAuto-self.stream[0].stats.starttime
-            logging.info("Observed pick @ %.3f (after trim)" % self.sPick) 
-            logging.info("Theoretical pick @ %.3f (after trim)" % self.sPickTheor)
-            logging.info("Automatic pick @ %.3f (after trim)" % self.sPickAuto) 
-        # calc V/H 
-        self.V2H=self.calcV2H(self.sPick)
-        # calc SNR
-        if self.sPick not in [0,np.nan]:
-            self.SNR=self.calcSNR(self.sPick)
-        else:
-            self.SNR=np.nan
 
+        logging.info("Automatic arrival @ %s" % self.sArrAuto)
+        logging.info("Automatic pick @ %.3f " % self.sPickAuto)   
+
+        # calc V/H 
+        self.V2H = self.calcV2H(self.sPick)
+        # calc SNR
+        if np.isnan(self.sPick):
+            self.SNR = np.nan
+        else:
+            self.SNR = self.calcSNR(self.sPick)
 
     def changeAR(self):
         """Turn AR-AIC picker on and off."""
@@ -3102,30 +2976,37 @@ class Pytheas(QtWidgets.QMainWindow):
         except AttributeError:
             return
 
-    def fetchSPicks(self):
+    def fetchSPicks(self, reset_picks=False):
         """
         Store all individual S picks per event per station
         in a comprehensive dictionary.
 
         """
         # make the s pick dictionary and store the arrival times
-        self.spickDict={}
+        self.dict_s_arr = {}
         for ev in sorted(self.evsDict):
-            self.spickDict.update({ev:{}})
+            self.dict_s_arr.update({ev:{}})
             for sta in sorted(self.statsDict[ev]):
-                try: # DB picks takes precedent
-                    _,vals=DB.retrieve(self.dbCur,"station","s_obs","%s/%s" % (ev,sta))
-                    if vals[0] in [0,np.nan,None]:
-                        raise IndexError("No arrival specified through Pytheas")
-                    if len(vals[0]) > 1:
-                        raise IndexError("More than 1 arrival found specified in database!")
-                    self.spickDict[ev].update({sta:UTCDateTime(vals[0][0])})
-                except: # fetch from DB
+                if not reset_picks:
                     try:
-                        pickval=self.evsDict[ev]['ORIGIN']+self.statsDict[ev][sta]['TOBSS']
-                        self.spickDict[ev].update({sta:pickval})
+                        _, vals = DB.retrieve(self.dbCur,"station","s_obs","%s/%s" % (ev,sta))
+                        if not vals[0]:
+                            raise IndexError("No arrival specified through Pytheas")
+                        if len(vals[0]) > 1:
+                            raise IndexError("More than 1 arrival found specified in database!")
+                        s_arr = UTCDateTime(vals[0][0])
                     except:
-                        self.spickDict[ev].update({sta:np.nan})
+                        try:
+                            s_arr = self.evsDict[ev]['ORIGIN'] + self.statsDict[ev][sta]['TOBSS']
+                        except:
+                            s_arr = None
+                else: # fetch from DB
+                    try:
+                        s_arr = self.evsDict[ev]['ORIGIN'] + self.statsDict[ev][sta]['TOBSS']
+                    except:
+                        s_arr = None
+                self.dict_s_arr[ev].update({sta:s_arr})
+
 
     def setSystem(self):
         """Get the axial system from waveforms in the stream"""
@@ -3198,7 +3079,7 @@ class Pytheas(QtWidgets.QMainWindow):
     def getGrade(self):
         """Get weight value from user input."""
         weight="X"; ok=True
-        accGrades=("A","B","C","D","E","N","X")
+        accGrades=("A","B","C","D","E","N","X","F")
         idx=accGrades.index(self.grade)
         grade, ok = QtWidgets.QInputDialog.getItem(
             self,"Measurement Grade (A-E or N)","Set grade: ",accGrades,idx,False
@@ -3271,7 +3152,7 @@ class Pytheas(QtWidgets.QMainWindow):
         sps=stream[0].stats.sampling_rate
         picks=(self.minPick,self.maxPick)
         pickwin=(int(round(min(picks)*sps)),int(round(max(picks)*sps)))
-        dFreq=self.getDomFreq(stream,pickwin)
+        dFreq=tools.get_dom_freq(stream,pickwin)
         # set the filter boundaries
         self.freqmin=dFreq*0.5
         self.freqmax=dFreq*1.5
@@ -3308,37 +3189,13 @@ class Pytheas(QtWidgets.QMainWindow):
         stream_initial = self.stream.copy()
         # start iterating
         try:
-            snr_dict = {k : np.nan for k in range(len(filter_ranges))}
-            logging.debug('Will test for %i filters' % len(snr_dict))
-            for f_idx, filter_row in enumerate(filter_ranges):
-                self.stream = stream_initial.copy()
-                filter_test = filter_row[1:]
-                if not (tools.isnone(filter_test[0]) and tools.isnone(filter_test[1])):
-                    self.stream.filter(
-                    					type='bandpass', 
-                    					freqmin=np.nanmin(filter_test),
-                                        freqmax=np.nanmax(filter_test), 
-                                        corners=4,
-                                        zerophase=True)
-                try:
-                    if self.sPick:
-                        snr = self.calcSNR(self.sPick)
-                    else:
-                        logging.warning("No S pick set.")
-                        snr = self.calcSNR(int(round((self.minPick+self.maxPick)/2)))
-                except:
-                    logging.exception('Could not estimate SNR')
-                    snr = np.nan
-                logging.debug('Filter %i: %s -> SNR: %.3f' % (filter_row[0], str(filter_test), snr))
-                snr_dict[f_idx] = snr
-            # reset stream
-            self.stream = stream_initial.copy()
-            # check if all SNR values are nan
-            snr_vals = np.asarray(list(snr_dict.values()))
-            if np.all(np.isnan(snr_vals)):
-                raise ValueError('All test filters yielded %.3f SNR' % np.nan)
-            # get the best filter
-            b_idx, b_snr = max(snr_dict.items(), key=operator.itemgetter(1))
+            b_idx, b_snr = tools.filtering_savage_et_al(
+                self.stream, 
+                self.sPick, 
+                filter_ranges, 
+                self.generalCNF.snrStart, 
+                self.generalCNF.snrEnd
+                                            )
         except:
             logging.exception('Could not find an optimal filter')
             # display warning msg
@@ -3357,7 +3214,7 @@ class Pytheas(QtWidgets.QMainWindow):
         if update_figure:
             self.updateFig(keepAxisLimits=True)
 
-    def applyBandFilter(self,freqmin=False,freqmax=False):
+    def applyBandFilter(self, freqmin=False, freqmax=False):
         """
         Apply bandpass filter
 
@@ -3504,7 +3361,7 @@ class Pytheas(QtWidgets.QMainWindow):
 
     ## Splitting Methods ##
     def applyCA(self,meth,stream,filtered,freqmin,freqmax,sPick,
-                baz,ain,showProg,runMult,eventCode=None):
+                baz,ain,snr,showProg,runMult,eventCode=None):
         """
         Function to apply Cluster Analysis on a single station-event pair.
 
@@ -3525,6 +3382,8 @@ class Pytheas(QtWidgets.QMainWindow):
         :param baz: the backazimuth
         :type ain: float
         :param ain: the angle of incidence
+        :type snr: float
+        :param snr: the Signal-to-Noise Ratio
         :type showProg: bool
         :param showProg: show progress dialog
         :type eventCode: str or None, optional
@@ -3537,12 +3396,7 @@ class Pytheas(QtWidgets.QMainWindow):
         station=stream[0].stats.station
         self.station=station
         ## assign the proper prefix to the method
-        if meth == "EV":
-            self.method="AEV"
-        elif meth == "ME":
-            self.method="AME"
-        elif meth == "RC":
-            self.method="ARC"
+        self.method = 'A%s' % meth
         ## CA prep
         logging.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         logging.debug("Event code: %s - Station: %s" % (eventCode,station))
@@ -3554,7 +3408,7 @@ class Pytheas(QtWidgets.QMainWindow):
                 sPick=sArr-self.stream[0].stats.starttime
             except KeyError:
                 try:
-                    sArr=self.spickDict[eventCode][station]
+                    sArr=self.dict_s_arr[eventCode][station]
                     sPick=sArr-self.stream[0].stats.starttime
                 except KeyError:
                     logging.warning("No manual arrival")
@@ -3581,9 +3435,11 @@ class Pytheas(QtWidgets.QMainWindow):
             self.tpts=tpts
         logging.info("Ts-Tp is %.3f s" % tpts)
         # get dominant period for S
-        pickwin=int(np.floor(sPick*stream[0].stats.sampling_rate)),\
-                int(np.ceil((self.caCNF.specWindow+sPick)*stream[0].stats.sampling_rate))
-        dPer=1./self.getDomFreq(stream,pickwin)
+        pickwin = (
+                int(np.floor(sPick * stream[0].stats.sampling_rate)),
+                int(np.ceil((sPick + self.caCNF.specWindow) * stream[0].stats.sampling_rate))
+                    )
+        dPer = 1. / tools.get_dom_freq(stream, pickwin)
         self.dPer=dPer
         # limit period to accepted limits
         if dPer < self.caCNF.minPeriod:
@@ -3616,11 +3472,11 @@ class Pytheas(QtWidgets.QMainWindow):
         else:
             logging.debug("Will rotate to ZRT")
             ain=0.            
-        self.CAthread=CA.clustering(tbStream,meth,sPick,baz,ain,self.caCNF)
+        self.CAthread=CA.clustering(tbStream,meth,sPick,baz,ain,SNR,self.caCNF)
         if not runMult:
             if showProg:
-                self.CAthread.iterDone.connect(self.updateProgBar)
-            self.CAthread.iterFail.connect(self.failCA)            
+                self.CAthread.iter_done.connect(self.updateProgBar)
+            self.CAthread.iter_fail.connect(self.failCA)            
             self.CAthread.finished.connect(self.doneCA)
         self.CAthread.start()
        
@@ -3691,6 +3547,7 @@ class Pytheas(QtWidgets.QMainWindow):
                        self.streamIni.copy(),metDict["phi"],metDict["td"]/(10**3),metDict["pol"],
                        (metDict["err_phi"],metDict["err_td"]/(10**3)),
                        self.baz,
+                       self.actQT.isChecked(),
                        (
                         UTCDateTime(metDict["window_min"])-self.stream[0].stats.starttime,
                         UTCDateTime(metDict["window_max"])-self.stream[0].stats.starttime
@@ -3699,7 +3556,7 @@ class Pytheas(QtWidgets.QMainWindow):
                        metDict["td_test"],method[1:],
                        metDict["C_max"],(metDict["filter_min"],metDict["filter_max"]),titleInfo
                       ) 
-        tools.qcClusterDiagram(
+        tools.qcClusterDiagram2(
          metDict["initial_clusters"],
          metDict["initial_clusters_errors"],
          metDict["calinski_score"],
@@ -3715,10 +3572,58 @@ class Pytheas(QtWidgets.QMainWindow):
 
 
     ## cluster analysis multi
+    def apply_cca_cli(self):
+        """
+        initiate different instances of the `cli.py` script
+        for each available CPU core
+        """
+        self.cca_cli_tic = UTCDateTime()
+        self.cca_cli_thread = PytheasCLILauncher(self.cca_cores)
+        # self.cca_cli_thread.iter_done.connect(self.updateProgBar)
+        # self.cca_cli_thread.iter_fail.connect(self.failCCA)
+        self.cca_cli_thread.finished.connect(self.cca_cli_finished)
+        self.cca_cli_thread.start()
+        self.cca_logs_window()
+
+        #--
+        self.cca_cli_logs_reader = PytheasCLIUpdateLogs('random_path', self.cca_cores)
+        self.cca_cli_logs_reader.iter_logs_read.connect(self.cca_cli_update_logs)
+        self.cca_cli_logs_reader.start()
+
+    def cca_cli_finished(self):
+        """
+        """
+        #--
+        self.cca_cli_logs_reader.stop()
+
+        # self.win_c_logs.close()
+        self.cca_cli_toc = UTCDateTime()
+        self.cca_cli_dur = self.cca_cli_toc - self.cca_cli_tic
+        self.cca_cli_str = str(datetime.timedelta(seconds=self.cca_cli_dur))
+
+
+        for ci in sorted(self.win_c_logs.scroll_labels):
+            self.win_c_logs.scroll_labels[ci].setText(':: Analysis completed in: %s' % self.cca_cli_str)
+
+
+
+        # logging.info('The CCA CLI thread is done!')
+        # winTitle="Catalogue CA"
+        # genText="CA Process completed!"
+        # infText="Analyzis done!"
+        # self.infoMsgBox(genText, infText, winTitle)
+
+    def cca_cli_update_logs(self, logs_bodytext):
+        """
+        """
+        for ci, txt in zip(sorted(self.win_c_logs.scroll_labels), logs_bodytext):
+            self.win_c_logs.scroll_labels[ci].setText(''.join(txt))
+
     def applyCCA(self, meth, selectedStations,
                       maxAin, minSNR, filterBounds, 
                       skipPairs, skipFailed,
-                      auto_filter_flag):
+                      auto_filter_flag,
+                      cca_pick_flag):
         """
         Function to apply Cluster Analysis on the whole catalogue.
 
@@ -3740,6 +3645,9 @@ class Pytheas(QtWidgets.QMainWindow):
         :type auto_filter_flag: bool
         :param auto_filter_flag: select whether to ignore given filter bounds and select
             the best ones automatically
+        :type cca_pick_flag: int
+        :param cca_pick_flag: select whether to use only observed picks (0), only theoretical
+            (2) or attempt to autopick with AR-AIC and if it fails then theoretical (1)            
 
         """
         logging.debug("===================================================")
@@ -3775,9 +3683,10 @@ class Pytheas(QtWidgets.QMainWindow):
         self.CCAthread = applyCAMult(self,self.method,
                                    selectedStations, maxAin, minSNR, 
                                    filterBounds, auto_filter_flag,
+                                   cca_pick_flag,
                                    skipPairs, skipFailed, actEvList)
-        self.CCAthread.iterDone.connect(self.updateProgBar)
-        self.CCAthread.iterFail.connect(self.failCCA)
+        self.CCAthread.iter_done.connect(self.updateProgBar)
+        self.CCAthread.iter_fail.connect(self.failCCA)
         self.CCAthread.finished.connect(self.doneCCA)
         self.CCAthread.start()
 
@@ -3795,7 +3704,7 @@ class Pytheas(QtWidgets.QMainWindow):
             pass
         try:
             raise exc
-        except UserCancelException:
+        except exceptions.UserCancelException:
             logging.exception("Catalogue CA process cancelled!")
             logging.debug("===================================================")
             genTxt="Clustering process"
@@ -3867,9 +3776,14 @@ class Pytheas(QtWidgets.QMainWindow):
                 return
             # calculate SNR
             try:
-                self.SNR=self.calcSNR(self.sPick)
-            except: 
-                self.SNR=self.calcSNR(round(int((self.minPick+self.maxPick)/2))) 
+                if np.isnan(self.sPick):
+                    self.SNR = self.calcSNR(round(int((self.minPick + self.maxPick) / 2))) 
+                else:
+                    self.SNR = self.calcSNR(self.sPick)
+            except:
+                logging.warning('Could not calculate SNR')
+                self.SNR = np.nan
+                
             # perform the grid search
             if self.actQT.isChecked():
                 logging.debug("Will rotate to LQT")
@@ -3922,6 +3836,7 @@ class Pytheas(QtWidgets.QMainWindow):
                            self.streamIni.copy(),metDict["phi"],metDict["td"]/(10**3),metDict["pol"],
                            (metDict["err_phi"],metDict["err_td"]/(10**3)),
                            self.baz,
+                           self.actQT.isChecked(),
                            (
                             UTCDateTime(metDict["window_min"])-self.stream[0].stats.starttime,
                             UTCDateTime(metDict["window_max"])-self.stream[0].stats.starttime
@@ -4013,6 +3928,7 @@ class Pytheas(QtWidgets.QMainWindow):
                            self.streamIni.copy(),metDict["phi"],metDict["td"]/(10**3),metDict["pol"],
                            (metDict["err_phi"],metDict["err_td"]/(10**3)),
                            self.baz,
+                           self.actQT.isChecked(),
                            (
                             UTCDateTime(metDict["window_min"])-self.stream[0].stats.starttime,
                             UTCDateTime(metDict["window_max"])-self.stream[0].stats.starttime
@@ -4031,52 +3947,38 @@ class Pytheas(QtWidgets.QMainWindow):
             self.warnMsgBox(genTxt,infTxt,winTit)  
         self.updateFig(center=False,keepAxisLimits=True)
 
-
-    def getDomFreq(self,stream,pickwin):
-        """
-        Calculate the dominant frequency in given window
-
-        :type stream: :class: `~obspy.core.stream.Stream`
-        :param stream: the stream containing the waveforms
-        :type pickwin: tuple-like
-        :param pickwin: a list of the two picks defining the signal
-            window
-        :returns: the dominant frequency
-        """
-        sps=stream[0].stats.sampling_rate
-        north=stream.select(component="N")[0].data[pickwin[0]:pickwin[1]]
-        east=stream.select(component="E")[0].data[pickwin[0]:pickwin[1]]
-        specs=tools.spectrum(north,east,sps)
-        nSpec=specs[0]; eSpec=specs[1]
-        # filter out frequencies less than 1Hz. 
-        # TODO: add as user option
-        minFreqIdx=(nSpec[0]>=1,eSpec[0]>=1)
-        # get max frequency
-        nFreq=nSpec[0][minFreqIdx[0]][np.where(nSpec[1]==nSpec[1].max())][0]
-        eFreq=eSpec[0][minFreqIdx[1]][np.where(eSpec[1]==eSpec[1].max())][0]
-        dFreq=(nFreq+eFreq)/2.
-        return dFreq
+    def plotQDSpectrogram(self):
+    	"""Plot a quick and dirty spectrogram of the waveforms."""
+    	fig, axes = plt.subplots(3)
+    	fig.suptitle('%s.%s' % (self.stream[0].stats.network, self.stream[0].stats.station))
+    	for trace, ax in zip(self.stream, axes):
+    		trace.spectrogram(axes=ax, show=False, log=True, mult=10, wlen=0.5)
+    		ax.set_ylabel(trace.stats.channel)
+    		if ax == axes[-1]:
+    			ax.set_xlabel('relative time (s)')
+    	plt.show()
 
     def plotSpectrum(self):
         """Plot the spectra used for recommending the filter."""
-        if self.streamIni:
-            stream=self.streamIni
-        else:
-            stream=self.stream
+        # if self.streamIni:
+        #     stream=self.streamIni
+        # else:
+        #     stream=self.stream
+        stream = self.stream
         if tools.isnone(self.minPick) or tools.isnone(self.maxPick):
             logging.warning("Both start and end of window must be picked!")
             return
-        sps=stream[0].stats.sampling_rate
-        picks=(self.minPick,self.maxPick)
-        pickwin=(int(round(min(picks)*sps)),int(round(max(picks)*sps)))
+        sps = stream[0].stats.sampling_rate
+        picks = (self.minPick, self.maxPick)
+        pickwin = (int(round(min(picks) * sps)), int(round(max(picks) * sps)))
         #
         north=stream.select(component="N")[0].data[pickwin[0]:pickwin[1]]
         east=stream.select(component="E")[0].data[pickwin[0]:pickwin[1]]
         specs=tools.spectrum(north,east,sps)
         nSpec=specs[0]; eSpec=specs[1]
-        # filter out frequencies less than 1Hz. 
+        # filter out frequencies less than 0.1Hz. 
         # TODO: add as user option
-        minFreqIdx=([nSpec[0]>=1],[eSpec[0]>=1])
+        minFreqIdx=([nSpec[0]>=0.1], [eSpec[0]>=0.1])
         # get max frequency
         nFreq=nSpec[0][minFreqIdx[0]][np.where(nSpec[1]==nSpec[1].max())]
         eFreq=eSpec[0][minFreqIdx[1]][np.where(eSpec[1]==eSpec[1].max())]
@@ -4155,8 +4057,8 @@ class Pytheas(QtWidgets.QMainWindow):
             if basicSplit:
                 self.phi=np.nan
                 self.td=0.
-                self.sArr=np.nan
-                self.sPick=0.
+                self.sArr = None
+                self.sPick = np.nan
                 self.aux=np.nan
                 self.pol=np.nan
                 self.SNR=np.nan
@@ -4330,32 +4232,43 @@ class Pytheas(QtWidgets.QMainWindow):
         if ok == QtWidgets.QMessageBox.No:
             return
         # now evcor
-        evcdir = os.path.join(WORKDIR, 'etc', 'evcor')
+        evcdir = os.path.join(_DIR_CWD, 'etc', 'evcor')
         logging.debug('Removing files from %s' % evcdir)
         for fl in os.listdir(evcdir):
             os.remove(os.path.join(evcdir, fl))
         # now indices
-        inddir = os.path.join(WORKDIR, 'etc', 'index')
+        inddir = os.path.join(_DIR_CWD, 'etc', 'index')
         logging.debug('Removing files from %s' % inddir)
         for fl in os.listdir(inddir):
             os.remove(os.path.join(inddir, fl))
         # now preferences
-        prefdir = os.path.join(WORKDIR, 'etc', 'options')
+        prefdir = os.path.join(_DIR_CWD, 'etc', 'options')
         logging.debug('Removing files from %s' % prefdir)
         for fl in os.listdir(prefdir):
             os.remove(os.path.join(prefdir, fl))
+        # clean cli
+        self.clean_data_cli()
         # now logs
         self.cleanLogs()
         # now quit
         QtWidgets.qApp.quit()
 
+    def clean_data_cli(self):
+        """Cleans all `.bin` files in the `data_cli` directory"""
+        logging.debug("Cleaning 'data_cli'...")
+        for cli_f in os.listdir(self.cli_settings_dir):
+            cli_p = os.path.join(self.cli_settings_dir, cli_f)
+            try:
+                os.remove(cli_p)
+            except:
+                pass
 
     def cleanLogs(self):
         """Cleans logs created in periods greater than specified days."""
         logging.debug("Cleaning logs...")
         days = self.generalCNF.cleanLogs
         days_in_sec = 3600. * 24 * days
-        logdir = os.path.join(WORKDIR, 'logs')
+        logdir = os.path.join(_DIR_CWD, 'logs')
         logfiles = os.listdir(logdir)
         now = UTCDateTime()
         for logfile in logfiles:
@@ -4395,11 +4308,13 @@ class Pytheas(QtWidgets.QMainWindow):
         """Open catalogue window."""
         #
         # ask for events master directory
-        self.exDataPath,self.exCatFile,self.exDbPath=self.pathParser(mode="read")
+        self.exDataPath, self.exCatFile, self.exDbPath = parsers.path_parser(self.exPathFile, mode="read")
         self.dataPath=self.exDataPath; self.catFile=self.exCatFile; self.dbPath=self.exDbPath
+
         # various parameters
         self.loadCatalogue=False
         self.ocWin=QtWidgets.QDialog(self)
+        self.ocWin.db_is_set = False
         self.ocWin.setModal(True)
         self.ocWin.setWindowTitle("Open Catalogue")
         self.ocWin.setWindowIcon(QtGui.QIcon(self.appIcon))
@@ -4460,6 +4375,10 @@ class Pytheas(QtWidgets.QMainWindow):
             self.catFile=catFile
             self.ocWin.catInp.setText(self.catFile)
             logging.debug("Selected catalogue file: %s" % self.catFile)
+            if not self.ocWin.db_is_set:
+                self.dbPath = os.path.splitext(self.catFile)[0] + '.db3'
+                self.ocWin.dbInp.setText(self.dbPath)
+                logging.debug("Selected database file: %s" % self.dbPath)
 
     def ocWinDb(self):
         """Prompt for db path/"""
@@ -4475,7 +4394,9 @@ class Pytheas(QtWidgets.QMainWindow):
         else:
             self.dbPath=dbPath
             self.ocWin.dbInp.setText(self.dbPath)
+            self.ocWin.db_is_set = True
             logging.debug("Selected database file: %s" % self.dbPath)
+
 
 
 
@@ -4507,10 +4428,16 @@ class Pytheas(QtWidgets.QMainWindow):
         try:
             # write new paths?
             if self.exDataPath != self.dataPath or self.exCatFile != self.catFile or self.exDbPath != self.dbPath:
-                self.pathParser(mode="write",catFile=self.catFile,dataPath=self.dataPath,dbPath=self.dbPath)
+                parsers.path_parser(
+                    self.exPathFile, 
+                    mode="write",
+                    catFile=self.catFile,
+                    dataPath=self.dataPath,
+                    dbPath=self.dbPath
+                                )
             self.openCat()
         except:
-            logging.exception("Could not open catalouge!")
+            logging.exception("Could not open catalogue!")
             try:
                 self.pDial.close()
             except:
@@ -4524,6 +4451,44 @@ class Pytheas(QtWidgets.QMainWindow):
     def ocWinCancel(self):
         """Close the Open Catalogue window."""
         self.ocWin.close()
+
+    ## CCA log output window
+    def cca_logs_window(self):
+        """
+        Open a window that displays n number of logs for
+        each spawned process of CCA.
+        """
+        #-- general setup
+        self.win_c_logs = QtWidgets.QDialog(self)
+        self.win_c_logs.setModal(True)
+        self.win_c_logs.setWindowTitle('CCA Logs')
+        self.win_c_logs.setWindowIcon(QtGui.QIcon(self.appIcon))
+        self.win_c_logs.setsFont1 = QtGui.QFont("Calibri", 14, QtGui.QFont.Bold)
+        self.win_c_logs.setsFont2 = QtGui.QFont("Calibri", 11, QtGui.QFont.Normal)
+        self.win_c_logs.layout_g_box = QtWidgets.QGridLayout(self.win_c_logs)
+        #-- add widgets according to cores
+        self.win_c_logs.core_count = self.cca_settings.cca_cores
+        self.win_c_logs.scroll_labels = {}
+        nrows, ncols = tools.grid_dimensions(self.win_c_logs.core_count, max_cols=1)
+        logging.debug('QGridLayout dimensions: %i x %i' % (nrows, ncols))
+        gridxy = [(r, c) for r in range(nrows) for c in range(ncols)]
+        for ci in range(1, self.win_c_logs.core_count + 1):
+            tsl = ScrollLabel()
+            tsl.setStyleSheet("background-color: black;")
+            self.win_c_logs.layout_g_box.addWidget(tsl, *gridxy[ci - 1])
+            self.win_c_logs.scroll_labels[ci] = tsl
+
+        #-- finalize
+        self.win_c_logs.box_diag_btn = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok| 
+            QtWidgets.QDialogButtonBox.Cancel
+            )
+        # self.win_c_logs.diagBox.accepted.connect()
+        # self.win_c_logs.diagBox.rejected.connect()
+        self.win_c_logs.layout_g_box.addWidget(self.win_c_logs.box_diag_btn, nrows, ncols - 1)
+        self.win_c_logs.resize(600, 800)
+        self.win_c_logs.show()
+
 
     ## Fully automatic Cluster analysis Window
     def caMultWindow(self):
@@ -4571,45 +4536,131 @@ class Pytheas(QtWidgets.QMainWindow):
         self.cmWinDum.gBox.addWidget(self.cmF2Inp,4,1)
         self.cmWinDum.gBox.addWidget(self.cmF2Inp,4,2)
         # check box for automatic filtering
-        self.cmWinDum.afFlag = QtWidgets.QCheckBox('Automatic Filtering',font=self.cmWin.setsFont2)        
+        self.cmWinDum.afFlag = QtWidgets.QCheckBox('Automatic Filtering', font=self.cmWin.setsFont2)        
         self.cmWinDum.afFlag.setChecked(False)
         self.cmWinDum.gBox.addWidget(self.cmWinDum.afFlag, 5, 1)
         # selected method
-        self.cmMetLbl=QtWidgets.QLabel("Method",font=self.cmWin.setsFont2)
-        self.cmMetInp=QtWidgets.QComboBox()
-        accMethods=sorted(("RC", "EV", "ME"))
+        self.cmMetLbl = QtWidgets.QLabel("Method",font=self.cmWin.setsFont2)
+        self.cmMetInp = QtWidgets.QComboBox()
+        accMethods = sorted(("RC", "EV", "ME"))
         for itm in accMethods:
             self.cmMetInp.addItem(itm)
         self.cmWinDum.gBox.addWidget(self.cmMetLbl, 6, 1)
         self.cmWinDum.gBox.addWidget(self.cmMetInp, 6, 2)
+        # combo box for picking method
+        self.cm_pick_lbl = QtWidgets.QLabel('Picks', font=self.cmWin.setsFont2)
+        self.cm_pick_inp = QtWidgets.QComboBox()
+        pick_methods = [
+                        'Observed-only',
+                        'Observed -> AR-AIC -> TauP',
+                        'Observed -> AR-AIC',
+                        'Observed -> TauP'
+                        ]
+        for itm in pick_methods: 
+            self.cm_pick_inp.addItem(itm)
+        self.cm_pick_inp.setCurrentIndex(0)
+        self.cmWinDum.gBox.addWidget(self.cm_pick_lbl, 7, 1)
+        self.cmWinDum.gBox.addWidget(self.cm_pick_inp, 7, 2)
         # checkbox for skipping pairs
         self.cmWinDum.skipFlag=QtWidgets.QCheckBox('Skip existing pairs',font=self.cmWin.setsFont2)        
         self.cmWinDum.skipFlag.setChecked(True)
-        self.cmWinDum.gBox.addWidget(self.cmWinDum.skipFlag, 7, 1)
+        self.cmWinDum.gBox.addWidget(self.cmWinDum.skipFlag, 8, 1)
         # checkbox for skipping failed pairs
         self.cmWinDum.skipFailedFlag=QtWidgets.QCheckBox('Skip previously failed pairs',font=self.cmWin.setsFont2)        
         self.cmWinDum.skipFailedFlag.setChecked(True)
         self.cmWinDum.gBox.addWidget(self.cmWinDum.skipFailedFlag, 8, 2)
+        #-- how many cores?
+        logging.debug('System has %i cores' % _CURRENT_CPU_CORES)
+        self.cmWinDum.cm_cpu_count_lbl = QtWidgets.QLabel(
+            ('CPU Cores (max: %i)' % _CURRENT_CPU_CORES), 
+            font=self.cmWin.setsFont2) 
+        self.cmWinDum.cm_cpu_count_inp = QtWidgets.QSpinBox()
+        self.cmWinDum.cm_cpu_count_inp.setRange(1, _CURRENT_CPU_CORES)
+        try:
+            self.cmWinDum.cm_cpu_count_inp.setValue(self.cca_settings.cca_core)
+        except:
+            self.cmWinDum.cm_cpu_count_inp.setValue(_CURRENT_CPU_CORES - 1)
+        self.cmWinDum.gBox.addWidget(self.cmWinDum.cm_cpu_count_lbl, 9, 1)
+        self.cmWinDum.gBox.addWidget(self.cmWinDum.cm_cpu_count_inp, 9, 2)
+
+        #-- add a run w/ CLI button
+        self.cm_run_cli_btn = QtWidgets.QPushButton("Save settings for CLI", font=self.cmWin.setsFont2)
+        self.cm_run_cli_btn.clicked.connect(self.cm_show_cli_msg)
+        self.cmWinDum.gBox.addWidget(self.cm_run_cli_btn, 10, 1)
+
         #
         self.cmWin.vBox.addWidget(self.cmWinDum)
-        #
+
+        #-- finalize
         self.cmWin.diagBox=QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok|
                                                       QtWidgets.QDialogButtonBox.Cancel)
-        self.cmWin.diagBox.accepted.connect(self.cmWinOk)
+        self.cmWin.diagBox.accepted.connect(lambda: self.cm_show_cli_msg(run_cca_flag=True))
         self.cmWin.diagBox.rejected.connect(self.cmWinCancel)
         self.cmWin.vBox.addWidget(self.cmWin.diagBox)
 
+        #-- if they exist, set previous parameters
+        if self.cca_settings.__dict__:  # settings file was not empty
+            logging.warning("GUI settings loading not implemented yet")
+            winTitle = "CLI Settings"
+            genText = "TODO"
+            infText = "GUI settings loading not implemented yet"
+            self.warnMsgBox(genText,infText,winTitle)
         self.cmWin.show()
 
-    def cmWinOk(self):
+    def cm_show_cli_msg(self, run_cca_flag=False):
+        """Save settings for CLI CCA usage and show relevant info to the user."""
+        #-- save a snapshot of evsdict and statsdict        
+        try:
+            os.makedirs(path_cli_data)
+        except:
+            pass
+
+        self.clean_data_cli()
+
+        #-- need to split data to n=ci instances
+        self.cca_cores = self.cmWinDum.cm_cpu_count_inp.value()
+
+        num_total_events = len(self.evsDict)
+        num_split = int(np.ceil(num_total_events / self.cca_cores))
+
+        for ci, keys_events_split in enumerate(tools.grouper(num_split, self.evsDict.keys())):
+
+            ci += 1  # python indexing!
+
+            path_pytheas_snapshot_core = os.path.join(
+                    self.cli_settings_dir,
+                    ('snapshot_pytheas_c%i.bin' % ci)
+                )
+
+            pk.dump(
+                {
+                'events':{k:self.evsDict[k] for k in keys_events_split if k != None},
+                'stations':{k:self.statsDict[k] for k in keys_events_split if k != None},
+                'picks':{k:self.dict_s_arr[k] for k in keys_events_split if k != None},
+                'vmod':self.tmodel
+                },
+                open(path_pytheas_snapshot_core, 'wb')
+            )
+
+            logging.info('Saved Pytheas snapshot to %s' % path_pytheas_snapshot_core)
+
+        #-- 
+        self.cmWinOk(run_cca_flag=run_cca_flag)
+
+    def cmWinOk(self, run_cca_flag=True):
         """Finalize CA Mult selection."""
         selectedStations=self.cmListGet(export=True)
-        winTitle="Automated CA Confirmation"
-        infText="The process will now begin for %i events and %i stations (potentially %i pairs). Are you sure?" \
-                % (len(self.evsDict),len(selectedStations),len(self.evsDict)*len(selectedStations))
-        rep=self.replyMsgBox(infText,winTitle)
-        if rep == QtWidgets.QMessageBox.No:
-            return
+        if run_cca_flag:
+            winTitle="Automated CA Confirmation"
+            infText = "The process will now begin for %s events and %s stations (potentially %s pairs). Are you sure?" \
+                        % (
+                            '{:,}'.format(len(self.evsDict)),
+                            '{:,}'.format(len(selectedStations)),
+                            '{:,}'.format(len(self.evsDict) * len(selectedStations))
+                            )
+            rep=self.replyMsgBox(infText,winTitle)
+            if rep == QtWidgets.QMessageBox.No:
+                return
         filterBounds=(np.float(self.cmF1Inp.text()), np.float(self.cmF2Inp.text()))
         if not any(filterBounds):
             filterBounds=(np.nan,np.nan)
@@ -4617,19 +4668,64 @@ class Pytheas(QtWidgets.QMainWindow):
         maxAin = np.float(self.cmMaxAinInp.text())
         minSNR = np.float(self.cmMinSNRInp.text())
         method = self.cmMetInp.currentText()
+        cca_pick_flag = self.cm_pick_inp.currentIndex()
         skipPairs = self.cmWinDum.skipFlag.isChecked()
         skipFailed = self.cmWinDum.skipFailedFlag.isChecked()
+        ######################################################
+        #-- OLD BLOCK, REMOVE BEFORE RELEASE OF 0.3.0
+        ### if run_cca_flag:
+        ###     self.cmWin.close()
+        ###     self.applyCCA(method, selectedStations,
+        ###                   maxAin, minSNR, filterBounds, skipPairs,
+        ###                   skipFailed, auto_filter_flag, cca_pick_flag)
+        ### else:
+        ######################################################
+        #-- store settings to a class for easier use
+        self.cca_settings.sws_method = method
+        self.cca_settings.selected_stations = selectedStations
+        self.cca_settings.sws_window = maxAin
+        self.cca_settings.snr_threshold = minSNR
+        self.cca_settings.filter_band = filterBounds
+        self.cca_settings.skip_pairs = skipPairs
+        self.cca_settings.skip_failed = skipFailed
+        self.cca_settings.filter_auto_flag = auto_filter_flag
+        self.cca_settings.cca_pick_flag = cca_pick_flag
+        self.cca_settings.rotate_to_lqt = self.actQT.isChecked()
+        self.cca_settings.cca_cores = self.cca_cores
+        self.cca_settings.cca_cores_active = 1
+        #-- save to default options file
+        try:
+            for ci in range(1, self.cca_settings.cca_cores + 1):
+                cli_settings_path_core = self.cli_settings_path % ci
+                self.cca_settings.cca_cores_active = ci
+                pk.dump(self.cca_settings, open(cli_settings_path_core, 'wb'))
+            logging.info('Stored CLI settings to %s' % self.cli_settings_path)
+        except Exception as exc:
+            logging.exception("Could not store settings to file %s" % self.cli_settings_path)
+            winTitle = "CLI Settings"
+            genText = "Could not store settings!"
+            infText = "Could not store CLI settings to file %s due to the following exception:\n%s  " % (
+                self.cli_settings_path,
+                exc
+                )
+            self.warnMsgBox(genText,infText,winTitle)
+            return
+        self.cca_settings.cca_cores_active = 1
+        #-- show feedback to user
         self.cmWin.close()
-        self.applyCCA(method, selectedStations,
-                      maxAin, minSNR, filterBounds, skipPairs,
-                      skipFailed, auto_filter_flag)
-        
+        if run_cca_flag:
+            self.apply_cca_cli()
+        else:
+            winTitle = "CLI Settings"
+            genText = "Successfully saved settings for CLI!"
+            infText = "Saved CLI settings to %s" % self.cli_settings_dir
+            self.infoMsgBox(genText, infText, winTitle)            
 
     def cmWinCancel(self):
         """Close CA Mult window."""
         self.cmWin.close()
 
-    def cmListGet(self,export=False):
+    def cmListGet(self, export=False):
         """
         Get selected items and update labels
 
@@ -4638,8 +4734,8 @@ class Pytheas(QtWidgets.QMainWindow):
             exported as list. Defaults to False.
         """
         # update stations
-        stations=self.cmStList.selectedItems()
-        self.cmStLbl.setText(str("Selected stations: %i" % len(stations)).replace("0","*"))
+        stations = self.cmStList.selectedItems()
+        self.cmStLbl.setText(str("Selected stations: %i" % len(stations)).replace("0", "*"))
         if export:
             if len(stations) == 0:
                 return sorted([self.cmStList.item(idx).text() for idx in range(self.cmStList.count())])
@@ -4834,8 +4930,9 @@ class Pytheas(QtWidgets.QMainWindow):
         self.caTab.gBox.addWidget(QtWidgets.QLabel("Linkage Criterion",font=self.pfWin.setsFont2),16,1)
         self.caTab.linkage=QtWidgets.QComboBox()
         accLinks=sorted(("ward", "complete", "average","single"))
-        for itm in accLinks: self.caTab.linkage.addItem(itm)
-        idx=accLinks.index(self.caCNF.linkage)
+        for itm in accLinks: 
+            self.caTab.linkage.addItem(itm)
+        idx = accLinks.index(self.caCNF.linkage)
         self.caTab.linkage.setCurrentIndex(idx)
         self.caTab.gBox.addWidget(self.caTab.linkage,16,2)
         # TauP
@@ -4888,7 +4985,7 @@ class Pytheas(QtWidgets.QMainWindow):
             
 
             btn_dummy = QtWidgets.QPushButton()
-            btn_dummy.setIcon(QtGui.QIcon(os.path.join(WORKDIR, 'etc', 'images', 'icon_remove.png')))
+            btn_dummy.setIcon(QtGui.QIcon(os.path.join(_DIR_CWD, 'etc', 'images', 'icon_remove.png')))
             btn_dummy.setIconSize(QtCore.QSize(24, 24))
             btn_dummy.resize(24, 24)
             btn_dummy.setEnabled(False)
@@ -4916,7 +5013,7 @@ class Pytheas(QtWidgets.QMainWindow):
 
             # add a removal button
             self.filt_table_btn_dict[i_filt_row] = QtWidgets.QPushButton()
-            self.filt_table_btn_dict[i_filt_row].setIcon(QtGui.QIcon(os.path.join(WORKDIR, 'etc', 'images', 'icon_remove.png')))
+            self.filt_table_btn_dict[i_filt_row].setIcon(QtGui.QIcon(os.path.join(_DIR_CWD, 'etc', 'images', 'icon_remove.png')))
             self.filt_table_btn_dict[i_filt_row].setIconSize(QtCore.QSize(24, 24))
             self.filt_table_btn_dict[i_filt_row].resize(24, 24)
             self.filtTab.filtTable.setCellWidget(i_filt_row, 3, self.filt_table_btn_dict[i_filt_row])
@@ -5037,7 +5134,7 @@ class Pytheas(QtWidgets.QMainWindow):
 
         # add a removal button
         self.filt_table_btn_dict[i_filt_row] = QtWidgets.QPushButton()
-        self.filt_table_btn_dict[i_filt_row].setIcon(QtGui.QIcon(os.path.join(WORKDIR, 'etc', 'images', 'icon_remove.png')))
+        self.filt_table_btn_dict[i_filt_row].setIcon(QtGui.QIcon(os.path.join(_DIR_CWD, 'etc', 'images', 'icon_remove.png')))
         self.filt_table_btn_dict[i_filt_row].setIconSize(QtCore.QSize(24, 24))
         self.filt_table_btn_dict[i_filt_row].resize(24, 24)
         self.filtTab.filtTable.setCellWidget(i_filt_row, 3, self.filt_table_btn_dict[i_filt_row])
@@ -5097,9 +5194,9 @@ class Pytheas(QtWidgets.QMainWindow):
         self.generalCNF.snrStart=float(self.gnTab.snrStart.text())
         self.generalCNF.snrEnd=float(self.gnTab.snrEnd.text())
         self.generalCNF.maxTd=float(self.gnTab.maxTd.text())
-        self.generalCNF.write(WORKDIR+os.sep+"etc%soptions%sgeneral.cnf"%(os.sep,os.sep))
+        self.generalCNF.write(_DIR_CWD+os.sep+"etc%soptions%sgeneral.cnf"%(os.sep,os.sep))
         # write the maximum bytes for the logs to an independent file for easy reading
-        with open(WORKDIR + os.sep + "etc%soptions%slog_max_bytes" % (os.sep,os.sep), 'w') as fid:
+        with open(_DIR_CWD + os.sep + "etc%soptions%slog_max_bytes" % (os.sep,os.sep), 'w') as fid:
             fid.write(str(self.generalCNF.max_log_size))
         # grading 
         self.gradeCNF.polOff=float(self.grTab.polOff.text())
@@ -5112,7 +5209,7 @@ class Pytheas(QtWidgets.QMainWindow):
         self.gradeCNF.gradeDict["B"]=float(self.grTab.gradeB.text())
         self.gradeCNF.gradeDict["C"]=float(self.grTab.gradeC.text())
         self.gradeCNF.gradeDict["D"]=float(self.grTab.gradeD.text())
-        self.gradeCNF.write(WORKDIR+os.sep+"etc%soptions%sgrading.cnf"%(os.sep,os.sep))
+        self.gradeCNF.write(_DIR_CWD+os.sep+"etc%soptions%sgrading.cnf"%(os.sep,os.sep))
         # cluster analysis
         self.caCNF.Tbeg1=float(self.caTab.Tbeg1.text())
         self.caCNF.DTbeg=float(self.caTab.DTbeg.text())
@@ -5130,12 +5227,12 @@ class Pytheas(QtWidgets.QMainWindow):
         # small hack
         self.caCNF.maxTd=self.generalCNF.maxTd
         # write the file now
-        self.caCNF.write(WORKDIR+os.sep+"etc%soptions%sclustering.cnf"%(os.sep,os.sep))
+        self.caCNF.write(_DIR_CWD+os.sep+"etc%soptions%sclustering.cnf"%(os.sep,os.sep))
         # taup
         self.tpCNF.model=str(self.tauTab.model.text())
         self.tpCNF.stations=str(self.tauTab.stations.text())
         self.tpCNF.ainFlag=self.tauTab.ainFlag.isChecked()
-        self.tpCNF.write(WORKDIR+os.sep+"etc%soptions%staup.cnf"%(os.sep,os.sep))
+        self.tpCNF.write(_DIR_CWD+os.sep+"etc%soptions%staup.cnf"%(os.sep,os.sep))
         # -- Filters
         n_filters = self.filtTab.filtTable.rowCount() - 2
         self.filterCNF.filter_ranges = np.zeros((n_filters, 3))
@@ -5171,7 +5268,7 @@ class Pytheas(QtWidgets.QMainWindow):
                 self.filterCNF.filter_ranges[n_row, 2] = np.float(self.filtTab.filtTable.item(n_row_table, 2).text())
             except ValueError:
                 self.filterCNF.filter_ranges[n_row, 2] = np.nan
-        self.filterCNF.write(os.path.join(WORKDIR, 'etc', 'options', 'filters.cnf'))
+        self.filterCNF.write(os.path.join(_DIR_CWD, 'etc', 'options', 'filters.cnf'))
         # AR-AIC
         self.pkCNF.arFMIN=float(self.arTab.arFMIN.text())
         self.pkCNF.arFMAX=float(self.arTab.arFMAX.text())
@@ -5183,7 +5280,7 @@ class Pytheas(QtWidgets.QMainWindow):
         self.pkCNF.arMS=int(self.arTab.arMS.text())
         self.pkCNF.arLP=float(self.arTab.arLP.text())
         self.pkCNF.arLS=float(self.arTab.arLS.text())
-        self.pkCNF.write(WORKDIR+os.sep+"etc%soptions%spicker.cnf"%(os.sep,os.sep))
+        self.pkCNF.write(_DIR_CWD+os.sep+"etc%soptions%spicker.cnf"%(os.sep,os.sep))
         logging.info("Saved preferences")
 
     def pfWinOk(self):
@@ -5281,9 +5378,7 @@ class Pytheas(QtWidgets.QMainWindow):
     ## Evens list window
     def eventsListWindow(self):
         """
-        Open a window containing selectable events. In case the events
-        doesn't exist? Maybe events from catalogue that do not correspond
-        to an event in folder with warnings (and not selectable).
+        Open a window containing selectable events.
         """
         self.evWin = QtWidgets.QDialog(self)
         self.evWin.setModal(True)
@@ -5385,10 +5480,11 @@ class Pytheas(QtWidgets.QMainWindow):
         self.stWin.selectSt.setSelectionBehavior(QtWidgets.QTableView.SelectRows)        
         self.stWin.vBox.addWidget(self.stWin.selectSt)
         actStaList=self.getActiveStations()
-        allStaList=sorted(
-                        self.statsDict[self.activeEvent],
-                        key=lambda x:self.statsDict[self.activeEvent][x]["AN"]
-                      )
+        # allStaList=sorted(
+        #                 self.statsDict[self.activeEvent],
+        #                 key=lambda x:self.statsDict[self.activeEvent][x]["AN"]
+        #               )
+        allStaList = self.staList
         maxLen=len(allStaList)
         self.stWin.selectSt.setRowCount(maxLen)
         self.stWin.selectSt.setHorizontalHeaderLabels(["#","Station","Incidence","Backazimuth"])
@@ -5465,347 +5561,98 @@ class Pytheas(QtWidgets.QMainWindow):
         """Hack to indirectly disable this checkbox."""
         self.inpV2H.setChecked(self.V2H)
 
-## class for threading Catalogue CA
-class applyCAMult(QtCore.QThread):
+## Update logs thread
+class PytheasCLIUpdateLogs(QtCore.QThread):
     """
-    Class for applying Catalogue CA. Admittedly, it's a bit messy, 
-    might have to rewrite it at some point and try and make it 
-    thread-safe (also enabling parallelism). Is it a good practice to use
-    the active class that controls the GUI as an argument?
-
-    Uses :class: `~PyQt5.QtCore.QThread`
- 
     """
-    # setup custom signals
-    iterDone=QtCore.pyqtSignal(list)
-    iterFail=QtCore.pyqtSignal(Exception)
 
-    def __init__(self,pytheas, meth, selectedStations,
-                 maxAin, minSNR,  
-                 filterBounds, auto_filter_flag,
-                 skipPairs, skipFailed,
-                 actEvList, parent=None):
-        """
-        Initilization
+    iter_logs_read = QtCore.pyqtSignal(list)
 
-        :type pytheas: :class: `~pytheas.Pytheas`
-        :param pytheas: the Pytheas' main class that contains all the required information and calls to
-            run the Catalogue CA.
-        :type meth: str
-        :param meth: analysis method to use with CA (EV, ME or RC)
-        :type selectedStations: tuple-like
-        :param selectedStations: list of stations to be used in the analysis
-        :type maxAin: float
-        :param maxAin: the incidence angle corresponding to the shear-wave window
-        :type minSNR: float
-        :param minSNR: the minimum accepted SNR. Pairs with a lesser SNR, will be
-            skipped altogether.
-        :type filterBounds: tuple-like
-        :param filterBounds: the minimum and maximum filter boundaries
-        :type auto_filter_flag: bool
-        :param auto_filter_flag: select whether to ignore given filter bounds and select
-            the best ones automatically
-        :type skipPairs: bool
-        :param skipPairs: select whether to skip pairs that already exist in the database
-        :type skipFailed: bool
-        :param skipFailed: select whether to skip pairs that previously led to errors during CA
-        :type actEvList: tuple-like
-        :param actEvList: list of active events
-
-        """
+    def __init__(self, files_c_logs, core_count, parent=None):
         QtCore.QThread.__init__(self,parent)
-        self.pytheas = pytheas
-        self.meth = meth
-        self.selectedStations = selectedStations
-        self.maxAin = maxAin
-        self.minSNR = minSNR
-        self.filterBounds = filterBounds
-        self.auto_filter_flag = auto_filter_flag
-        self.freqmin = filterBounds[0]
-        self.freqmax = filterBounds[1]
-        self.skipPairs = skipPairs
-        self.skipFailed = skipFailed
-        self.actEvList = actEvList
-        self.excFlag = False
+        self.files_c_logs = files_c_logs
+        self.core_count = core_count
         self._isRunning = True
 
-    def stop(self):
-        """Set flag to stop iterating over windows."""
-        self._isRunning = False
-        try:
-            self.pytheas.CAthread._isRunning = False
-        except:
-            pass
-        self.wait()
 
     def run(self):
-        """Run the full catalogue."""
-        try:
-            # get start time
-            tic = UTCDateTime()
-            self.tic = tic
-            # setup the log for the CA
-            logfileCA=WORKDIR+os.sep+"logs"+os.sep+"CA_%s.log" % tic.strftime("%Y%m%d_%H%M%S")
-            self.logfileCA = logfileCA
-            logging.info("Will save CA related information to %s" % logfileCA)
-            with open(logfileCA,"w") as fid:
-                fid.write("# Shear-wave Window: %.1f deg | Filter (Hz): %.1f - %.1f\n" % (self.maxAin,self.freqmin,self.freqmax))
-                fid.write("# Process started @ %s\n" % tic)
-            # pairs analyzed
-            self.ipairs=0; self.ispairs=0
-            maxI=len(self.actEvList)
-            ## connecting to DB
-            self.dbConn,self.dbCur=DB.open(self.pytheas.dbPath)
-            # find all failed attempts
-            if self.skipFailed:
-                _,uids=DB.find(self.dbCur,"method","grade","F")
-                failedPairs=["%s/%s/%s" % x for x in uids]
-            # start iterating events
-            for event in sorted(self.actEvList):
-                if not self._isRunning:
-                    raise UserCancelException("User cancelled the iterations.")
-                i=sorted(self.actEvList).index(event)+1
-                # get info first #
-                self.pytheas.activeEvent=event
-                logging.info("Iterating %i/%i events"%(i,maxI))
-                self.pytheas.multStDict=stDict=self.pytheas.statsDict[event]
-                self.pytheas.multEvDict=evDict=self.pytheas.evsDict[event]
-                maxJ=len(stDict.keys())
-                with open(logfileCA,"a") as fid:
-                    fid.write("===== Starting event %s =====\n" % event)
-                # start iterating stations
-                for station in sorted(stDict.keys()):
-                    ## checks ##
-                    skip=False; state=False                    
-                    # reset measurements first
-                    self.pytheas.flagReset(general=False,splitting=True,indexing=False,titling=False,splitDict=False)
-                    # keep going
-                    if not self._isRunning:
-                        raise UserCancelException("User cancelled the iterations.")
-                    # was this a failed attempt before? skip?
-                    if self.skipFailed:
-                        uid="%s/%s/%s" % (event,station,self.meth)
-                        if uid in failedPairs:
-                            logging.info("%s has previously failed, skipping..." % uid)
-                            continue
-                    # has this combo already been analyzed? skip?
-                    if self.skipPairs:
-                        uid="%s/%s/%s" % (event,station,self.meth)
-                        _,vals=DB.retrieve(self.dbCur,"method","method",uid)
-                        if vals:
-                            logging.info("%s exists in database" % uid)
-                            continue
-                    # station was not one of the selected ones. skip!
-                    if station not in self.selectedStations:
-                        logging.debug("%s was not in the selected stations, skipping..." % station)
-                        continue
-                    # get station's #
-                    j=sorted(stDict.keys()).index(station)+1
-                    # send a signal to main thread and update progress bar
-                    self.iterDone.emit(["Processing event %s (%i/%i)\nProcessing station %s (%i/%i)" \
-                            % (
-                                event,i,maxI, 
-                                station,j,maxJ
-                              ),100*i/maxI])
-                    self.pytheas.station=station
-                    try:
-                        logging.info("Iterating %i/%i stations"%(j,maxJ))
-                        # calculate incidence angle?
-                        if self.pytheas.tpCNF.ainFlag:
-                            try:
-                              taupdat=tools.getTheorArrivals( # TODO: display secpndary phases too
-                                                       (evDict["ORIGIN"],evDict["LAT"],
-                                                        evDict["LON"],evDict["DEPTH"]),
-                                                       (self.pytheas.inventory[station]["latitude"],
-                                                        self.pytheas.inventory[station]["longitude"]),
-                                                        self.pytheas.tmodel
-                                                            )
-                              # grab measurements for the s arrival (not S)
-                              for reg in taupdat.values():
-                                if reg["phase"] == "s": 
-                                    ain=reg["ain"]
-                                    stDict[station]["AN"]=ain
-                                    break # can there be more than 1 "s" arrivals??
-                            except:
-                                logging.debug("Could not calculate TauP ain for %s -%s" % (event,station))            
-                        # is the pair outside the shear-wave window?
-                        if float(stDict[station]['AN']) > self.pytheas.maxAin:
-                            logging.warning("Angle of incidence greater than %.1f, skipping..." % self.pytheas.maxAin)
-                            skip=True
-                            state=" SKIP AIN\n"
-                        # does the pair have an active S arrival?
-                        if station not in self.pytheas.spickDict[event]:
-                            logging.warning("No S pick for %s , skipping..."%station)     
-                            skip=True
-                            if not state:
-                                state=" SKIP NO_S_PICKS\n"                        
-                        # check if arrival is valid
-                        self.pytheas.sArr=self.pytheas.spickDict[event][station]
-                        if self.pytheas.sArr in [None,0,np.nan]:
-                            logging.warning("No S pick for %s , skipping..."%station)     
-                            skip=True
-                            if not state:
-                                state=" SKIP NO_S_PICKS\n"   
-                        # are we skipping?                                          
-                        if skip:
-                            with open(logfileCA,"a") as fid:
-                                fid.write(event.ljust(25)+station.rjust(6)+state)
-                            # WRITE DUMMY DICT WITH F GRADE TO DB
-                            continue                 
-                        # get origin time
-                        otime=evDict["ORIGIN"]
-                        # find the event folder and fetch the waveforms
-                        evFolder=self.pytheas.fullEvents[event]
-                        # iterate through ZNE
-                        try:
-                            stationFile=evFolder+os.sep+"*."+station+".*"
-                            tempStream,orCorrection=self.pytheas.getWave(stationFile,
-                                                                         inventory=self.pytheas.xmlInventory,
-                                                                         prefChannel=self.pytheas.generalCNF.chanPref,
-                                                                         orientCorr=self.pytheas.generalCNF.orientFlag,
-                                                                         showWarn=False)
-                            if not tempStream:
-                                raise StationException("Could not find station")
-                            stream=tempStream
-                            self.pytheas.stream=stream
-                            self.pytheas.orCorrection=orCorrection
-                        except:
-                            logging.exception("Could not find %s for %s, while applying CA!" % (station,event))
-                            with open(logfileCA,"a") as fid: 
-                                state=" FAIL CHANNEL_NOT_FOUND\n"
-                                fid.write(event.ljust(25)+station.rjust(6)+state)
-                            continue
-                        # get S pick
-                        self.pytheas.sArr=self.pytheas.spickDict[event][station]
-                        self.pytheas.sPick=self.pytheas.sArr-self.pytheas.stream[0].stats.starttime
-                        #
-                        self.ipairs+=1
-                        # check if all timeseries have the same length
-                        Wz=stream.select(component="Z")[0]
-                        Wy=stream.select(component="N")[0]
-                        Wx=stream.select(component="E")[0]
-                        # First horizontals
-                        Ax,Ay=tools.lengthcheck(Wx,Wy)
-                        stream.select(component="E")[0].data=Ax 
-                        stream.select(component="N")[0].data=Ay
-                        # Now the vertical
-                        Az,Ay=tools.lengthcheck(Wz,Wy)
-                        stream.select(component="Z")[0].data=Az
-                        stream.select(component="N")[0].data=Ay
-                        # Horizontals second time 
-                        Ax,Ay=tools.lengthcheck(Wx,Wy)
-                        stream.select(component="E")[0].data=Ax 
-                        stream.select(component="N")[0].data=Ay
-                        ######################################
-                        if abs(stream[1].stats.starttime - stream[2].stats.starttime) > stream[1].stats.delta:
-                            logging.warning("Could not synchronize waveforms, skipping...")
-                            with open(logfileCA,"a") as fid: 
-                                state=" FAIL START_TIME_ERROR\n"
-                                fid.write(event.ljust(25)+station.rjust(6)+state)
-                            # add grade
-                            self.pytheas.grade="F"            
-                            self.pytheas.updateSplittingDict()
-                            DB.addValues(self.dbConn,self.dbCur,self.pytheas.splittingDict)
-                            continue
-                        # apply filter
-                        if self.auto_filter_flag:
-                            self.pytheas.automatic_filter_selection(update_figure=False)
-                            SNR = self.pytheas.SNR
-                        else:
-                            if not tools.isnone(self.pytheas.freqmin) or not tools.isnone(self.pytheas.freqmax):
-                                stream.filter(type="bandpass",freqmin=self.pytheas.freqmin,freqmax=self.pytheas.freqmax,zerophase=True,corners=4)
-                            # get SNR, if needed
-                            SNR = self.pytheas.calcSNR(self.pytheas.sPick)
-                        # is the pair outside the shear-wave window?
-                        if SNR < self.pytheas.minSNR:
-                            logging.warning("SNR too low (%.3f < %.3f), skipping..." % (SNR, self.pytheas.minSNR))
-                            #skip = True  # not really needed here, can just use 'continue'
-                            with open(logfileCA,"a") as fid: 
-                                state = " SKIP SNR\n"
-                                fid.write(event.ljust(25) + station.rjust(6) + state)
-                            continue
-                        # deal with ain
-                        if self.pytheas.actQT.isChecked():
-                            logging.debug("Will rotate to LQT")
-                            ain=stDict[station]['AN']
-                        else:
-                            logging.debug("Will rotate to ZRT")
-                            ain=0.
-                        self.pytheas.applyCA(self.meth[1:],stream,False,self.pytheas.freqmin,self.pytheas.freqmax,
-                                     self.pytheas.sPick,stDict[station]['BAZ'],ain,False,True,
-                                     eventCode=event)
-                        while self.pytheas.CAthread.isRunning():
-                            time.sleep(0.1) # stability hack
-                            continue
-                        if self.pytheas.CAthread.excFlag:
-                            logging.error("Error while executing fully automatic clustering in pair: %s - %s" \
-                                          % (event,station))
-                            with open(logfileCA,"a") as fid:
-                                try:
-                                    _,_,exc_traceback=sys.exc_info()
-                                    ss=traceback.extract_tb(exc_traceback)[0]
-                                    state=" FAIL %s\n" % ss.line
-                                except:
-                                    state=" FAIL CA_THREAD_ERROR\n"
-                                fid.write(event.ljust(25)+station.rjust(6)+state)
-                            # add grade
-                            self.pytheas.grade="F"
-                            self.pytheas.updateSplittingDict()
-                            DB.addValues(self.dbConn,self.dbCur,self.pytheas.splittingDict)
-                            continue
-                        phi=self.pytheas.CAthread.phi % 180
-                        td=self.pytheas.CAthread.dt
-                        optWindow=self.pytheas.CAthread.optWindow
-                        filterRange=(self.pytheas.freqmin,self.pytheas.freqmax)
-                        errors=(self.pytheas.CAthread.sphi,self.pytheas.CAthread.sdt)
-                        _,_,cArray,pTest,dTest,\
-                        pol,_,_,cEmax,\
-                        CC_FS,CC_NE,Tvar,nContours=self.pytheas.CAthread.tempRes 
-                        # grade the result
-                        grade_score,grade=tools.autoGrading(
-                            (phi,pol,self.pytheas.gradeCNF.polOff),
-                            (errors[0],errors[1],SNR,CC_FS,CC_NE), # values
-                            (self.pytheas.gradeCNF.error_bounds[0],
-                            self.pytheas.gradeCNF.error_bounds[1],
-                            self.pytheas.gradeCNF.snr_bound,
-                            self.pytheas.gradeCNF.CC_FS_bound, 
-                            self.pytheas.gradeCNF.CC_NE_bound),  # bounds
-                            self.pytheas.gradeCNF.gradeDict
-                                        )
-                        # write results to splitting dict
-                        self.pytheas.phi=phi; self.pytheas.td=td; self.pytheas.pol=pol
-                        self.pytheas.nContours=nContours; self.pytheas.CC_FS=CC_FS; self.pytheas.CC_NE=CC_NE
-                        self.pytheas.Tvar=Tvar; self.pytheas.errors=errors
-                        self.pytheas.minPick,self.pytheas.maxPick=optWindow
-                        self.pytheas.grade=grade; self.pytheas.grade_score=grade_score; self.pytheas.SNR=SNR
-                        self.pytheas.pTest=pTest; self.pytheas.dTest=dTest
-                        self.pytheas.cEmax=cEmax; self.pytheas.cArray=cArray
-                        self.pytheas.initialClusters=self.pytheas.CAthread.initial; self.pytheas.initialClustersErrors=self.pytheas.CAthread.initial_err
-                        self.pytheas.calinski=self.pytheas.CAthread.calinski
-                        self.pytheas.clusters1=self.pytheas.CAthread.clusters1; self.pytheas.clusters2=self.pytheas.CAthread.clusters2                    
-                        ## add values to database
-                        self.pytheas.updateSplittingDict()
-                        DB.addValues(self.dbConn,self.dbCur,self.pytheas.splittingDict)
-                        self.ispairs+=1
-                        with open(logfileCA,"a") as fid:
-                            state=" DONE\n"
-                            fid.write(event.ljust(25)+station.rjust(6)+state)
-                    except:
-                        logging.exception("Error in Cluster Analysis! Skipping %s - %s" % (event,station))
-                        _,_,exc_traceback=sys.exc_info()
-                        ss=traceback.extract_tb(exc_traceback)[0]
-                        with open(logfileCA,"a") as fid:
-                            state=" FAIL %s\n" % ss.line
-                            fid.write(event.ljust(25)+station.rjust(6)+state)
-                        # add grade
-                        self.pytheas.grade="F"
-                        self.pytheas.updateSplittingDict()
-                        DB.addValues(self.dbConn,self.dbCur,self.pytheas.splittingDict)
-                        continue
-        except Exception as exc:
-            self.excFlag=True
-            self.iterFail.emit(exc)
-        DB.close(self.dbConn)
+        iters = 0
+        while self._isRunning:
+            time.sleep(100)
+            ####
+            # read logs here
+            ####
+            iters += 1
+            logs_bodytext = [
+                [('ran iteration #%i\n' % (ii * jj)) for ii in range(1, iters + 1)] for jj in range(1, self.core_count)
+            ]
+            self.iter_logs_read.emit(logs_bodytext)
+
+    def stop(self):
+        self._isRunning = False
+
+    def __del__(self):
+        """Change the __del__ method."""
+        self.wait()    
+
+## Catalogue Cluster Analysis CLI thread class
+class PytheasCLILauncher(QtCore.QThread):
+    """
+    """
+    def __init__(self, core_count, parent=None):
+        QtCore.QThread.__init__(self,parent)
+        self.core_count = core_count
+
+    def run(self):
+        target = os.path.join(_DIR_CWD, 'multiproc.py')
+        sub_call(['python', target, ('%i' % self.core_count)])
+
+    def __del__(self):
+        """Change the __del__ method."""
+        self.wait()
+
+#-- scrollable label 
+class ScrollLabel(QtWidgets.QScrollArea):
+    """
+    https://www.geeksforgeeks.org/pyqt5-scrollable-label/
+    """
+    # contructor
+    def __init__(self, *args, **kwargs):
+        QtWidgets.QScrollArea.__init__(self, *args, **kwargs)
+
+        # making widget resizable
+        self.setWidgetResizable(True)
+
+        # making qwidget object
+        content = QtWidgets.QWidget(self)
+        self.setWidget(content)
+
+        # vertical box layout
+        lay = QtWidgets.QVBoxLayout(content)
+
+        # creating label
+        self.label = QtWidgets.QLabel(content)
+
+        # change color of text
+        self.label.setStyleSheet(("""
+                    QLabel {
+                        color: cyan;
+                    }
+                    """))
+
+        # setting alignment to the text
+        self.label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+
+        # making label multi-line
+        self.label.setWordWrap(True)
+
+        # adding label to the layout
+        lay.addWidget(self.label)
+
+    # the setText method
+    def setText(self, text):
+        # setting text to the label
+        self.label.setText(text)
 
 ## Subclassing QTableWidgetItem to enable sorting
 class QTableWidgetNumItem(QtWidgets.QTableWidgetItem):
@@ -5817,16 +5664,6 @@ class QTableWidgetDateItem(QtWidgets.QTableWidgetItem):
     """Set a different sorting method for date items."""
     def __lt__(self, other):
         return UTCDateTime(self.text()) < UTCDateTime(other.text())
-
-## Custom Exceptions ##
-class StationException(Exception):
-    pass
-
-class EventException(Exception):
-    pass
-
-class UserCancelException(Exception):
-    pass
 
 # grab silent exceptions
 def my_excepthook(type,value,tback):

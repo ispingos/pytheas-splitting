@@ -1,30 +1,30 @@
 #!/usr/bin/python
 
 # basic usr params
-nodes=['eida-routing'] # list of nodes to search/download info. Can either a FDSN node
-                       # or one of 'eida-routing' and 'iris-federator'
-period='2018-03-01','2050-01-01' # selection period
-p1=(21.6255,37.9624) # SE point of selection rectangle
-p2=(22.7428,38.5516) # NW point of selection rectangle
-level='response' # information layer to download (network,station,channel,response)
-outName='wgoc_stations_eida.txt' # full name for destination file of results 
-outType='STATIONXML'    # output type of file (CSS, KML, SACPZ, SHAPEFILE, STATIONTXT, STATIONXML)
+nodes=['eida-routing']  # list of nodes to search/download info. Can either a FDSN node
+                        # or one of 'eida-routing' and 'iris-federator'
+period= ['2018-03-01', '2050-01-01']  # selected time period
+p1 = (21.6255, 37.9624)  # SE point of selection rectangle
+p2 = (22.7428, 38.5516)  # NW point of selection rectangle
+level = 'channel'  # information layer to download (network,station,channel,response)
+outName = 'wgoc_stations_eida.xml'  # full name for destination file of results 
+outType = 'STATIONXML'  # output type of file (CSS, KML, SACPZ, SHAPEFILE, STATIONTXT, STATIONXML)
                         # use 'CLASSTXT' for a custom text format
 #############################################
 #
 #
-#                  ~ getStations ~
+#        ~ fdsn_get_station_metadata ~
 #
 # Fetch station metadata from FDSN in required
 # format for selected area and time period from 
 # selected nodes.
 #
 #
-# Spingos I. (2019)
+# Spingos I. (2019-2021)
 #############################################
 # defs
 VERSION = '1.0.0'
-VERDATE = '15/04/2019'
+VERDATE = '03/04/2021'
 ## imports ##
 import logging
 from obspy import UTCDateTime

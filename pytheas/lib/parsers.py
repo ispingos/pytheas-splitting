@@ -13,7 +13,7 @@ while, at the same time, enhanching the effectiveness of processing and quality 
 
 Pytheas is released under the GNU GPLv3 license.
 
-Authors: Spingos I. & Kaviris G. (c) 2019-2020
+Authors: Spingos I. & Kaviris G. (c) 2019-2021
 Special thanks to Millas C. for testing the software and providing valuable feedback from the 
 very early stages of this endeavor!
 
@@ -31,6 +31,7 @@ at https://www.github.com/ispingos/pytheas-splitting
 import os
 import logging
 import numpy as np
+from obspy import read_events, read_inventory
 from configparser import *
 
 class parseGeneralCnf():
@@ -659,3 +660,108 @@ class ParseFilterCnf():
 							 '14,4.00000000,10.00000000\n',
 							 '15,1.00000000,20.00000000\n']
 						  )
+def path_parser(paths_file, mode="read", catFile=None, dataPath=None, dbPath=None):
+    """
+    Check whether a file containing the previously used data directory, catalogue file and
+    database file paths exists and then either read or write.
+    :type paths_file: str
+    :param paths_file: Path to the ASCII file containing paths (or the one where the paths
+        will be stored in 'read' mode).
+    :type mode: str, optional
+    :param mode: One of 'read' or 'write', selects the mode with which the function will
+        operate. 'read' means reading previous paths and 'write' means (over)writing the 
+        new ones to the file. Defaults to 'read'.
+    :type catFile: str or None, optional
+    :param catFile: path to the catalogue file. If None, this path will be skipped. Defaults to 
+        None.
+    :type dataPath: str or None, optional
+    :param dataPath: path to data directory. If None, this path will be skipped. Defaults to
+        None.
+    :type dbPath: str or None, optional
+    :param dbPath: path to database file. If None, this path will be skipped. Defaults to
+        None.
+    """
+    # set name for paths file
+    if mode == "read": # read from existing file
+        try:
+            with open(paths_file,"r") as fid:
+                temp=fid.readlines()
+            paths=[x.split(",") for x in temp]
+            for path in paths:
+                if path[0] == "ERRPATH": # catalogue. 'ERR' is a remnant from old times...
+                    catFile=path[1].strip()
+                elif path[0] == "DATAPATH": # data directory
+                    dataPath=path[1].strip()
+                elif path[0] == "DBPATH": # database directory
+                    dbPath=path[1].strip()
+            # if the file doesn't exist, set current directory
+            if not catFile or not os.path.exists(catFile):
+                catFile=os.getcwd()
+            if not dataPath or not os.path.exists(dataPath):
+                dataPath=os.getcwd()
+            if not dbPath or not os.path.exists(dbPath):
+                dbPath=os.getcwd()
+            return dataPath,catFile,dbPath
+        except IOError:
+            catFile=os.getcwd()
+            dataPath=os.getcwd()
+            dbPath=os.getcwd()
+            return dataPath,catFile,dbPath
+    elif mode == "write": # write to the file
+        if catFile and dataPath and dbPath:
+            with open(paths_file,"w") as fid:
+                fid.write("ERRPATH"+","+catFile+"\n")
+                fid.write("DATAPATH"+","+dataPath+"\n")
+                fid.write("DBPATH"+","+dbPath+"\n")
+
+
+def read_stations(path_station_file):
+    """
+    Read the stations information file. Must be either a
+    StationXML or an ASCII file in the format:
+    station network latitude longitude elevation
+    :type path_station_file: str
+    :param path_station_file: path to the station information file
+    :returns: if the file is StationXML returns a tuple with 
+        (a dict containing the station information, 
+            the :class:`~obspy.core.stream.Inventory` object),
+        otherwise returns (a dict containing the station information, None)
+    """
+    try:
+        # simple check to validate file is of xml type, as obspy's
+        # read_inventory sometimes parses non-xml files as xml
+        with open(path_station_file, 'r') as fid:
+            check_line = fid.readline()
+        if not '?xml version' in check_line:
+            raise TypeError('Input file is not StationXML')
+        # read the xml
+        xml = read_inventory(path_station_file)
+        inventory = {}
+        for net in xml:
+            for sta in net:
+                inventory.update(
+                    {
+                        sta.code:{
+                        "network":net.code,
+                        "latitude":sta.latitude,
+                        "longitude":sta.longitude,
+                        "elevation":sta.elevation
+                                }
+                    }
+                                )
+        return inventory, xml
+    except TypeError:
+        xml = None
+        with open(path_station_file, "r") as fid:
+            staLines=fid.readlines()
+        return {x.split()[0]:
+                    {
+                    "network":x.split()[1],
+                    "latitude":float(x.split()[2]),
+                    "longitude":float(x.split()[3]),
+                    "elevation":float(x.split()[4])
+                    } for x in staLines
+                }, xml
+    except:
+        logging.exception('Caught exception')
+        raise IOError("Could not read station file %s" % path_station_file)

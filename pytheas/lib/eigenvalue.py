@@ -13,7 +13,7 @@ while, at the same time, enhanching the effectiveness of processing and quality 
 
 Pytheas is released under the GNU GPLv3 license.
 
-Authors: Spingos I. & Kaviris G. (c) 2019-2020
+Authors: Spingos I. & Kaviris G. (c) 2019-2021
 Special thanks to Millas C. for testing the software and providing valuable feedback from the 
 very early stages of this endeavor!
 
@@ -329,8 +329,9 @@ def getBounds(td,phi,tdTest,phiTest,cArrayNorm):
     for i,_ in enumerate(cs.collections):
         for j,pt in enumerate(cs.collections[i].get_paths()):
             if pt.contains_point((td,phi)):
-                c95Contour=pt
-                selContour=pt.interpolated(100).vertices
+                c95Contour = pt
+                selContour = pt.interpolated(100).vertices
+                n_contours = len(cs.collections[i].get_paths())
                 break
     ## search for point-contour combinations
     if len(selContour) == 0:
@@ -360,4 +361,4 @@ def getBounds(td,phi,tdTest,phiTest,cArrayNorm):
         tdErr=abs(tdErrors[0]-td)*0.5
     else:
         tdErr=abs(max(tdErrors)-min(tdErrors))*0.25
-    return phiErr,tdErr,len(cs.collections)
+    return phiErr, tdErr, n_contours
