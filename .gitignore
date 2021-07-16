@@ -120,3 +120,5 @@ dmypy.json
 *.cnf
 *.db3
 pytheas/etc/options/log_max_bytes
+*.bin
+*.npz

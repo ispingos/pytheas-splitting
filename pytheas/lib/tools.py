@@ -187,7 +187,9 @@ def initSplittingDict(layer):
                 "depth":np.nan,"magnitude":np.nan}
     elif layer == "station":
         return {"station":None,"epicentral":np.nan,"azimuth":np.nan,
-                "s_p":np.nan,"incidence":np.nan,
+                "s_p":np.nan,
+                "incidence":np.nan,
+                "takeoff":np.nan,
                 "s_obs":None,
                 "s_theo":None,
                 "s_auto":None,
@@ -222,7 +224,7 @@ def initPytheasDict(layer):
                 'LAT':None,'LON':None,'DEPTH':None,
                 'MAG':None,'evID':None}
     elif layer == "station":
-        return {'STA':None,'NET':None,'DIST':None,'BAZ':None,'AN':None,
+        return {'STA':None,'NET':None,'DIST':None,'BAZ':None,'AN':np.nan, 'TF':np.nan,
                 'SECP':None,'TOBSP':None,'SECS':None,'TOBSS':None,}
 
 ## time-delay related functions
@@ -793,23 +795,25 @@ def getTheorArrivals(event,station,model,phases=[]):
 
     """
     # get arrivals
-    arrivals=model.get_travel_times_geo(
+    arrivals = model.get_travel_times_geo(
                                         source_depth_in_km=event[3],
                                         source_latitude_in_deg=event[1],
                                         source_longitude_in_deg=event[2],
                                         receiver_latitude_in_deg=station[0],
-                                        receiver_longitude_in_deg=station[1]
-                                        #phase_list=phases
+                                        receiver_longitude_in_deg=station[1],
+                                        phase_list=phases
                                        )    
     # convert to a more convenient structure
-    arDict={}; i=0
-    for arr in arrivals:
-        i+=1
+    arDict = {}
+    for i, arr in enumerate(arrivals):
+        i += 1
         arDict.update(
             {
               i : {
-                    "phase":arr.name, "ain":arr.incident_angle,
-                    "time":event[0]+arr.time
+                    "phase":arr.name, 
+                    "ain":arr.incident_angle,
+                    'tkf':arr.takeoff_angle,
+                    "time":event[0] + arr.time
 
               }
             }

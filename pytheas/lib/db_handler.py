@@ -35,9 +35,9 @@ import numpy as np
 
 ## global variables ##
 # default keys for each layer
-defKeys={
+defKeys = {
             "event":("origin","latitude","longitude","depth","magnitude"),
-            "station":("station","network","epicentral","azimuth","incidence","s_p",
+            "station":("station","network","epicentral","azimuth","incidence","takeoff","s_p",
                        "s_obs","s_theo","s_auto","orientation"),
             "method":("station","network","method","phi","td","pol","CC_NE","CC_FS","var_T","err_phi","err_td",
                       "N_contours","grade_score","grade","filter_min","filter_max",
@@ -48,8 +48,9 @@ defKeys={
                        )
         }
 # assign the SQL datatype related to each key
-typeKeys={"origin":"DATETIME","latitude":"REAL","longitude":"REAL","depth":"REAL","magnitude":"REAL",
-          "station":"TEXT","network":"TEXT","epicentral":"REAL","azimuth":"REAL","incidence":"REAL","SNR":"REAL",
+typeKeys = {"origin":"DATETIME","latitude":"REAL","longitude":"REAL","depth":"REAL","magnitude":"REAL",
+          "station":"TEXT","network":"TEXT","epicentral":"REAL",
+          "azimuth":"REAL","incidence":"REAL", "takeoff":"REAL", "SNR":"REAL",
           "s_obs":"DATETIME","s_theo":"DATETIME","s_auto":"DATETIME",
           "s_freq":"REAL","s_p":"REAL","orientation":"REAL",
           "method":"TEXT","phi":"REAL","td":"REAL","pol":"REAL","CC_NE":"REAL","CC_FS":"REAL",
@@ -222,6 +223,35 @@ def addValues(conn,cur,splittingDict):
                     cur.execute(mcom,[metDict[x] for x in sorted(defKeys['method'])]+[evid,skey,mkey])
     conn.commit() 
     logging.info("Successfully updated database.")
+
+def synckeys(conn, cur):
+    """
+    Add new keys to older databases for compatibility
+
+    :type conn: :class: `~sqlite3.Connection`
+    :param conn: the connection object, linked to the
+        database.
+    :type cur: :class: `~sqlite3.Cursor`
+    :param cur: the cursor instance, linked to the
+        database.
+
+    """ 
+    #-- search whether all keys in `defKeys` exist in the database
+    for dkey in defKeys:
+        #- get database's keys for the specified table
+        res = cur.execute('SELECT * from {:s}'.format(dkey))
+        ikeys = [c[0] for c in res.description]
+        for mkey in defKeys[dkey]:
+            if not mkey in ikeys:
+                logging.info('Will add new key {:s} to database'.format(mkey))
+                cur.execute('ALTER TABLE {:s} ADD {:s} {:s}'.format(dkey, mkey, typeKeys[mkey]))
+    #-- save
+    conn.commit()
+    logging.info('Successfully synchronized keys to newest DB version')
+
+
+
+
 
 def find(cur,table,column,value):
     """

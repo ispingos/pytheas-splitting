@@ -49,8 +49,8 @@ LIC_STR=("""
 
 global _PYTHEAS_VERSION
 global _PYTHEAS_VERDATE
-_PYTHEAS_VERSION = "0.3.0+d11"
-_PYTHEAS_VERDATE = "03/04/2021"
+_PYTHEAS_VERSION = "0.3.0+d12"
+_PYTHEAS_VERDATE = "17/07/2021"
 
 #-- intro
 print('~~~ STARTING PYTHEAS v.%s (%s) ~~~' % (_PYTHEAS_VERSION, _PYTHEAS_VERDATE))
@@ -239,7 +239,7 @@ class Pytheas(QtWidgets.QMainWindow):
         self.tpCNF = parsers.parseTaupCnf(os.path.join(_DIR_CWD, 'etc', 'options', 'taup.cnf'))
         self.gradeCNF = parsers.parseGradeCnf(os.path.join(_DIR_CWD, 'etc', 'options', 'grading.cnf'))
         self.filterCNF = parsers.ParseFilterCnf(os.path.join(_DIR_CWD, 'etc', 'options', 'filters.cnf'))
-        self.cli_settings_path = os.path.join(self.cli_settings_dir, 'cca_settings_c%i.bin')
+        self.cli_settings_path = os.path.join(self.cli_settings_dir, 'cca_settings_c{:d}.bin'.format(1))
         logging.info(f'Attempting to get previous settings from {self.cli_settings_path}')
         try:
             self.cca_settings = pk.load(open(self.cli_settings_path, 'rb'))
@@ -395,8 +395,10 @@ class Pytheas(QtWidgets.QMainWindow):
         self.lblOrigin.setAlignment(QtCore.Qt.AlignCenter)
         self.lblStation=QtWidgets.QLabel("V. Date: %s" % _PYTHEAS_VERDATE,font=QtGui.QFont("Calibri",14,QtGui.QFont.Bold))
         self.lblStation.setAlignment(QtCore.Qt.AlignCenter)
-        self.lblAIN=QtWidgets.QLabel("incidence ("+u"\u00b0"+"):",font=self.lblFont)
-        self.inpAIN=QtWidgets.QLabel("45",font=self.inpFont)
+        self.lblAIN=QtWidgets.QLabel("inc ("+u"\u00b0"+"):",font=self.lblFont)
+        self.inpAIN = QtWidgets.QLabel("45",font=self.inpFont)
+        self.lblTKF = QtWidgets.QLabel("tkf ("+u"\u00b0"+"):", font=self.lblFont)
+        self.inpTKF = QtWidgets.QLabel("135",font=self.inpFont)
         self.lblBAZ=QtWidgets.QLabel("backazimuth (N"+u"\u00b0"+"E):",font=self.lblFont)
         self.inpBAZ=QtWidgets.QLabel("270",font=self.inpFont)
         self.lblEPI=QtWidgets.QLabel("epicentral (km):",font=self.lblFont)
@@ -435,18 +437,20 @@ class Pytheas(QtWidgets.QMainWindow):
         self.gLayout.addWidget(self.lblStation,1,7)
         self.gLayout.addWidget(self.lblAIN,2,1)
         self.gLayout.addWidget(self.inpAIN,2,2)
-        self.gLayout.addWidget(self.lblBAZ,2,3)
-        self.gLayout.addWidget(self.inpBAZ,2,4)
-        self.gLayout.addWidget(self.lblEPI,2,5)
-        self.gLayout.addWidget(self.inpEPI,2,6)
-        self.gLayout.addWidget(self.lblMAG,2,7)
-        self.gLayout.addWidget(self.inpMAG,2,8)
-        self.gLayout.addWidget(self.lblSNR,2,9)
-        self.gLayout.addWidget(self.inpSNR,2,10)
-        self.gLayout.addWidget(self.lblSYS,2,11)
-        self.gLayout.addWidget(self.inpSYS,2,12)
-        self.gLayout.addWidget(self.lblV2H,2,13)
-        self.gLayout.addWidget(self.inpV2H,2,14)
+        self.gLayout.addWidget(self.lblTKF,2,3)
+        self.gLayout.addWidget(self.inpTKF,2,4)
+        self.gLayout.addWidget(self.lblBAZ,2,5)
+        self.gLayout.addWidget(self.inpBAZ,2,6)
+        self.gLayout.addWidget(self.lblEPI,2,7)
+        self.gLayout.addWidget(self.inpEPI,2,8)
+        self.gLayout.addWidget(self.lblMAG,2,9)
+        self.gLayout.addWidget(self.inpMAG,2,10)
+        self.gLayout.addWidget(self.lblSNR,2,11)
+        self.gLayout.addWidget(self.inpSNR,2,12)
+        self.gLayout.addWidget(self.lblSYS,2,13)
+        self.gLayout.addWidget(self.inpSYS,2,14)
+        self.gLayout.addWidget(self.lblV2H,2,15)
+        self.gLayout.addWidget(self.inpV2H,2,16)
         self.gLayout.addWidget(self.lblPHI,3,1)
         self.gLayout.addWidget(self.inpPHI,3,2)
         self.gLayout.addWidget(self.lblTD,3,3)
@@ -544,7 +548,12 @@ class Pytheas(QtWidgets.QMainWindow):
         N = self.stream.select(component=H1)[0].data[idxstart:idxend]
         E = self.stream.select(component=H2)[0].data[idxstart:idxend]
         ## return the ratios
-        return any((np.abs(Z).max()<np.abs(N).max(),np.abs(Z).max()<np.abs(E).max()))
+        return any(
+            (
+                np.abs(Z).max() < np.abs(N).max(), 
+                np.abs(Z).max() < np.abs(E).max()
+                )
+            )
 
     def calcSNR(self, pick, win_noise=None, win_signal=None):
         """
@@ -575,6 +584,29 @@ class Pytheas(QtWidgets.QMainWindow):
         # calculate the snr
         return tools.calculate_snr(self.stream, pick, win_noise, win_signal)
   
+    def check_length(self, stream_ini):
+        """
+        Checks and corrects differences in stream length by padding
+        """
+        stream = stream_ini.copy()
+        #-- check length
+        Wx = stream[0]
+        Wy = stream[1]
+        Wz = stream[2]
+        # First horizontals
+        Ax, Ay = tools.lengthcheck(Wx, Wy)
+        Wx.data = Ax 
+        Wy.data = Ay
+        # Now the vertical
+        Az, Ay = tools.lengthcheck(Wz, Wy)
+        Wz.data = Az
+        Wy.data = Ay
+        # Horizontals second time
+        Ax,Ay = tools.lengthcheck(Wx, Wy)
+        Wx.data = Ax 
+        Wy.data = Ay   
+        return stream
+
     def tdCheck(self,td):
         """
         Checks that the input time delay value is proper according to the
@@ -708,15 +740,14 @@ class Pytheas(QtWidgets.QMainWindow):
         :returns: a list of the station names
 
         """
-        evFolder=self.fullEvents[self.activeEvent]
-        staList=sorted(
-                        self.statsDict[self.activeEvent],
-                        key=lambda x:self.statsDict[self.activeEvent][x]["AN"]
-                      )
-        activeStations=[]
+        evFolder = self.fullEvents[self.activeEvent]
+        staList = sorted(
+            self.statsDict[self.activeEvent],
+            key=lambda x:self.statsDict[self.activeEvent][x]["AN"]
+            )
+        activeStations = []
         for station in staList:
-            path=evFolder+os.sep+"*."+station+".*"
-            path = os.path.join(evFolder, '*.%s.*' % station)
+            path = os.path.join(evFolder, '*.{:s}.*'.format(station))
             try:
                 if glob(path)[0]:
                     activeStations.append(station)
@@ -759,43 +790,52 @@ class Pytheas(QtWidgets.QMainWindow):
         evsDict={}; statsDict={}
         frmt="%Y-%m-%d-%H-%M-%S"
         # read the file
-        with open(catFile,"r") as fid: catLines=fid.readlines()
-        for evid,line in enumerate(catLines):
+        with open(catFile,"r") as fid:
+            catLines = fid.readlines()
+        for evid, line in enumerate(catLines):
           try:
-              evDict=tools.initPytheasDict("event")
-              origin=UTCDateTime(line[:23])
-              dateKey=origin.strftime(frmt)
-              evlat=float(line[23:].strip().split()[0])
-              evlon=float(line[23:].strip().split()[1])
-              evdep=float(line[23:].strip().split()[2])
+              evDict = tools.initPytheasDict("event")
+              origin = UTCDateTime(line[:23])
+              dateKey = origin.strftime(frmt)
+              evlat = float(line[23:].strip().split()[0])
+              evlon = float(line[23:].strip().split()[1])
+              evdep = float(line[23:].strip().split()[2])
               if not evdep:
                 evdep = 0.1  # temporary fix
-              mag=float(line[23:].strip().split()[3])
-              evDict["YEAR"]=origin.year
-              evDict["Mo"]=origin.month
-              evDict["Da"]=origin.day
-              evDict["HR"]=origin.hour
-              evDict["MN"]=origin.minute
-              evDict["SEC"]=origin.second+origin.microsecond/10**6
-              evDict["ORIGIN"]=origin
-              evDict["LAT"]=evlat; evDict["LON"]=evlon; evDict["DEPTH"]=evdep
-              evDict["MAG"]=mag; evDict["evID"]=str(evid)
+              mag = float(line[23:].strip().split()[3])
+              evDict["YEAR"] = origin.year
+              evDict["Mo"] = origin.month
+              evDict["Da"] = origin.day
+              evDict["HR"] = origin.hour
+              evDict["MN"] = origin.minute
+              evDict["SEC"] = origin.second+origin.microsecond/10**6
+              evDict["ORIGIN"] = origin
+              evDict["LAT"] = evlat
+              evDict["LON"] = evlon
+              evDict["DEPTH"] = evdep
+              evDict["MAG"] = mag 
+              evDict["evID"] = str(evid)
               # start adding stations
               statsDict.update({dateKey:{}})
               for station in sorted(self.inventory):
                 try:
-                    staDict=tools.initPytheasDict("station")                
+                    staDict = tools.initPytheasDict("station")                
                     # get distance and azimuth
-                    dist,az,baz=gps2dist_azimuth(evlat,evlon,
-                                                  self.inventory[station]["latitude"],
-                                                  self.inventory[station]["longitude"])
+                    dist, az, baz = gps2dist_azimuth(
+                        evlat,evlon,
+                        self.inventory[station]["latitude"],
+                        self.inventory[station]["longitude"]
+                        )
                     # calculate ain for direct linear raypath #
-                    ain=np.rad2deg(np.arctan((dist/1000.)/evdep))
+                    ain = np.rad2deg(np.arctan((dist / 1000.)/evdep))
+                    tkf = (180 - ain) % 180
                     # store values to dictionary
-                    staDict['STA']=station
-                    staDict['NET']=self.inventory[station]['network']
-                    staDict['DIST']=dist/1000.
-                    staDict['BAZ']=baz; staDict['AN']=ain
+                    staDict['STA'] = station
+                    staDict['NET'] = self.inventory[station]['network']
+                    staDict['DIST'] = dist * 1e-3
+                    staDict['BAZ'] = baz
+                    staDict['AN'] = ain
+                    staDict['TF'] = tkf
                     statsDict[dateKey].update({station:staDict})
                 except:
                     logging.exception("Could not process %s for %s" % (station,dateKey))
@@ -808,7 +848,7 @@ class Pytheas(QtWidgets.QMainWindow):
         return evsDict,statsDict
 
 
-    def readQML(self,qmlFile):
+    def readQML(self, qmlFile):
         """
         Read a QuakeML file.
 
@@ -881,26 +921,31 @@ class Pytheas(QtWidgets.QMainWindow):
                             baz=(arr.azimuth+180) % 360
                         except: # no az either? 
                             baz=None
+                    #-- get takeoff angle
+                    try:
+                        tkf = arr.takeoff_angle
+                        assert tkf != None, "Takeoff from QuakemL is 'None'"
+                    except:
+                        logging.exception('Could not find takeoff angle in QuakeML')
+                        tkf = np.nan
                     # get the angle of incidence
-                    try: # if ain is not written
-                        ain=arr.incidence_angle
-                    except AttributeError: # maybe the takeoff is
-                        try:
-                            # calculate the incidence angle from the takeoff
-                            # as seen in Kapetanidis (2017).
-                            ih=arr.takeoff_angle # takeoff angle
-                            vTop=np.float(self.vmodel.evaluate_below(0,'s')) # velocity at station
-                            vSrc=np.float(self.vmodel.evaluate_below(dep,'s')) # velocity at source
-                            ain=np.rad2deg(np.arcsin((vTop/vSrc)*np.sin(np.deg2rad(ih))))
-                        except:
-                            ain=np.nan
+                    try:
+                        # calculate the incidence angle from the takeoff
+                        # as seen in Kapetanidis (2017).
+                        vTop = np.float(self.vmodel.evaluate_below(0,'s'))  # velocity at station
+                        vSrc = np.float(self.vmodel.evaluate_below(dep,'s'))  # velocity at source
+                        ain = np.rad2deg(np.arcsin((vTop / vSrc) * np.sin(np.deg2rad(tkf))))
+                    except:
+                        logging.exception('Could not estimate incidence angle from takeoff')
+                        ain = np.nan
+
                     ## TODO: this should be added as a user-switch
                     ##if dist > degrees2kilometers(1): # accept ONLY local phases. should this be a user option?
                     ##    continue
                     
                     # check for phase and select
-                    if phase not in ["p","P","s","S"]: # "P"/"S" accepted only cause of erroneous registration
-                        continue                       # of direct upward local phases in the QuakeML
+                    if phase not in ["p","P","s","S"]:  # "P"/"S" accepted only cause of erroneous registration
+                        continue                        # of direct upward local phases in the QuakeML
                     for tmp in picksRef: # get the station info for the arrival
                         if tmp.resource_id == pid: # match arrival to pick
                             station=tmp.waveform_id.station_code
@@ -930,12 +975,13 @@ class Pytheas(QtWidgets.QMainWindow):
                                     baz=gps[2]
                                 if tools.isnone(ain):
                                     # calculate ain for direct linear raypath
-                                    ain=np.rad2deg(np.arctan((dist)/dep))
-                                    if tools.isnone(ain): ain = 90.0
+                                    ain = np.rad2deg(np.arctan((dist) / dep))
+                                    if tools.isnone(ain): 
+                                        ain = 90.0
                     # get phase information
                     if phase in ['p','P']:
                         temp={'STA':station,'NET':network,'COM':component,
-                             'DIST':dist,'BAZ':baz,'AN':ain,
+                             'DIST':dist,'BAZ':baz,'AN':ain, 'TF':tkf,
                              'SECP':ptime-originZero,'TOBSP':ptime-origin}
                         if station in staDict:
                             staDict[station].update(temp)                       
@@ -943,7 +989,7 @@ class Pytheas(QtWidgets.QMainWindow):
                           staDict.update({station:temp}) 
                     elif phase in ['s','S']:
                         temp={'STA':station,'NET':network,'COM':component, # re-adding these in case no
-                             'DIST':dist,'BAZ':baz,'AN':ain,               # P-arrival was found in the 
+                             'DIST':dist,'BAZ':baz,'AN':ain, 'TF':tkf,            # P-arrival was found in the 
                              'SECS':ptime-originZero,'TOBSS':ptime-origin} # QuakeML
                         if station in staDict:
                             staDict[station].update(temp)                       
@@ -964,21 +1010,22 @@ class Pytheas(QtWidgets.QMainWindow):
                         ain=np.rad2deg(np.arctan((dist/1000.)/dep))
                         if tools.isnone(ain): ain = 0.0
                         # store values to dictionary
-                        tempDict['STA']=station
-                        tempDict['NET']=self.inventory[station]['network']
-                        tempDict['DIST']=dist/1000.
-                        tempDict['BAZ']=baz
-                        tempDict['AN']=ain
+                        tempDict['STA'] = station
+                        tempDict['NET'] = self.inventory[station]['network']
+                        tempDict['DIST'] = dist * 1e-3
+                        tempDict['BAZ'] = baz
+                        tempDict['AN'] = ain
+                        tempDict['TF'] = tkf
                         staDict.update({station:tempDict})
                     except:
                         logging.exception("Could not process %s for %s" % (station,dateKey))
                         continue
                 evsDict.update({dateKey:evDict})                            
-                evsDict[dateKey]['NSTA']=len(staDict)
+                evsDict[dateKey]['NSTA'] = len(staDict)
                 statsDict.update({dateKey:staDict})
             except:
                 logging.exception("Could not parse %s from catalogue, skipping..." % evid)
-        return evsDict,statsDict
+        return evsDict, statsDict
 
     def eventCorrect(self,evPath,evsDict,statsDict):
        """
@@ -1077,6 +1124,7 @@ class Pytheas(QtWidgets.QMainWindow):
         self.splittingDict[self.activeEvent][self.station]["epicentral"]=float(self.statsDict[self.activeEvent][self.station]["DIST"])
         self.splittingDict[self.activeEvent][self.station]["azimuth"]=float(self.statsDict[self.activeEvent][self.station]["BAZ"])
         self.splittingDict[self.activeEvent][self.station]["incidence"]=float(self.statsDict[self.activeEvent][self.station]["AN"])
+        self.splittingDict[self.activeEvent][self.station]["takeoff"] = float(self.statsDict[self.activeEvent][self.station]["TF"])
         self.splittingDict[self.activeEvent][self.station]["s_p"]=self.tpts
         self.splittingDict[self.activeEvent][self.station]["orientation"]=self.orCorrection
         # update arrivals and picks
@@ -1276,7 +1324,8 @@ class Pytheas(QtWidgets.QMainWindow):
                     )
         elif splname.lower().endswith("csv"):
             hdr=",".join(("Origin Time","Latitude","Longitude",
-                           "Depth","Magnitude","Epicentral (km)","Backazimuth","Incidence",
+                           "Depth","Magnitude","Epicentral (km)",
+                           "Backazimuth", "Incidence", "Takeoff",
                            "phi","td (ms)","pol","Station","Method",
                            "SNR","phi error","td error (ms)","CC FS","CC NE",
                            "Score","Grade","Orientation","Comment"))
@@ -1303,7 +1352,8 @@ class Pytheas(QtWidgets.QMainWindow):
                 network=stLayer["network"]
                 distance="{:.2f}".format(stLayer["epicentral"])
                 backazimuth="{:.1f}".format(stLayer["azimuth"])
-                ain="{:.1f}".format(stLayer["incidence"])
+                ain = "{:.1f}".format(stLayer["incidence"])
+                tkf = "{:.1f}".format(stLayer["takeoff"])
                 orientation="{:.1f}".format(stLayer["orientation"])
                 for method in sorted(stLayer):
                     meLayer=stLayer[method]
@@ -1337,12 +1387,14 @@ class Pytheas(QtWidgets.QMainWindow):
                                     3*" "+grade+" # "+comment
                                 )
                     elif splname.lower().endswith("csv"):
-                        line=",".join((str(UTCDateTime(evLayer["origin"]))[:-3],latitude,longitude,depth,magnitude,distance,backazimuth,ain,phi,
-                                        td,pol,station,method,SNR,sphi,sdt,cc_fs,cc_ne,score,grade,orientation,comment))
+                        line=",".join((str(UTCDateTime(evLayer["origin"]))[:-3],
+                            latitude,longitude,depth,magnitude,distance,backazimuth,ain,tkf,
+                            phi,td,pol,station,method,SNR,sphi,sdt,cc_fs,cc_ne,score,grade,orientation,comment))
                     # append to list for writing in event file
                     writeList.append(line+"\n")
         # write to event file
-        with open(splname,"w") as fid: fid.writelines(writeList)
+        with open(splname,"w") as fid:
+            fid.writelines(writeList)
         # let the user know
         winTitle="Database Export"
         genText="Successfully exported results from database!"
@@ -1657,6 +1709,7 @@ class Pytheas(QtWidgets.QMainWindow):
         self.lblOrigin.setText(str(UTCDateTime(self.evsDict[self.activeEvent]["ORIGIN"]))[:-3])
         self.lblStation.setText(self.station)
         self.inpAIN.setText("{:.1f}".format(self.ain))
+        self.inpTKF.setText("{:.1f}".format(self.tkf))
         self.inpBAZ.setText("{:.1f}".format(self.baz))
         self.inpEPI.setText("{:.2f}".format(self.dist))
         self.inpMAG.setText("{:.1f}".format(self.mag))
@@ -2198,6 +2251,7 @@ class Pytheas(QtWidgets.QMainWindow):
             self.flagReset(general=False,indexing=False,titling=False,splitDict=False,splitting=splitRes)
         except KeyError: # means that one of event/station/method is not in the DB
             try:
+                logging.exception('Event/station/mehod not in DB')
                 self.sArr=self.dict_s_arr[self.activeEvent][self.station]
                 self.sPick=self.sArr-self.stream[0].stats.starttime
                 self.flagReset(general=False,indexing=False,titling=False,splitDict=False,splitting=splitRes)
@@ -2480,6 +2534,48 @@ class Pytheas(QtWidgets.QMainWindow):
             with open(idxFile,"a") as fid:
                 fid.write('%s,%s,%i\n' % (idxNew, dataPath, self.waveforms_number))
         logging.info("Found "+str(len(self.fullEvents))+" events in given path.")
+        ## intialize the velocity model
+        # set model object
+        try:
+            if self.tpCNF.model.endswith("tvel") or self.tpCNF.model.endswith("nd"):
+                from obspy.taup.taup_create import build_taup_model
+                modroot=os.path.split(self.tpCNF.model)[0]
+                _=build_taup_model(self.tpCNF.model,output_folder=modroot)
+                # get vel model name
+                vmod=os.path.split(os.path.splitext(self.tpCNF.model)[0])[1]
+                vmod=os.path.splitext(self.tpCNF.model)[0]+'.npz'
+            else:
+                vmod = self.tpCNF.model.upper()
+            # set taup model
+            self.tmodel=TauPyModel(model=vmod)
+        except:
+            logging.exception("Could not use custom model! Using IASP91 instead...")
+            winTitle="Velocity Model Warning"
+            genText="Could not read the velocity model!!"
+            infText="Could not read %s ! Will use 'iasp91' instead" % self.tpCNF.model
+            self.warnMsgBox(genText, infText, winTitle)
+            vmod="IASP91"
+            # set taup model
+            self.tmodel=TauPyModel(model=vmod)            
+
+        # set velocity model
+        try:
+            self.vmodel = VelocityModel.read_velocity_file(self.tpCNF.model)
+            logging.debug('Velocity model {:s} successfully read'.format(self.tpCNF.model))
+        except:
+            # if the vel model doesn't exist it might mean this
+            # is one of the builtins, so search for it
+            logging.exception('Could not read velocity model {:s}'.format(self.tpCNF.model))
+            bltin=taup_get_builtin_model_files()
+            vmod=[x for x in bltin if vmod.lower() in x.lower()]
+            try:
+                vmod=vmod[0]
+            except IndexError: # means no results were returned
+                vmod='IASP91'
+                vmod=[x for x in bltin if vmod.lower() in os.path.split(x)[1].lower()][0]
+            self.vmodel=VelocityModel.read_velocity_file(vmod)
+        logging.debug('Using velocity model %s' % vmod)        
+
         ## read the catalogue file
         try:
             self.pDial.setLabelText("Reading the catalogue file...")
@@ -2519,44 +2615,7 @@ class Pytheas(QtWidgets.QMainWindow):
             self.warnMsgBox(genText,infText,winTitle)
             return
         logging.info("Found "+str(len(self.evsDict))+" events in given catalogue.")
-        ## intialize the velocity model
-        # set model object
-        try:
-            if self.tpCNF.model.endswith("tvel") or self.tpCNF.model.endswith("nd"):
-                from obspy.taup.taup_create import build_taup_model
-                modroot=os.path.split(self.tpCNF.model)[0]
-                _=build_taup_model(self.tpCNF.model,output_folder=modroot)
-                # get vel model name
-                vmod=os.path.split(os.path.splitext(self.tpCNF.model)[0])[1]
-                vmod=os.path.splitext(self.tpCNF.model)[0]+'.npz'
-            else:
-                vmod = self.tpCNF.model.upper()
-            # set taup model
-            self.tmodel=TauPyModel(model=vmod)
-        except:
-            logging.exception("Could not use custom model! Using IASP91 instead...")
-            winTitle="Velocity Model Warning"
-            genText="Could not read the velocity model!!"
-            infText="Could not read %s ! Will use 'iasp91' instead" % self.tpCNF.model
-            self.warnMsgBox(genText, infText, winTitle)
-            vmod="IASP91"
-            # set taup model
-            self.tmodel=TauPyModel(model=vmod)            
-        # set velocity model
-        try:
-            self.vmodel=VelocityModel.read_velocity_file(self.tpCNF.model)
-        except:
-            # if the vel model doesn't exist it might mean this
-            # is one of the builtins, so search for it
-            bltin=taup_get_builtin_model_files()
-            vmod=[x for x in bltin if vmod.lower() in x.lower()]
-            try:
-                vmod=vmod[0]
-            except IndexError: # means no results were returned
-                vmod='IASP91'
-                vmod=[x for x in bltin if vmod.lower() in os.path.split(x)[1].lower()][0]
-            self.vmodel=VelocityModel.read_velocity_file(vmod)
-        logging.debug('Using velocity model %s' % vmod)
+
         ## read the database if it exists, otherwise create it
         try: # create
             self.dbConn,self.dbCur=DB.init(self.dbPath)
@@ -2564,6 +2623,8 @@ class Pytheas(QtWidgets.QMainWindow):
             self.dict_s_arr={}
         except IOError: # read
             self.dbConn,self.dbCur=DB.open(self.dbPath)
+        #-- synchronize database to latest
+        DB.synckeys(self.dbConn, self.dbCur)
         # correct keys
         try:
             self.pDial.setLabelText("Matchin directories to events...")
@@ -2831,7 +2892,7 @@ class Pytheas(QtWidgets.QMainWindow):
                 infTxt=str(exc)
                 winTit="Stream Error"
                 self.warnMsgBox(genTxt,infTxt,winTit)
-                pass # pass cause stream will be empty and handled below
+
             if not tempStream:
                 if not eventMode:
                     raise exceptions.StationException("Could not find %s" %station)
@@ -2843,6 +2904,11 @@ class Pytheas(QtWidgets.QMainWindow):
                 break
         self.stIdx=stIdx
         self.stream=tempStream
+        
+        #-- check length
+        self.stream = self.check_length(self.stream)     
+
+        ## orientation correction
         self.station=self.stream[0].stats.station
         self.orCorrection=orCorrection
         logging.info("Orientation correction: %.0f" % self.orCorrection)
@@ -2882,6 +2948,8 @@ class Pytheas(QtWidgets.QMainWindow):
                              nearest_sample=False,
                              fill_value=0
                              )
+        # correct lengths
+        self.stream = self.check_length(self.stream)
         # sync 
         self.stream = tools.sync_waveforms(self.stream.copy())
 
@@ -2904,14 +2972,15 @@ class Pytheas(QtWidgets.QMainWindow):
                                                                   self.evDict["DEPTH"]),
                                    (self.inventory[station]["latitude"],
                                     self.inventory[station]["longitude"]),
-                                   self.tmodel
+                                   self.tmodel,
+                                   phases=['p', 'P', 's', 'S']
                                         )
 
           # grab measurements for the s arrival (not S)
           foundS = False
           for reg in taupdat.values():
-            if reg["phase"] == "s": 
-                foundS=True
+            if reg["phase"].lower() == "s": 
+                foundS = True
                 self.sArrTheor = reg["time"]
                 self.sPickTheor = self.sArrTheor-self.stream[0].stats.starttime
                 if self.tpCNF.ainFlag:
@@ -2919,15 +2988,19 @@ class Pytheas(QtWidgets.QMainWindow):
                         raise ValueError("TauP couldn't estimate a valid incidence angle.")
                     logging.debug('Estimated TauP incidence angle at %.1f' % reg['ain'])
                     self.ain = reg["ain"]
-                    self.statsDict[self.activeEvent][station]["AN"]=self.ain
+                    self.tkf = reg['tkf']
+                    self.statsDict[self.activeEvent][station]["AN"] = self.ain
+                    self.statsDict[self.activeEvent][station]["TF"] = self.tkf
                 else:
-                    self.ain=self.statsDict[self.activeEvent][station]["AN"]
+                    self.ain = self.statsDict[self.activeEvent][station]["AN"]
+                    self.tkf = self.statsDict[self.activeEvent][station]["TF"]
                 break # can there be more than 1 "s" arrivals??
           if not foundS:
             raise ValueError('Could not find a valid s arrival with TauP!')
         except:
           logging.exception("Could not calculate theoretical arrivals for %s in %s pair!" % (station, self.activeEvent))
           self.ain = self.statsDict[self.activeEvent][station]["AN"]
+          self.ain = self.statsDict[self.activeEvent][station]["TF"]
 
         logging.info("Theoretical arrival @ %s" % self.sArrTheor)
         logging.info("Theoretical pick @ %.3f " % self.sPickTheor)
@@ -3308,27 +3381,14 @@ class Pytheas(QtWidgets.QMainWindow):
         self.td=self.tdCheck(self.td)
         if self.stageCorrected:
             self.stream=self.rotation(self.phi,self.stream,"NE->RT")
-        data=self.timedelay(self.td,self.stream)
-        self.stream.select(component="T")[0].data=data
+        data = self.timedelay(self.td,self.stream)
+        self.stream.select(component="T")[0].data = data
         # Correct lengths
-        Wz=self.stream.select(component="Z")[0]
-        Wy=self.stream.select(component="R")[0]
-        Wx=self.stream.select(component="T")[0]
-        # First horizontals
-        Ax,Ay=tools.lengthcheck(Wx,Wy)
-        Wx.data=Ax 
-        Wy.data=Ay
-        # Now the vertical
-        Az,Ay=tools.lengthcheck(Wz,Wy)
-        Wz.data=Az
-        Wy.data=Ay
-        # Horizontals second time
-        Ax,Ay=tools.lengthcheck(Wx,Wy)
-        Wx.data=Ax 
-        Wy.data=Ay
+        self.stream = self.check_length(self.stream)
+
         # get either aux or pol
-        T=self.polarDict["TIME"]
-        D=self.polarDict["ANGLE"]                
+        T = self.polarDict["TIME"]
+        D = self.polarDict["ANGLE"]                
         # get angles
         pAngle=D[np.abs(T-self.sPick).argmin()] % 180
         # Convert to Fast-Slow according to quadrant.
@@ -5468,51 +5528,69 @@ class Pytheas(QtWidgets.QMainWindow):
         doesn't exist? Maybe events from catalogue that do not correspond
         to an event in folder with warnings (and not selectable).
         """
-        self.stWin=QtWidgets.QDialog(self)
+        self.stWin = QtWidgets.QDialog(self)
         self.stWin.setModal(True)
         self.stWin.setWindowTitle("Station List")
         self.setWindowIcon(QtGui.QIcon(self.appIcon))
-        self.stWin.vBox=QtWidgets.QVBoxLayout(self.stWin)
+        self.stWin.vBox = QtWidgets.QVBoxLayout(self.stWin)
         self.stWin.setLayout(self.stWin.vBox)
-        self.stWin.selectSt=QtWidgets.QTableWidget()
+        self.stWin.selectSt = QtWidgets.QTableWidget()
         self.stWin.selectSt.setColumnCount(4)
         self.stWin.selectSt.verticalHeader().setVisible(False)
         self.stWin.selectSt.setSelectionBehavior(QtWidgets.QTableView.SelectRows)        
         self.stWin.vBox.addWidget(self.stWin.selectSt)
-        actStaList=self.getActiveStations()
+        actStaList = self.getActiveStations()
         # allStaList=sorted(
         #                 self.statsDict[self.activeEvent],
         #                 key=lambda x:self.statsDict[self.activeEvent][x]["AN"]
         #               )
         allStaList = self.staList
-        maxLen=len(allStaList)
+        maxLen = len(allStaList)
         self.stWin.selectSt.setRowCount(maxLen)
-        self.stWin.selectSt.setHorizontalHeaderLabels(["#","Station","Incidence","Backazimuth"])
-        hdr=self.stWin.selectSt.horizontalHeader()
+        hdr_list = [
+        "#",
+        "Station",
+        "Incidence",
+        "Takeoff",
+        "Backazimuth"
+        ]
+        self.stWin.selectSt.setHorizontalHeaderLabels(hdr_list)
+        hdr = self.stWin.selectSt.horizontalHeader()
         for hi in range(self.stWin.selectSt.columnCount()): 
             hdr.setSectionResizeMode(hi, QtWidgets.QHeaderView.ResizeToContents)
-        for j,i in enumerate(allStaList):
-            j+=1
-            ain=self.statsDict[self.activeEvent][i]["AN"]
-            font=QtGui.QFont()
+        for j, i in enumerate(allStaList):
+            j += 1
+            ain = self.statsDict[self.activeEvent][i]["AN"]
+            tkf = self.statsDict[self.activeEvent][i]["TF"]
+            font = QtGui.QFont()
             if (i in actStaList) and (ain <= self.maxAin):
                 font.setWeight(QtGui.QFont.Bold)
             elif i not in actStaList:
                 font.setStrikeOut(True)
             # add event code
-            tItems=[]
-            for ii,jj in enumerate((str(j),i,
-                                      "{:.1f}".format(self.statsDict[self.activeEvent][i]["AN"]),
-                                      "{:.2f}".format(self.statsDict[self.activeEvent][i]["BAZ"]))):
+            tItems = []
+            for ii, jj in enumerate(
+                (
+                    str(j),
+                    i,
+                    "{:.1f}".format(self.statsDict[self.activeEvent][i]["AN"]),
+                    "{:.1f}".format(self.statsDict[self.activeEvent][i]["TF"]),
+                    "{:.2f}".format(self.statsDict[self.activeEvent][i]["BAZ"])
+                    )
+                ):
                 if tools.isreal(jj):
-                    itm=QTableWidgetNumItem(jj)
+                    itm = QTableWidgetNumItem(jj)
                 else:
-                    itm=QtWidgets.QTableWidgetItem(jj)
+                    itm = QtWidgets.QTableWidgetItem(jj)
+                if tools.isreal(jj):
+                    itm = QTableWidgetNumItem(jj)
+                else:
+                    itm = QtWidgets.QTableWidgetItem(jj)                    
                 itm.setTextAlignment(QtCore.Qt.AlignCenter)
                 itm.setFont(font)
-                if ii != 1: # index 1 is the station name
+                if ii != 1:  # index 1 is the station name
                     itm.setData(QtCore.Qt.EditRole, QtCore.QVariant(float(jj)))
-                self.stWin.selectSt.setItem(j-1,ii,itm)       
+                self.stWin.selectSt.setItem(j - 1, ii, itm)       
         self.stWin.buttons=QtWidgets.QDialogButtonBox(
            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
                                     )
