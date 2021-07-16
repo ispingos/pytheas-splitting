@@ -152,9 +152,11 @@ def clustering_station_wrapper(
                                             )
                 # grab measurements for the s arrival (not S)
                 for reg in taupdat.values():
-                    if reg["phase"] == "s": 
+                    if reg["phase"].lower() == "s": 
                         ain = reg["ain"]
+                        tkf = reg["tkf"]
                         dict_stations[station]['AN'] = ain
+                        dict_stations[station]['TF'] = tkf
                         s_arr_taup = reg["time"]
                         break # can there be more than 1 "s" arrivals??
             except:
@@ -162,6 +164,7 @@ def clustering_station_wrapper(
                 s_arr_taup = np.nan
         else:
             ain = dict_stations[station]['AN']
+            tkf = dict_stations[station]['TF']
         
         if dict_stations[station]['AN'] > cca_settings.sws_window:
             ROOT_LOGGER.warning('%s: SKIP_AIN' % uid)
@@ -369,6 +372,7 @@ def clustering_station_wrapper(
         dict_splitting[event][station]["epicentral"] = float(dict_stations[station]["DIST"])
         dict_splitting[event][station]["azimuth"] = float(dict_stations[station]["BAZ"])
         dict_splitting[event][station]["incidence"] = float(dict_stations[station]["AN"])
+        dict_splitting[event][station]["takeoff"] = float(dict_stations[station]["TF"])
         dict_splitting[event][station]["s_p"] = tpts
         dict_splitting[event][station]["orientation"] = or_correction
         # update arrivals and picks
@@ -469,6 +473,7 @@ def clustering_station_wrapper(
         dict_splitting[event][station]["epicentral"] = float(dict_stations[station]["DIST"])
         dict_splitting[event][station]["azimuth"] = float(dict_stations[station]["BAZ"])
         dict_splitting[event][station]["incidence"] = float(dict_stations[station]["AN"])
+        dict_splitting[event][station]["takeoff"] = float(dict_stations[station]["TF"])
         # update the method layer
         dict_splitting[event][station][sws_method_tag]["station"] = station
         dict_splitting[event][station][sws_method_tag]["method"] = sws_method_tag
