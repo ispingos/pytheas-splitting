@@ -49,8 +49,8 @@ LIC_STR=("""
 
 global _PYTHEAS_VERSION
 global _PYTHEAS_VERDATE
-_PYTHEAS_VERSION = "0.3.0+d12"
-_PYTHEAS_VERDATE = "17/07/2021"
+_PYTHEAS_VERSION = "0.3.0+d13"
+_PYTHEAS_VERDATE = "24/07/2021"
 
 #-- intro
 print('~~~ STARTING PYTHEAS v.%s (%s) ~~~' % (_PYTHEAS_VERSION, _PYTHEAS_VERDATE))
@@ -239,7 +239,7 @@ class Pytheas(QtWidgets.QMainWindow):
         self.tpCNF = parsers.parseTaupCnf(os.path.join(_DIR_CWD, 'etc', 'options', 'taup.cnf'))
         self.gradeCNF = parsers.parseGradeCnf(os.path.join(_DIR_CWD, 'etc', 'options', 'grading.cnf'))
         self.filterCNF = parsers.ParseFilterCnf(os.path.join(_DIR_CWD, 'etc', 'options', 'filters.cnf'))
-        self.cli_settings_path = os.path.join(self.cli_settings_dir, 'cca_settings_c{:d}.bin'.format(1))
+        self.cli_settings_path = os.path.join(self.cli_settings_dir, 'cca_settings_c%.0f.bin')
         logging.info(f'Attempting to get previous settings from {self.cli_settings_path}')
         try:
             self.cca_settings = pk.load(open(self.cli_settings_path, 'rb'))
