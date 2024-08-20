@@ -14,7 +14,7 @@ while, at the same time, enhanching the effectiveness of processing and quality 
 
 Pytheas is released under the GNU GPLv3 license.
 
-Authors: Spingos I. & Kaviris G. (c) 2019-2021
+Authors: Spingos I. & Kaviris G. (c) 2019-2024
 Special thanks to Millas C. for testing the software and providing valuable feedback from the 
 very early stages of this endeavor!
 
@@ -27,7 +27,7 @@ LIC_STR=("""
 
      Pytheas // PYThon sHear - wavE Analysis Suite
 
-  Copyright (C) 2019-2021 Spingos I. & Kaviris G.
+  Copyright (C) 2019-2024 Spingos I. & Kaviris G.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,8 +49,8 @@ LIC_STR=("""
 
 global _PYTHEAS_VERSION
 global _PYTHEAS_VERDATE
-_PYTHEAS_VERSION = "0.3.0+d13"
-_PYTHEAS_VERDATE = "24/07/2021"
+_PYTHEAS_VERSION = "0.3.0+d14"
+_PYTHEAS_VERDATE = "20/08/2024"
 
 #-- intro
 print('~~~ STARTING PYTHEAS v.%s (%s) ~~~' % (_PYTHEAS_VERSION, _PYTHEAS_VERDATE))

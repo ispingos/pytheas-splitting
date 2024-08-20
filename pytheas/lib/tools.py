@@ -13,7 +13,7 @@ while, at the same time, enhanching the effectiveness of processing and quality 
 
 Pytheas is released under the GNU GPLv3 license.
 
-Authors: Spingos I. & Kaviris G. (c) 2019-2021
+Authors: Spingos I. & Kaviris G. (c) 2019-2024
 Special thanks to Millas C. for testing the software and providing valuable feedback from the 
 very early stages of this endeavor!
 
@@ -1640,12 +1640,12 @@ def Rmatrix3D(baz,ain):
             J. Geophys. 59, 129–139.
     
     """
-    baz=np.deg2rad(baz)
-    ain=np.deg2rad(ain)
+    baz = np.deg2rad(baz)
+    ain = np.deg2rad(ain)
     return np.asarray([
-            [np.cos(baz),-np.sin(ain)*np.sin(baz),-np.sin(ain)*np.cos(baz)],
-            [np.sin(ain), np.cos(ain)*np.sin(baz), np.cos(ain)*np.cos(baz)],
-            [0,          -np.cos(baz),             np.sin(baz)]
+            [np.cos(ain), -np.sin(ain) * np.sin(baz), -np.sin(ain) * np.cos(baz)],
+            [np.sin(ain),  np.cos(ain) * np.sin(baz),  np.cos(ain) * np.cos(baz)],
+            [0,           -np.cos(baz),                np.sin(baz)]
                      ])
 
 def isreal(string):
